@@ -52,7 +52,7 @@
       },
       experienceClick() {
         if (!this.validation()) return;
-
+        this.$router.push({ path: '/home' });
       }
     },
   }

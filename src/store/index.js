@@ -7,7 +7,7 @@ import actions from "./actions";
 Vue.use(Vuex);
 
 const state = {
-
+  user: {}, // 登录用户的信息
 }
 
 export default new Vuex.Store({
