@@ -1,7 +1,7 @@
 import login  from '../api/login';
 
 import {
-  initUserInfo
+  initUserInfo,
 } from './mutation-types';
 const actions = {
   async isExistPhone(ctx, phone) {
@@ -15,6 +15,9 @@ const actions = {
       return false
     }
     return true;
+  },
+  async isLogined() {
+    return await login.isLogined();
   }
 }
 

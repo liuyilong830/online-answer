@@ -29,8 +29,8 @@ instance.interceptors.response.use(res => {
   if (data.status === 403) {
     Toast(data.message, 1500);
   } else if (data.status === 401) {
-    console.log('响应拦截器: 重定向到login');
-    router.push('/login');
+    console.log('响应拦截器: 删除token，准备显示ModelBox组件');
+    localStorage.removeItem('token');
   }
   return data;
 }, error => {

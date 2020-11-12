@@ -71,7 +71,8 @@
         this.isLoading = false;
         if (flag) {
           // 路由跳转到首页
-          this.$router.push('/home');
+          let path = localStorage.getItem('tologin');
+          this.$router.push(path);
           console.log('即将跳转页面');
         }
       }

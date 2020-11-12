@@ -1,16 +1,29 @@
 <template>
   <div class="msg">
-    Message
+    <main-model-box @quitProfile="quitProfile" @toLogin="toLogin">
+      message
+    </main-model-box>
   </div>
 </template>
 
 <script>
+  import MainModelBox from "../../components/model-box/MainModelBox";
   export default {
     name: "Message",
+    components: {
+      MainModelBox,
+    },
     data() {
       return {}
     },
-    methods: {},
+    methods: {
+      quitProfile() {
+        this.$router.replace('/home');
+      },
+      toLogin() {
+        this.$router.replace('/login');
+      }
+    },
   }
 </script>
 

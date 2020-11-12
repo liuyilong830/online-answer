@@ -28,7 +28,7 @@
         </p>
       </div>
       <login-pwd :is-show.sync="enterPwd" :info="info"/>
-      <register :is-show.sync="isRegister"/>
+      <register :is-show.sync="isRegister" :phone="phone"/>
     </div>
   </transition>
 </template>

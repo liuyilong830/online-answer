@@ -27,12 +27,20 @@
       },
       width: { type: Number, default: 0 },
       height: { type: Number, default: 0 },
+      top: { type: String, default: '50%' },
+      left: { type: String, default: '50%' },
+      bottom: { type: String, default: '' },
+      right: { type: String, default: '' },
     },
     computed: {
       boxStyle() {
         let style = {};
         if (this.width) style.width = `${this.width}px`;
         if (this.height) style.height = `${this.height}px`;
+        if (this.top) style.top = `${this.top}`;
+        if (this.left) style.left = `${this.left}`;
+        if (this.bottom) style.bottom = `${this.bottom}`;
+        if (this.right) style.right = `${this.right}`;
         return style;
       }
     }

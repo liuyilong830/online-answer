@@ -34,10 +34,13 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   let token = window.localStorage.getItem('token');
   if (to.path === '/login') {
+    window.localStorage.setItem('tologin', from.path);
     return next();
   }
+  // 如果刷新页面，则重新获取当前登录用户的信息
   if (token && !store.state.user.token) {
     login.isLogined().then(res => {
+      if (res.status === 401) return;
       store.commit(resetUserInfo, res.data);
     })
   }
