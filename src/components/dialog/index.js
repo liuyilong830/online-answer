@@ -1,14 +1,8 @@
 import Vue from 'vue';
-import dialog from "./Dialog";
+import dialog, { props } from "./Dialog";
 
 const DialogConstructor = Vue.extend(dialog);
 let instance = null;
-const callbacks = ['onsuccess', 'oncancel'];
-const props = ['width', 'title', 'isShow', 'message', 'messageAlign', 'confirmButtonText', 'cancelButtonText', 'overlay', 'beforeClose', 'type', 'beforeClose'];
-
-const setCallBack = function () {
-  return function () {}
-}
 
 const Dialog = function (options) {
   if (typeof options !== 'object') {
@@ -23,10 +17,15 @@ const Dialog = function (options) {
           oncancel: reject
         }
       },
+      props
     });
-    props.forEach(type => {
-      if (options[type]) instance[type] = options[type];
-    });
+    instance.useFunc = true;
+    Object.keys(props).forEach(key => {
+      if (options[key]) {
+        instance[key] = options[key];
+      }
+    })
+    console.log(instance)
     instance.$mount();
     document.body.appendChild(instance.$el);
     instance.isShow = true;
@@ -43,4 +42,13 @@ const Dialog = function (options) {
   }
 })
 
+Dialog.close = function () {
+  if (instance) {
+    instance.close();
+  }
+}
+
 export default Dialog;
+export {
+  props,
+}

@@ -1,20 +1,24 @@
 <template>
-  <transition @after-enter="dlgAfterEnter">
+  <transition @after-enter="dlgAfterEnter" @enter="() => this.$emit('open')" @after-leave="() => this.$emit('closed')">
     <div class="pt-dialog" v-if="isShow">
       <transition name="pt-mk">
-        <div class="pt-dialog-mask" v-if="veriable"></div>
+        <div class="pt-dialog-mask" v-if="veriable && overlay"></div>
       </transition>
-      <transition name="dialog-box" @after-leave="boxAfterLeave">
-        <div class="pt-dialog-box" v-if="veriable">
+      <transition name="dialog-box" @after-leave="boxAfterLeave" @after-enter="boxAfterEnter">
+        <div class="pt-dialog-box" v-if="veriable" :style="dialogBoxStyle">
           <div class="pt-dlg-top" v-if="title">
-            <p>{{title}}</p>
+            <p v-if="$slots.title || title">
+              <slot name="title">{{title}}</slot>
+            </p>
           </div>
           <div class="pt-dlg-center">
-            <p>{{message}}</p>
+            <p v-if="$slots.default || message" :style="messageStyle">
+              <slot>{{message}}</slot>
+            </p>
           </div>
           <div class="pt-dlg-footer">
-            <button class="dlg-ft-btn qxit" v-if="type === 'confirm'" @click="toClose('cancel')">{{cancelButtonText}}</button>
-            <button class="dlg-ft-btn confirm" @click="toClose('confirm')">{{confirmButtonText}}</button>
+            <button class="dlg-ft-btn qxit" :style="cancelButtonStyle" v-if="type === 'confirm'" @click="toClose('cancel')">{{cancelButtonText}}</button>
+            <button class="dlg-ft-btn confirm" :style="confirmButtonStyle" @click="toClose('confirm')">{{confirmButtonText}}</button>
           </div>
         </div>
       </transition>
@@ -23,6 +27,41 @@
 </template>
 
 <script>
+  export const props = {
+    isShow: { type: Boolean },
+    title: { type: String },
+    message: { type: String, default: '' },
+    messageAlign: {
+      type: String,
+      default: 'center',
+      validator(value) {
+        let arr = ['left', 'center', 'right'];
+        return arr.includes(value);
+      }
+    },
+    type: {
+      type: String,
+      default: '',
+      validator(value) {
+        return value === 'alert' || value === 'confirm' || value === '';
+      }
+    },
+    confirmButtonText: { type: String, default: '确认' },
+    cancelButtonText: { type: String, default: '取消' },
+    width: { type: String, default: '320px' },
+    beforeClose: {
+      type: Function
+    },
+    overlay: { type: Boolean, default: true },
+    confirmButtonStyle: {
+      type: Object,
+      default() { return {} }
+    },
+    cancelButtonStyle: {
+      type: Object,
+      default() { return {} }
+    },
+  };
   export default {
     name: "Dialog",
     data() {
@@ -30,49 +69,53 @@
         veriable: false, // 控制 Dialog组件 和 遮罩层 和 弹框的显示和隐藏
         oncancel: null,
         onsuccess: null,
-        clicked: ''
+        clicked: '',
+        useFunc: false,
       }
     },
-    props: {
-      isShow: { type: Boolean },
-      title: { type: String },
-      type: {
-        type: String,
-        default: '',
-        validator(value) {
-          return value === 'alert' || value === 'confirm' || value === '';
-        }
-      },
-      width: { type: String, default: '320px' },
-      message: { type: String, default: '' },
-      messageAlign: {
-        type: String,
-        default: 'center',
-        validator(value) {
-          let arr = ['left', 'center', 'right'];
-          return arr.includes(value);
-        }
-      },
-      confirmButtonText: { type: String, default: '确认' },
-      cancelButtonText: { type: String, default: '取消' },
-      beforeClose: {
-        type: Function
-      },
+    model: {
+      prop: 'isShow',
+      event: 'click'
     },
+    props,
     computed: {
+      messageStyle() {
+        let style = {};
+        style.textAlign = this.messageAlign;
 
+        return style;
+      },
+      dialogBoxStyle() {
+        let style = {};
+        style.width = this.width;
+
+        return style;
+      }
     },
     methods: {
       dlgAfterEnter() {
         this.veriable = true;
       },
+      boxAfterEnter() {
+        this.$emit('opened')
+      },
       boxAfterLeave() {
-        this.isShow = false;
+        this.$emit('close');
+        if (this.useFunc) {
+          this.isShow = false;
+        } else {
+          this.$emit('click', false);
+        }
+      },
+      close() {
+        this.closeDialog();
       },
       // 让弹窗和遮罩层消失
       closeDialog(cb) {
         this.veriable = false;
-        cb.apply(this);
+        if (cb) {
+          cb.apply(this);
+        }
       },
       done(flag) { // 当用户调用该函数且 flag 为 false，则可以阻断弹窗的消失，true则继续弹窗的消失
         if (flag) {
@@ -82,6 +125,7 @@
       toClose(type) {
         if (!this.veriable) return;
         this.clicked = type;
+        this.$emit(type);
         if (this.beforeClose) {
           this.beforeClose(this.done);
         } else {
