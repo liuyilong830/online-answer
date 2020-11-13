@@ -72,6 +72,7 @@
         if (flag) {
           // 路由跳转到首页
           let path = localStorage.getItem('tologin');
+          path = path ? path : '/home';
           this.$router.push(path);
           console.log('即将跳转页面');
         }

@@ -12,7 +12,7 @@
             </p>
           </div>
           <div class="pt-dlg-center">
-            <p v-if="$slots.default || message" :style="messageStyle">
+            <p v-if="$slots.default || message" :class="messageClass">
               <slot>{{message}}</slot>
             </p>
           </div>
@@ -79,11 +79,9 @@
     },
     props,
     computed: {
-      messageStyle() {
-        let style = {};
-        style.textAlign = this.messageAlign;
-
-        return style;
+      messageClass() {
+        let msgCls = [`dlg-ct-${this.messageAlign}`];
+        return msgCls;
       },
       dialogBoxStyle() {
         let style = {};
@@ -192,6 +190,21 @@
       }
       .pt-dlg-center {
         flex: 1;
+        p {
+          font-size: 16px;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          &.dlg-ct-center {
+            justify-content: center;
+          }
+          &.dlg-ct-left {
+            justify-content: flex-start;
+          }
+          &.dlg-ct-right {
+            justify-content: flex-end;
+          }
+        }
       }
     }
   }

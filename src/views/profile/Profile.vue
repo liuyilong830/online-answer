@@ -1,29 +1,22 @@
 <template>
   <div class="pfl">
-    <main-model-box @quitProfile="quitProfile" @toLogin="toLogin">
+    <redirect-dialog>
       profile
-    </main-model-box>
+    </redirect-dialog>
   </div>
 </template>
 
 <script>
-  import MainModelBox from "../../components/model-box/MainModelBox";
+  import RedirectDialog from "../../components/content/redirectj-dialog/RedirectDialog";
   export default {
     name: "Profile",
     components: {
-      MainModelBox,
+      RedirectDialog,
     },
     data() {
       return {}
     },
-    methods: {
-      quitProfile() {
-        this.$router.replace('/home');
-      },
-      toLogin() {
-        this.$router.replace('/login');
-      }
-    }
+    methods: {}
   }
 </script>
 

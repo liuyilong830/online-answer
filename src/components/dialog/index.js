@@ -25,7 +25,6 @@ const Dialog = function (options) {
         instance[key] = options[key];
       }
     })
-    console.log(instance)
     instance.$mount();
     document.body.appendChild(instance.$el);
     instance.isShow = true;

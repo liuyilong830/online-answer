@@ -30,6 +30,7 @@
     border-bottom: 1px solid #ccc;
     box-shadow: 0px 1px 5px -3px #666666;
     display: flex;
+    background-color: #fff;
     .nvb-lf, .nvb-rt {
       position: relative;
       width: 50px;

@@ -36,6 +36,7 @@
 
 <style scoped lang="scss">
   .cd {
+    width: 140px;
     height: 100%;
     box-sizing: border-box;
     padding: 5px;
@@ -43,6 +44,7 @@
     border-radius: 5px;
     display: flex;
     flex-direction: column;
+    background-color: #fff;
     .cd-tt, .cd-ft {
       height: 30px;
     }

@@ -18,6 +18,15 @@ const actions = {
   },
   async isLogined() {
     return await login.isLogined();
+  },
+  async toregister({ commit }, info) {
+    let res = await login.toregister(info);
+    console.log(res);
+    commit(initUserInfo, res.data);
+    if (res.status !== 200) {
+      return false
+    }
+    return true;
   }
 }
 

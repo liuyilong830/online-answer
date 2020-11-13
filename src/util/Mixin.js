@@ -10,6 +10,7 @@ const showModelBox = {
   },
   async created() {
     let token = window.localStorage.getItem('token');
+    console.log(token)
     if (!token) {
       this.isShowModel = true;
     } else {

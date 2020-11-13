@@ -81,6 +81,10 @@
         }
       },
     },
+    model: {
+      prop: 'isShow',
+      event: 'update:isShow'
+    },
     computed: {
       contentClass() {
         let roundCls = this.round ? `pt-${this.position}-round` : '';
