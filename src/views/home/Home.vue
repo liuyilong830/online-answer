@@ -1,39 +1,35 @@
 <template>
   <div class="hm">
     Home
-    <button @click="func">按钮</button>
+    <button @touchstart.stop="func">按钮</button>
+    <number-keyboard
+      v-model="value"
+      max-length="6"
+      :show.sync="show"
+      @blur="show = false"
+      close-button-text="完成"
+    />
   </div>
 </template>
 
 <script>
-  import Dialog from "../../components/dialog";
+  import NumberKeyboard from "../../components/common/NumberKeyboard";
+  import Popup from "../../components/popup/Popup";
   export default {
     name: "Home",
+    components: {
+      NumberKeyboard,
+      Popup,
+    },
     data() {
       return {
-        isShow: false,
-        isShow2: false,
+        show: false,
+        value: '',
       }
     },
     methods: {
       func() {
-        Dialog({
-          message: '你好啊',
-          title: '标题',
-          confirmButtonText: '你确定？',
-          width: '200px',
-          beforeClose(done) {
-            done(true);
-          }
-        }).then(() => {
-          console.log('确认');
-        }, (err) => {
-          console.log(err)
-          console.log('取消');
-        })
-      },
-      func2() {
-        this.isShow2 = true;
+        this.show = true;
       },
     },
   }

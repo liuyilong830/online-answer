@@ -153,8 +153,6 @@
     }
     .pt-popup-content {
       position: absolute;
-      width: 200px;
-      height: 150px;
       background-color: #fff;
       display: flex;
       flex-direction: column;
@@ -162,8 +160,6 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 200px;
-        height: 100px;
         &.pt-center-round {
           border-radius: 15px;
         }
@@ -171,7 +167,6 @@
       &.pt-content-top {
         top: 0;
         width: 100%;
-        height: 30%;
         &.pt-top-round {
           border-bottom-left-radius: 15px;
           border-bottom-right-radius: 15px;
@@ -180,7 +175,6 @@
       &.pt-content-bottom {
         bottom: 0;
         width: 100%;
-        height: 30%;
         &.pt-bottom-round {
           border-top-left-radius: 15px;
           border-top-right-radius: 15px;
@@ -188,7 +182,6 @@
       }
       &.pt-content-left {
         left: 0;
-        width: 20%;
         height: 100%;
         &.pt-left-round {
           border-top-right-radius: 15px;
@@ -197,7 +190,6 @@
       }
       &.pt-content-right {
         right: 0;
-        width: 20%;
         height: 100%;
         &.pt-right-round {
           border-top-left-radius: 15px;
