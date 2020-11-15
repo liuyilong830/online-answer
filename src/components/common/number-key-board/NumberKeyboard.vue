@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import Popup from "../popup/Popup";
+  import Popup from "../../popup/Popup";
   export default {
     name: "NumberKeyboard",
     components: {
@@ -86,6 +86,7 @@
       deleteButtonText: { type: String, default: '' },
       showDeleteKey: { type: Boolean, default: true },
       hideOnClickOutsid: { type: Boolean, default: true },
+      renderOfBody: { type: Boolean, default: false },
     },
     computed: {
       isShowTitle() {
@@ -167,6 +168,9 @@
         document.body.addEventListener('touchstart', () => {
           this.onblur();
         })
+      }
+      if (this.renderOfBody) {
+        document.body.appendChild(this.$el);
       }
     }
   }
