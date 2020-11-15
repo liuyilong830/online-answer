@@ -16,7 +16,7 @@ const Profile = () => import('../views/profile/Profile');
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/', redirect: '/login' },
+  { path: '/', redirect: '/home' },
   { path: '/home', component: Home, meta: { isShowTab: true } },
   { path: '/login', component: Login, meta: { isShowTab: false } },
   { path: '/questions', component: Questions, meta: { isShowTab: true } },
@@ -33,11 +33,29 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   let token = window.localStorage.getItem('token');
-  if (to.path === '/login') {
+  /*if (to.path === '/login') {
     window.localStorage.setItem('tologin', from.path);
     return next();
+  } else if (to.path === '/') {
+    if (!token) return next('/login');
+    login.isLogined().then(res => {
+      if (res.status === 401) {
+        next('/login');
+      } else {
+        store.commit(resetUserInfo, res.data);
+        next('/home');
+      }
+    })
+  } else {
+    next();
+  }*/
+  if (to.path === '/login') {
+    if (from.path !== '/') {
+      localStorage.setItem('tologin', from.path);
+    }
+    localStorage.removeItem('token');
+    return next();
   }
-  // 如果刷新页面，则重新获取当前登录用户的信息
   if (token && !store.state.user.token) {
     login.isLogined().then(res => {
       if (res.status === 401) return;
