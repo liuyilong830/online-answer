@@ -33,22 +33,6 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   let token = window.localStorage.getItem('token');
-  /*if (to.path === '/login') {
-    window.localStorage.setItem('tologin', from.path);
-    return next();
-  } else if (to.path === '/') {
-    if (!token) return next('/login');
-    login.isLogined().then(res => {
-      if (res.status === 401) {
-        next('/login');
-      } else {
-        store.commit(resetUserInfo, res.data);
-        next('/home');
-      }
-    })
-  } else {
-    next();
-  }*/
   if (to.path === '/login') {
     if (from.path !== '/') {
       localStorage.setItem('tologin', from.path);
