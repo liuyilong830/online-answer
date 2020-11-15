@@ -4,6 +4,7 @@
     <button @touchstart.stop="func">按钮</button>
     <number-keyboard
       v-model="value"
+      theme="custom"
       max-length="6"
       :show.sync="show"
       @blur="show = false"

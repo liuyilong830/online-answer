@@ -21,7 +21,9 @@
         </ul>
         <div class="pt-keyboard-custom" v-if="theme !== 'default'">
           <div class="pt-keyboard-key">
-            <div class="pt-key-content" tabindex="0" hidefocus="true" @touchstart="deleteBtnClick">删除</div>
+            <div class="pt-key-content" tabindex="0" hidefocus="true" @touchstart="deleteBtnClick">
+              <i class="iconfont icon-qingchu"></i>
+            </div>
           </div>
           <div class="pt-keyboard-key">
             <div class="pt-key-content btn-blue" tabindex="0" hidefocus="true" @touchstart="closeFromBtn">完成</div>
@@ -110,7 +112,12 @@
       otherKeys() {
         let index = this.keys.length-2;
         if (!this.extraKey) {
-          this.keys.splice(index, 0, { text: '键盘', isclose: true });
+          if (this.theme === 'custom') {
+            this.keys.pop();
+            this.keys.push({ text: 'icon-ai-keyboard', isclose: true })
+          } else {
+            this.keys.splice(index, 0, { text: 'icon-ai-keyboard', isclose: true });
+          }
         }else if (this.theme === 'custom') {
           let arr = this.extraKey instanceof Array ? this.extraKey : [this.extraKey];
           if (arr.length < 2) {
@@ -211,6 +218,9 @@
             border-radius: 8px;
             font-size: 25px;
             outline: 0;
+            .iconfont {
+              font-size: 27px;
+            }
           }
           &.special {
             flex-basis: 66.66%;
@@ -235,6 +245,9 @@
             border-radius: 8px;
             font-size: 16px;
             outline: 0;
+            .iconfont {
+              font-size: 27px;
+            }
             &.btn-blue {
               background-color: #1989fa;
               color: #ffffff;
