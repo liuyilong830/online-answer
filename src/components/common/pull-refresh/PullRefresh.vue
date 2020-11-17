@@ -83,6 +83,9 @@
       },
     },
     methods: {
+      getElementRect(el) {
+        return el.getBoundingClientRect();
+      },
       setTransform(num) {
         return this.$refs.pullRefreshRef.style.transform = `translate3d(0, ${num}px, 0)`;
       },
@@ -96,7 +99,10 @@
         this.startY = event.touches[0].clientY;
       },
       ontouchMove(event) {
-        if (this.value) return;
+        const { top } = this.getElementRect(this.$refs.pullRefreshRef);
+        if (top < 0 || this.value) {
+          return this.ispulling = false;
+        };
         this.offset = (event.touches[0].clientY - this.startY) / 3.5;
         if (this.offset < this.getHeadHeight) {
           this.ispulling = true;
@@ -125,9 +131,11 @@
         if (!newVal) {
           this.setTransform(0);
           this.setTransition(this.animationDuration);
-          setTimeout(() => {
-            this.isShow = false;
-          }, this.animationDuration);
+          if (this.isShow) {
+            setTimeout(() => {
+              this.isShow = false;
+            }, this.animationDuration);
+          }
         }
       },
       isloading(newVal) {
@@ -149,13 +157,15 @@
         }
       }
     },
+    mounted() {
+
+    }
   }
 </script>
 
 <style scoped lang="scss">
   .pt-pull-refresh {
     height: 100%;
-    overflow: hidden;
     .pt-pull-refresh-track {
       height: 100%;
       position: relative;

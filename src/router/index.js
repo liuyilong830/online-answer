@@ -16,7 +16,7 @@ const Profile = () => import('../views/profile/Profile');
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/', redirect: '/home' },
+  { path: '/', redirect: '/login' },
   { path: '/home', component: Home, meta: { isShowTab: true } },
   { path: '/login', component: Login, meta: { isShowTab: false } },
   { path: '/questions', component: Questions, meta: { isShowTab: true } },
