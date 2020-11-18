@@ -1,8 +1,8 @@
 <template>
   <div class="hm">
     <pull-refresh v-model="isloading" @refresh="refresh" success-text="刷新成功" :style="{height: '100%'}">
-      <list>
-        <div v-for="num in 40" :key="num" style="text-align: center; padding: 10px 5px;">{{num}}</div>
+      <list v-model="loading" @load="onload" :finished="finished" finished-text="到底了...">
+        <div v-for="num in list" :key="num" style="text-align: center; padding: 20px 5px;">{{num}}</div>
       </list>
     </pull-refresh>
   </div>
@@ -22,6 +22,9 @@
         show: false,
         value: '',
         isloading: false,
+        list: [],
+        loading: false,
+        finished: false,
       }
     },
     methods: {
@@ -31,8 +34,16 @@
 
         }, 1500)
       },
-      func() {
-        this.show = true;
+      onload() {
+        setTimeout(() => {
+          for (let i = 1; i <= 10; i++) {
+            this.list.push(this.list.length + 1);
+          }
+          this.loading = false;
+          if (this.list.length >= 40) {
+            this.finished = true;
+          }
+        }, 1000)
       }
     },
   }
