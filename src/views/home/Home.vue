@@ -1,30 +1,28 @@
 <template>
   <div class="hm">
-    <pull-refresh v-model="isloading" @refresh="refresh" success-text="刷新成功" :style="{height: '100%'}">
-      <pagination v-model="current" total-items="24" items-per-page="5"></pagination>
-      <pagination v-model="current1" total-items="24" items-per-page="3" mode="simple"></pagination>
-      <pagination v-model="current2" total-items="125" show-page-size="3" force-ellipses></pagination>
-      <pagination v-model="current3" total-items="125"></pagination>
-    </pull-refresh>
+    <!--<pull-refresh v-model="isloading" @refresh="refresh" success-text="刷新成功" :style="{height: '100%'}">
+
+    </pull-refresh>-->
+    <swipe class="my-swipe">
+      <swipe-item v-for="num in 4" :key="num">{{num}}</swipe-item>
+    </swipe>
   </div>
 </template>
 
 <script>
   import PullRefresh from "../../components/common/pull-refresh/PullRefresh";
-  import Pagination from "../../components/common/pagination/Pagination";
+  import Swipe from "../../components/common/swipe/Swipe";
+  import SwipeItem from "../../components/common/swipe/SwipeItem";
   export default {
     name: "Home",
     components: {
       PullRefresh,
-      Pagination,
+      Swipe,
+      SwipeItem,
     },
     data() {
       return {
         isloading: false,
-        current: 1,
-        current1: 1,
-        current2: 1,
-        current3: 1,
       }
     },
     methods: {
@@ -45,6 +43,11 @@
     overflow: auto;
     &::-webkit-scrollbar {
       width: 0 !important;
+    }
+    .my-swipe .pt-swipe-item {
+      line-height: 150px;
+      text-align: center;
+      color: #ffffff;
     }
   }
 </style>
