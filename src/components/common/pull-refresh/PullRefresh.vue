@@ -99,11 +99,13 @@
         this.startY = event.touches[0].clientY;
       },
       ontouchMove(event) {
-        const { top } = this.getElementRect(this.$refs.pullRefreshRef);
-        if (top < 0 || this.value) {
+        this.trackRect = this.getElementRect(this.$refs.pullRefreshRef);
+        if (this.trackRect.top - this.rect.top < 0) return;
+        let detal = event.touches[0].clientY - this.startY;
+        if (detal < 0 || this.value) {
           return this.ispulling = false;
         };
-        this.offset = (event.touches[0].clientY - this.startY) / 3.5;
+        this.offset = detal / 3.5;
         if (this.offset < this.getHeadHeight) {
           this.ispulling = true;
           this.isloosing = false;
@@ -158,7 +160,7 @@
       }
     },
     mounted() {
-
+      this.rect = this.getElementRect(this.$el);
     }
   }
 </script>
@@ -166,8 +168,11 @@
 <style scoped lang="scss">
   .pt-pull-refresh {
     height: 100%;
+    overflow: auto;
+    &::-webkit-scrollbar {
+      width: 0 !important;
+    }
     .pt-pull-refresh-track {
-      height: 100%;
       position: relative;
       .pt-pull-refresh-head {
         width: 100%;
