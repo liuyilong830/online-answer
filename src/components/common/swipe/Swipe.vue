@@ -1,8 +1,13 @@
 <template>
   <div class="pt-swipe">
-    <div class="pt-swipe-track" :style="trackStyle" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+    <div :class="trackClass" :style="trackStyle" @touchstart.stop="touchStart" @touchmove.stop="touchMove" @touchend.stop="touchEnd">
       <slot></slot>
     </div>
+    <slot name="indicator" :active="activeIndicator">
+      <div class="pt-swipe-indicators">
+        <i :class="{'pt-swipe-indicator': true, 'pt-swipe-indicator-active': activeIndicator === num-1}" v-for="num in count" :key="num"></i>
+      </div>
+    </slot>
   </div>
 </template>
 
@@ -33,10 +38,14 @@
       showIndicators: { type: Boolean, default: true },
       vertical: { type: Boolean, default: false },
       touchable: { type: Boolean, default: true },
+      minMove: { type: [Number,String], default: 30 },
     },
     computed: {
       size() { // swipe-item 的大小
         return this.vertical ? this.computeHeight : this.computeWidth;
+      },
+      activeIndicator() {
+        return (this.active + this.count) % this.count;
       },
       count() { // swipe-item子节点数量
         return this.children.length;
@@ -46,6 +55,13 @@
       },
       trackSize() { // track 的大小
         return this.size * this.count;
+      },
+      trackClass() {
+        let cls = ['pt-swipe-track'];
+        if (this.vertical) {
+          cls.push('pt-swipe-track--vertical');
+        }
+        return cls;
       },
       trackStyle() { // track 的动态样式
         let style = {};
@@ -60,14 +76,18 @@
     },
     methods: {
       initialize() {
-        clearTimeout(this.timer);
+        this.clear();
         let rect = this.$el.getBoundingClientRect();
         this.rect = rect; // 将 swipe根元素的位置信息保存起来
         this.computeWidth = +this.width || rect.width;
         this.computeHeight = +this.height || rect.height;
-        this.active = this.initialSwipe;
+        this.active = +this.initialSwipe;
+        this.swiping = true;
         this.offset = this.getTargetOffset(this.active);
         this.autoPlay();
+      },
+      clear() {
+        clearTimeout(this.timer);
       },
       resetTouchStatus() {
         this.delitX = 0;
@@ -87,7 +107,7 @@
       },
       touchStart(event) {
         this.resetTouchStatus();
-        clearTimeout(this.timer);
+        this.clear();
         let touch = event.touches[0];
         this.startX = touch.clientX;
         this.startY = touch.clientY;
@@ -104,7 +124,7 @@
       },
       touchEnd() {
         if (!this.touchable || !this.swiping) return;
-        const shouldSwipe = Math.abs(this.delit) >= 80;
+        const shouldSwipe = Math.abs(this.delit) >= (+this.minMove);
         if (shouldSwipe) {
           let pace = this.delit > 0 ? -1 : 1;
           this.move({
@@ -118,18 +138,28 @@
         this.swiping = false;
         this.autoPlay();
       },
-      range(targetActive) {
-        return Math.min(Math.max(targetActive, -1), this.count);
+      range(num, min, max) {
+        return Math.min(Math.max(num, min), max);
       },
       getTargetActive(pace) {
         if (pace) {
-          return this.range(this.active + pace);
+          if (this.loop) {
+            return this.range(this.active + pace, -1, this.count);
+          }
+          return this.range(this.active + pace, 0, this.count-1);
         }
         return this.active;
       },
       getTargetOffset(targetActive, offset = 0) {
         let position = targetActive * this.size;
-        return offset - position;
+        if (!this.loop) {
+          position = Math.min(position, -this.minOffset);
+        }
+        let targetOffset = offset - position;
+        if (!this.loop) {
+          targetOffset = this.range(targetOffset, this.minOffset, 0);
+        }
+        return targetOffset;
       },
       move({ pace = 0, offset = 0 }) {
         let targetActive = this.getTargetActive(pace);
@@ -169,13 +199,28 @@
       },
       autoPlay() {
         if (this.autoplay > 0 && this.count > 1) {
-          clearTimeout(this.timer);
+          this.clear();
           this.timer = setTimeout(() => {
             this.next();
             this.autoPlay();
           }, this.autoplay);
         }
       },
+      onvisibilitychange() {
+        if (document.hidden) {
+          this.clear();
+        } else {
+          this.autoPlay();
+        }
+      },
+      bindEvent() {
+        window.addEventListener('visibilitychange', this.onvisibilitychange);
+      }
+    },
+    watch: {
+      activeIndicator(newVal) {
+        this.$emit('change', newVal);
+      }
     },
     provide() {
       return {
@@ -184,20 +229,42 @@
     },
     mounted() {
       this.initialize();
+      this.bindEvent();
     }
   }
 </script>
 
 <style scoped lang="scss">
   .pt-swipe {
+    position: relative;
     overflow: hidden;
     .pt-swipe-track {
       display: flex;
+      &.pt-swipe-track--vertical {
+        flex-direction: column;
+      }
       & .pt-swipe-item:nth-of-type(2n+1) {
         background-color: #5754fd;
       }
       & .pt-swipe-item:nth-of-type(2n) {
         background-color: #1989fa;
+      }
+    }
+    .pt-swipe-indicators {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 10px;
+      display: flex;
+      .pt-swipe-indicator {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #d2d2d2;
+        margin: 0 3px;
+        &.pt-swipe-indicator-active {
+          background-color: #fff;
+        }
       }
     }
   }

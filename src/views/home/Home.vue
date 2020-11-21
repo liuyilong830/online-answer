@@ -1,11 +1,19 @@
 <template>
   <div class="hm">
-    <!--<pull-refresh v-model="isloading" @refresh="refresh" success-text="刷新成功" :style="{height: '100%'}">
-
-    </pull-refresh>-->
-    <swipe class="my-swipe">
-      <swipe-item v-for="num in 4" :key="num">{{num}}</swipe-item>
-    </swipe>
+    <pull-refresh v-model="isloading" @refresh="refresh" success-text="刷新成功" :style="{height: '100%'}">
+      <swipe class="my-swipe" min-move="80">
+        <swipe-item v-for="num in 4" :key="num">{{num}}</swipe-item>
+        <template #indicator="obj">
+          <div class="custom-indicator">
+            {{ obj.active + 1 }}/ 4
+          </div>
+        </template>
+      </swipe>
+      <hr>
+      <swipe class="my-swipe" :loop="false" width="300">
+        <swipe-item v-for="num in 4" :key="num">{{num}}</swipe-item>
+      </swipe>
+    </pull-refresh>
   </div>
 </template>
 
@@ -48,6 +56,15 @@
       line-height: 150px;
       text-align: center;
       color: #ffffff;
+    }
+    .custom-indicator {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      padding: 2px 5px;
+      font-size: 12px;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.1);
     }
   }
 </style>
