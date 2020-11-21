@@ -9,7 +9,7 @@ const actions = {
     return res;
   },
   async toLogin({ commit }, payload) {
-    let res = await login.toLogin(payload.root, payload.phone, payload.password);
+    let res = await login.toLogin(payload.phone, payload.password);
     commit(initUserInfo, res.data);
     if (res.status !== 200) {
       return false

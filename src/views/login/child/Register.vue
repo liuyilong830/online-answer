@@ -51,7 +51,7 @@
         </div>
         <div class="fm-input">
           <span>学校</span>
-          <input type="text" @click="focusFromKey('schid')" readonly v-model="getSchoolName">
+          <input type="text" @click="focusFromKey('sname')" readonly v-model="sname">
         </div>
         <div class="fm-input">
           <span>性别</span>
@@ -80,7 +80,7 @@
             @confirm="confirmBirthday"
           />
         </div>
-        <div class="popup-schid" v-else-if="key === 'schid'">
+        <div class="popup-schid" v-else-if="key === 'sname'">
           <van-picker show-toolbar title="选择你所在的学校" :columns="columns" @confirm="confirmSchid" />
         </div>
       </popup>
@@ -118,10 +118,7 @@
         sex: -1, // 0是男，1是女
         password: '',
         nickname: '',
-        school: {
-          schid: -1,
-          name: ''
-        },
+        sname: '',
         birthday: '',
         key: '',
         minDate: new Date(1900, 0, 1),
@@ -139,7 +136,7 @@
         let style = {};
         if (this.key === 'sex') style.height = '130px';
         else if (this.key === 'birthday') style.height = '250px';
-        else if (this.key === 'schid') style.height = '250px';
+        else if (this.key === 'sname') style.height = '250px';
         else style.width = '200px';
         return style;
       },
@@ -153,9 +150,6 @@
       getBirthday() {
         return this.birthday.split('/').join('-');
       },
-      getSchoolName() {
-        return this.school.name;
-      }
     },
     methods: {
       ...mapActions(['toregister']),
@@ -188,9 +182,8 @@
         this.closePopup();
       },
       confirmSchid(names, indexs) {
-        const {id, text} = schools[indexs[0]].children[indexs[1]];
-        this.school.schid = id;
-        this.school.name = text;
+        const {text} = schools[indexs[0]].children[indexs[1]];
+        this.sname = text;
         this.closePopup();
       },
       toRegist() {
@@ -204,9 +197,9 @@
           return this.toregister({
             phone: this.phone,
             password: this.password,
-            root: this.rid,
+            rid: this.rid,
             nickname: this.nickname,
-            schid: this.school.schid,
+            sname: this.sname,
             sex: this.sex,
             birthday: this.birthday
           })
@@ -225,7 +218,7 @@
           return this.setToast('昵称是必须的');
         } else if (!this.password) {
           return this.setToast('请输入之后登录时需要的密码');
-        } else if (this.school.schid === -1) {
+        } else if (!this.sname) {
           return this.setToast('请选择你在读或者曾经毕业的学校');
         } else if (this.sex === -1) {
           return this.setToast('请选择您的性别');
