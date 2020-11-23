@@ -1,4 +1,5 @@
 import login  from '../api/login';
+import home from '../api/home';
 
 import {
   initUserInfo,
@@ -27,6 +28,9 @@ const actions = {
       return false
     }
     return true;
+  },
+  async getQuestionsList(ctx, limit, start) {
+    return await home.getQuestionsList(limit, start)
   }
 }
 

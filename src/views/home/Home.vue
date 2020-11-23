@@ -25,10 +25,14 @@
       </div>
       <div class="qsbk">
         <ul class="qsbk-list">
-          <li class="qsbk-item" v-for="item in ['190px', '160px', '150px','190px', '160px', '150px','190px', '160px', '150px']" :style="{height: item}"></li>
+          <li class="qsbk-item" v-for="bank in quesList.left" :key="bank.qid">
+            <questions-card :bank="bank"/>
+          </li>
         </ul>
-        <ul class="qsbk-list">
-          <li class="qsbk-item" v-for="item in ['150px', '160px', '190px','190px', '160px', '150px','150px', '160px', '190px']" :style="{height: item}"></li>
+        <ul class="qsbk-list qsbk-list-right">
+          <li class="qsbk-item" v-for="bank in quesList.right" :key="bank.qid">
+            <questions-card :bank="bank"/>
+          </li>
         </ul>
       </div>
     </pull-refresh>
@@ -40,6 +44,8 @@
   import NavBar from "../../components/nav-bar/NavBar";
   import Swipe from "../../components/common/swipe/Swipe";
   import SwipeItem from "../../components/common/swipe/SwipeItem";
+  import QuestionsCard from "./child/QuestionsCard";
+  import { mapActions } from 'vuex';
   export default {
     name: "Home",
     components: {
@@ -47,19 +53,25 @@
       NavBar,
       Swipe,
       SwipeItem,
+      QuestionsCard,
     },
     data() {
       return {
         isloading: false,
         height: 0,
+        quesList: {
+          left: [],
+          right: []
+        }, // 用来保存没有被隐藏的题库
       }
     },
     computed: {
       getPullHeight() {
         return `${this.height}px`;
-      }
+      },
     },
     methods: {
+      ...mapActions(['getQuestionsList']),
       refresh() {
         setTimeout(() => {
           this.isloading = false;
@@ -70,10 +82,24 @@
         let { height: HomeHeight } = this.$el.getBoundingClientRect();
         let { height: NavBarHeight } = this.$refs.navbar.$el.getBoundingClientRect();
         this.height =  HomeHeight - NavBarHeight;
+      },
+      async asyncGetQuestList(limit = 10, start = 0) {
+        let res = await this.getQuestionsList(limit, start);
+        let temp = Math.floor(res.data.count / 2);
+        if (res.data) {
+          res.data.list.forEach((bank, index) => {
+            if (index < temp) {
+              this.quesList.left.push(bank);
+            } else {
+              this.quesList.right.push(bank);
+            }
+          })
+        }
       }
     },
     mounted() {
       this.PullRefreshHeight();
+      this.asyncGetQuestList(12, 0);
     }
   }
 </script>
@@ -129,12 +155,14 @@
     }
     .qsbk {
       box-sizing: border-box;
-      padding: 0 20px;
+      padding: 0 5px;
       display: flex;
+      justify-content: space-between;
       .qsbk-list {
         flex: 1;
         display: flex;
         flex-direction: column;
+        align-items: center;
         .qsbk-item {
           width: 97%;
           background-color: lightcoral;
