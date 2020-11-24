@@ -32,6 +32,7 @@
   .pt-card {
     background-color: #fff;
     border-radius: 5px;
+    overflow: hidden;
     color: #666;
     .pt-card-img {
       background-color: #ccc;

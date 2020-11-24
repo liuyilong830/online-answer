@@ -29,7 +29,7 @@ const actions = {
     }
     return true;
   },
-  async getQuestionsList(ctx, limit, start) {
+  async getQuestionsList(ctx, {limit, start}) {
     return await home.getQuestionsList(limit, start)
   }
 }
