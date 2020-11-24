@@ -89,10 +89,12 @@
     methods: {
       ...mapActions(['getQuestionsList']),
       refresh() {
-        setTimeout(() => {
-          this.isloading = false;
-
-        }, 1500)
+        this.quesList.left = [];
+        this.quesList.right = [];
+        this.finished = false;
+        this.islistload = true;
+        this.start = 0;
+        this.onListLoad();
       },
       onListLoad() {
         this.asyncGetQuestList(4, this.start);
@@ -117,6 +119,9 @@
       async asyncGetQuestList(limit = 10, start = 0) {
         let res = await this.getQuestionsList({limit, start});
         if (res.data) {
+          if (this.isloading) {
+            this.isloading = false;
+          }
           let { list, count} = res.data;
           this.islistload = false;
           if (count === 0) {
