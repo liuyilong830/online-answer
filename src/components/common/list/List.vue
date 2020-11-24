@@ -3,7 +3,7 @@
     <slot></slot>
     <div class="pt-list-loading" v-if="loading">{{loadingText}}</div>
     <div class="pt-list-error" v-if="error" @click="clickErrorText">{{errorText}}</div>
-    <div class="pt-list-finished" v-if="finished">{{finishedText}}</div>
+    <div class="pt-list-finished" v-if="finished && finishedText">{{finishedText}}</div>
     <div class="placeholder" ref="placeholder"></div>
   </div>
 </template>
