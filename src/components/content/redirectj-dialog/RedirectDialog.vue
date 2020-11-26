@@ -21,6 +21,7 @@
       ...mapActions(['isLogined']),
       openDialog() {
         this.isShow = true;
+        this.$emit('isrender', false);
         Dialog.confirm({
           message: '您还未登录哟，请麻烦进行登录!'
         }).then(() => {
@@ -47,6 +48,10 @@
 <style scoped lang="scss">
   .rict-dlg {
     height: 100%;
+    overflow: auto;
+    &::-webkit-scrollbar {
+      width: 0 !important;
+    }
     .rict-dlg-normal {
       background-color: #fff;
       height: 100%;

@@ -16,7 +16,14 @@
         <i class="iconfont icon-sousuo"></i>
       </template>
     </nav-bar>
-    <pull-refresh v-model="isloading" @refresh="refresh" @scroll.native="onscroll" success-text="刷新成功" :style="{height: getPullHeight}">
+    <pull-refresh
+      v-model="isloading"
+      ref="pullRefresh"
+      @refresh="refresh"
+      @scroll.native="onscroll"
+      success-text="刷新成功"
+      :style="{height: getPullHeight}"
+    >
       <swipe>
         <swipe-item class="my-swipe-item" v-for="num in 5" :key="num">
           <div class="swipe-item-content">{{num}}</div>
@@ -79,6 +86,8 @@
         islistload: false,
         finished: false,
         start: 0,
+        top: 0,
+        offsetY: 0,
       }
     },
     computed: {
@@ -105,6 +114,11 @@
         this.height =  HomeHeight - NavBarHeight;
       },
       onscroll(event) {
+        this.showDropDownCopy();
+        const { top } = this.$refs.pullRefresh.$el.children[0].getBoundingClientRect();
+        this.offsetY = this.top - top; // 记录之后需要返回该页面时需要滑动的位置
+      },
+      showDropDownCopy() {
         const { top } = this.$refs.dropDown.$el.getBoundingClientRect();
         if (!this.ismenu) {
           if (top <= 50) {
@@ -154,6 +168,10 @@
     },
     mounted() {
       this.PullRefreshHeight();
+      this.top = this.$refs.pullRefresh.$el.getBoundingClientRect().top;
+    },
+    activated() {
+      this.$refs.pullRefresh.$el.scrollTop = this.offsetY; // 让元素滑动到指定位置，配合了 keep-alive使用
     }
   }
 </script>

@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <keep-alive :include="['Home', 'Questions']">
+      <router-view></router-view>
+    </keep-alive>
     <main-tab-bar class="main-tab-bar" v-if="$route.meta.isShowTab"/>
   </div>
 </template>
@@ -20,7 +22,7 @@
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_qjsjqr0tyq.css');
+    @import url('http://at.alicdn.com/t/font_2194746_7tkelldugh7.css');
     width: 100vw;
     height: 100vh;
     display: flex;
