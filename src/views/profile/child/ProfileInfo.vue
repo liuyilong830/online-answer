@@ -3,20 +3,27 @@
     <div class="pfl-info-normal">
       <div class="pfl-info-base">
         <div class="baseinfo-img">
-          <img src="http://localhost:5000/img/def-avatar.png" alt="">
+          <img :src="info.avatar" alt="">
         </div>
         <div class="baseinfo-others">
-          <p class="others-nickname">大树</p>
-          <p class="others-uid">答题号: 10000</p>
-          <p class="others-tags"><span><i class="iconfont icon-nan man"></i>21岁</span><span>中国</span></p>
+          <p class="others-nickname">{{info.nickname}}</p>
+          <p class="others-uid">答题号: {{info.uid}}</p>
+          <p class="others-tags">
+            <span>
+              <i :class="sexClass"></i>
+              {{getAge}}
+            </span>
+            <span>{{info.sname}}</span>
+            <span>{{getIdentity}}</span>
+          </p>
         </div>
       </div>
-      <div class="pfl-info-signature">即将去小红书总部搬砖的程序猿</div>
+      <div class="pfl-info-signature">{{info.signature}}</div>
       <div class="pfl-info-others">
         <div class="others-of-num">
-          <p class="focus-num"><span>12</span><span>关注</span></p>
-          <p class="fans-num"><span>8</span><span>粉丝</span></p>
-          <p class="zan-num"><span>99</span><span>获赞</span></p>
+          <p class="focus-num"><span>{{info.foucs}}</span><span>关注</span></p>
+          <p class="fans-num"><span>{{info.fans}}</span><span>粉丝</span></p>
+          <p class="zan-num"><span>{{info.zan}}</span><span>获赞</span></p>
         </div>
         <div class="others-of-setting">
           <p class="edit-data public">编辑资料</p>
@@ -28,10 +35,46 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex';
   export default {
     name: "ProfileInfo",
     data() {
       return {}
+    },
+    computed: {
+      ...mapGetters(['getUserInfo']),
+      info() {
+        return this.getUserInfo;
+      },
+      sexClass() {
+        let cls = ['iconfont'];
+        if (this.info.sex === 0) {
+          cls.push('icon-nan', 'man');
+        } else {
+          cls.push('icon-nv1', 'women');
+        }
+        return cls;
+      },
+      getAge() {
+        let time = parseInt((new Date() - this.info.birthday) / 1000);
+        let age = 0;
+        if (time.toString() === 'NaN') {
+          age = 0;
+        } else {
+          age = parseInt(time / (86400 * 365));
+        }
+        return age + '岁';
+      },
+      getIdentity() {
+        let rid = this.info.rid;
+        if (rid === 1) {
+          return '教师';
+        } else if (rid === 2) {
+          return '学生';
+        } else {
+          return '';
+        }
+      },
     },
     methods: {},
   }
@@ -109,6 +152,9 @@
                 }
                 &.women {
                   color: pink;
+                }
+                &.icon-nv1 {
+                  font-size: 13px;
                 }
               }
             }

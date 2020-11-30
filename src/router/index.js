@@ -1,11 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import login from '../api/login';
 import store from '../store/index';
 import {
-  resetUserInfo,
-} from '../store/mutation-types';
+  resetUserInfo
+} from "../store/mutation-types";
 
 const Login = () => import('../views/login/Login');
 const Home = () => import('../views/home/Home');
@@ -31,7 +30,7 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   let token = window.localStorage.getItem('token');
   if (to.path === '/login') {
     if (from.path !== '/') {
@@ -41,10 +40,9 @@ router.beforeEach((to, from, next) => {
     return next();
   }
   if (token && !store.state.user.token) {
-    login.isLogined().then(res => {
-      if (res.status === 401) return;
-      store.commit(resetUserInfo, res.data);
-    })
+    let res = await store.dispatch('isLogined');
+    if (res.status === 401) return;
+    store.commit(resetUserInfo, res.data);
   }
   next();
 })

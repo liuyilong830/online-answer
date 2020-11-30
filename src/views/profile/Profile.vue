@@ -11,99 +11,14 @@
         </template>
       </nav-bar>
       <div class="mask-bg" :style="maskStyle"></div>
-      <div class="copy" :style="copyStyle" v-show="isShow">
-        <div class="scroll-top-box"></div>
+      <div class="copy" :style="copyStyle" v-if="isShow">
+        <profile-nav-bar v-model="current"/>
       </div>
       <profile-info ref="pflInfoRef"/>
       <profile-content>
-        <div class="scroll-top-box"></div>
+        <profile-nav-bar v-model="current"/>
         <div class="scroll-content">
-          <ul>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-            <li>1</li>
-          </ul>
+          
         </div>
       </profile-content>
     </redirect-dialog>
@@ -115,6 +30,7 @@
   import NavBar from "../../components/nav-bar/NavBar";
   import ProfileInfo from "./child/ProfileInfo";
   import ProfileContent from "./child/ProfileContent";
+  import ProfileNavBar from "./child/ProfileNavBar";
   export default {
     name: "Profile",
     components: {
@@ -122,6 +38,7 @@
       NavBar,
       ProfileInfo,
       ProfileContent,
+      ProfileNavBar,
     },
     data() {
       return {
@@ -131,6 +48,7 @@
         bgUrl: 'http://localhost:5000/img/bg.jpg',
         isShow: false,
         isrender: true,
+        current: 0,
       }
     },
     computed: {
@@ -177,16 +95,6 @@
 </script>
 
 <style scoped lang="scss">
-  @mixin base {
-    width: 100%;
-    height: 40px;
-    background-color: #fff;
-    border-bottom: 1px solid #666;
-    margin-bottom: 10px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    overflow: hidden;
-  }
   .pfl {
     position: relative;
     height: calc(100% - 50px);
@@ -238,12 +146,6 @@
         top: 0;
         background-color: rgba(0,0,0, .58);
       }
-      .scroll-top-box {
-        @include base;
-      }
-    }
-    .scroll-top-box {
-      @include base;
     }
     .scroll-content {
       padding: 0 15px;

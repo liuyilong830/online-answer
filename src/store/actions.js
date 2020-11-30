@@ -3,6 +3,7 @@ import home from '../api/home';
 
 import {
   initUserInfo,
+  resetUserInfo,
 } from './mutation-types';
 const actions = {
   async isExistPhone(ctx, phone) {
