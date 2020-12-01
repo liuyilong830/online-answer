@@ -26,7 +26,7 @@
       return {
         tabBarList: [
           { id: 1, title: '首页', path: '/home' },
-          { id: 2, title: '题库', path: '/questions' },
+          { id: 2, title: '竞赛', path: '/game' },
           { id: 3, title: '', path: '/home', other: true },
           { id: 4, title: '消息', path: '/message' },
           { id: 5, title: '我', path: '/profile' },

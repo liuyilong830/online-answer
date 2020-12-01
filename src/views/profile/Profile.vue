@@ -18,7 +18,7 @@
       <profile-content>
         <profile-nav-bar v-model="current"/>
         <div class="scroll-content">
-          
+          <router-view/>
         </div>
       </profile-content>
     </redirect-dialog>
@@ -148,6 +148,7 @@
       }
     }
     .scroll-content {
+      min-height: 512px;
       padding: 0 15px;
     }
   }

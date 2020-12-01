@@ -15,7 +15,8 @@
     },
     computed: {
       isActive() {
-        return this.$route.path === this.path;
+        let reg = new RegExp(this.path);
+        return reg.test(this.$route.path);
       }
     },
     methods: {

@@ -4,10 +4,10 @@
       <li
         :class="{'profile-navbar_item': true, 'profile-navbar_item-active': index === value}"
         v-for="(val,index) in list"
-        :key="val"
+        :key="val.path"
         @click.stop="changeTag(index)"
       >
-        <span class="item_text" ref="textRefs">{{val}}</span>
+        <span class="item_text" ref="textRefs">{{val.title}}</span>
       </li>
     </ul>
     <div class="dot" ref="dotRef">
@@ -22,7 +22,11 @@
     name: "ProfileNavBar",
     data() {
       return {
-        list: ['挑战记录', '收藏', '历史记录'],
+        list: [
+          { title: '挑战记录', path: '/profile/challenge' },
+          { title: '收藏夹', path: '/profile/collection' },
+          { title: '历史记录', path: '/profile/history' },
+        ],
         offset: 0,
         width: 0,
         isanimation: false,
@@ -48,6 +52,7 @@
       changeTag(index) {
         if (index === this.value) return;
         this.$emit('input', index);
+        this.$router.replace(this.list[index].path);
       },
       init() {
         this.dotRect = this.$refs.dotRef.getBoundingClientRect();

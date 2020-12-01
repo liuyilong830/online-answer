@@ -1,12 +1,12 @@
 <template>
-  <div class="qst">
-    questions
+  <div class="profile-collection">
+    profile-collection
   </div>
 </template>
 
 <script>
   export default {
-    name: "Questions",
+    name: "ProfileCollection",
     data() {
       return {}
     },
@@ -15,8 +15,5 @@
 </script>
 
 <style scoped lang="scss">
-  .qst {
-    height: 100%;
-    background-color: #fff;
-  }
+  .profile-collection {}
 </style>

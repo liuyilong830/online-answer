@@ -32,13 +32,14 @@
       }
     },
     async created() {
-      let token = window.localStorage.getItem('token');
+      let token = localStorage.getItem('token');
       if (!token) {
         this.openDialog();
       } else {
         let res = await this.isLogined();
         if (res.status === 401) {
           this.openDialog();
+          localStorage.removeItem('token');
         }
       }
     }
