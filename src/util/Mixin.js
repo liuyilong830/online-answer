@@ -1,4 +1,4 @@
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 const showModelBox = {
   data() {
     return {
@@ -22,6 +22,19 @@ const showModelBox = {
   }
 }
 
+const root = {
+  computed: {
+    ...mapGetters(['getUserInfo']),
+    getRoot() {
+      return this.getUserInfo.rid;
+    },
+    isTea() {
+      return this.getRoot === 1;
+    }
+  },
+}
+
 export {
   showModelBox,
+  root
 }

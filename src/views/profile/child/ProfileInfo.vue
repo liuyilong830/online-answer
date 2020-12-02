@@ -18,7 +18,7 @@
           </p>
         </div>
       </div>
-      <div class="pfl-info-signature">{{info.signature}}</div>
+      <div class="pfl-info-signature">{{getSignature}}</div>
       <div class="pfl-info-others">
         <div class="others-of-num">
           <p class="focus-num"><span>{{info.foucs}}</span><span>关注</span></p>
@@ -54,6 +54,9 @@
           cls.push('icon-nv1', 'women');
         }
         return cls;
+      },
+      getSignature() {
+        return this.info.signature ? this.info.signature : '该用户比较懒，什么都没留下...'
       },
       getAge() {
         let time = parseInt((new Date() - this.info.birthday) / 1000);

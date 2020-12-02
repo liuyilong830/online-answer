@@ -39,6 +39,9 @@
       min-height: 50px;
       margin-bottom: 5px;
       font-size: 0;
+      img {
+        width: 100%;
+      }
     }
     .pt-card-content {
       padding: 0 5px;

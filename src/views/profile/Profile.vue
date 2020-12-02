@@ -12,11 +12,11 @@
       </nav-bar>
       <div class="mask-bg" :style="maskStyle"></div>
       <div class="copy" :style="copyStyle" v-if="isShow">
-        <profile-nav-bar v-model="current"/>
+        <profile-nav-bar v-model="current" :list="list"/>
       </div>
       <profile-info ref="pflInfoRef"/>
       <profile-content>
-        <profile-nav-bar v-model="current"/>
+        <profile-nav-bar v-model="current" :list="list"/>
         <div class="scroll-content">
           <router-view/>
         </div>
@@ -49,6 +49,11 @@
         isShow: false,
         isrender: true,
         current: 0,
+        list: [
+          { title: '我的班级', path: '/profile/class' },
+          { title: '挑战记录', path: '/profile/challenge' },
+          { title: '收藏夹', path: '/profile/collection' },
+        ],
       }
     },
     computed: {
@@ -87,6 +92,10 @@
       onrender(flag) {
         this.isrender = flag;
       }
+    },
+    created() {
+      let index = this.list.findIndex(item => item.path === this.$route.path);
+      this.current = index;
     },
     mounted() {
       this.init();
@@ -149,7 +158,7 @@
     }
     .scroll-content {
       min-height: 512px;
-      padding: 0 15px;
+      padding: 0 10px;
     }
   }
 </style>

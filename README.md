@@ -1,19 +1,27 @@
-# online-answer
+# 基于vue.js + node.js 的在线答题系统
 
-## Project setup
-```
-npm install
-```
+## 项目描述：
+1. 该项目在进行中封装了很多UI组件库，组件库的样式是参考的 ``vant`` 来设计，实现了
+比如：下拉刷新、数字键盘、列表加载、轮播图、图片缩略图等等。
+2. 该项目是前后端分离的项目，前端使用vue.js编写前端页面，使用node.js编写后台接口，
+使用mysql8作为数据库使用。
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## 主要技术：
+ - vue.js
+ - node.js
+ - token
+ - 自己封装的UI组件库
+ - mysql
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## 功能模块：
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 基础模块
+
+
+### 答题模块
+
+
+### 聊天模块
+
+
+### 个人中心模块

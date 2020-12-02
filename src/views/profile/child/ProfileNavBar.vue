@@ -22,11 +22,6 @@
     name: "ProfileNavBar",
     data() {
       return {
-        list: [
-          { title: '挑战记录', path: '/profile/challenge' },
-          { title: '收藏夹', path: '/profile/collection' },
-          { title: '历史记录', path: '/profile/history' },
-        ],
         offset: 0,
         width: 0,
         isanimation: false,
@@ -34,12 +29,10 @@
     },
     props: {
       value: Number,
+      list: Array,
     },
     computed: {
       ...mapGetters(['getUserInfo']),
-      isTea() {
-        return this.getUserInfo.rid === 1;
-      },
       dynamicDotStyle() {
         return {
           transform: `translate(${this.offset}px, 0)`,
@@ -75,9 +68,6 @@
       }
     },
     mounted() {
-      if (this.isTea) {
-        this.list.unshift('班级');
-      }
       this.init();
     }
   }

@@ -22,7 +22,7 @@
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_7tkelldugh7.css');
+    @import url('http://at.alicdn.com/t/font_2194746_qon6jgoavr.css');
     width: 100vw;
     height: 100vh;
     display: flex;

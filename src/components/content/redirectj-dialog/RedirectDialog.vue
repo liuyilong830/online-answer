@@ -17,6 +17,11 @@
         isShow: false,
       }
     },
+    provide() {
+      return {
+        scroller: this
+      }
+    },
     methods: {
       ...mapActions(['isLogined']),
       openDialog() {

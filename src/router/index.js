@@ -14,6 +14,7 @@ const Profile = () => import('../views/profile/Profile');
 const ProfileChallenge = () => import('../views/profile/child/ProfileChallenge');
 const ProfileCollection = () => import('../views/profile/child/ProfileCollection');
 const ProfileHistory = () => import('../views/profile/child/ProfileHistory');
+const ProfileClass = () => import('../views/profile/child/ProfileClass');
 
 Vue.use(VueRouter);
 
@@ -24,10 +25,10 @@ const routes = [
   { path: '/game', component: Game, meta: { isShowTab: true } },
   { path: '/message', component: Message, meta: { isShowTab: true } },
   { path: '/profile', component: Profile, meta: { isShowTab: true }, children: [
-      { path: '', redirect: 'challenge' },
+      { path: '', redirect: 'class' },
       { path: 'challenge', component: ProfileChallenge, meta: { isShowTab: true } },
       { path: 'collection', component: ProfileCollection, meta: { isShowTab: true } },
-      { path: 'history', component: ProfileHistory, meta: { isShowTab: true } },
+      { path: 'class', component: ProfileClass, meta: { isShowTab: true } },
     ]
   },
 
