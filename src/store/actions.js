@@ -1,5 +1,6 @@
 import login  from '../api/login';
 import home from '../api/home';
+import profile from '../api/profile';
 
 import {
   initUserInfo,
@@ -32,6 +33,9 @@ const actions = {
   },
   async getQuestionsList(ctx, {limit, start}) {
     return await home.getQuestionsList(limit, start)
+  },
+  async getClass(ctx, uid) {
+    return await profile.getClass(uid);
   }
 }
 

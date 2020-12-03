@@ -37,7 +37,10 @@
   .tt {
     position: fixed;
     padding: 10px;
-    width: 200px;
+    /*width: 200px;*/
+    padding: 5px 10px;
+    text-align: center;
+    max-width: 200px;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, .8);
     color: #ffffff;

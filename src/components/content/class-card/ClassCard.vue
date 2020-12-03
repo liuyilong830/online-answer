@@ -3,20 +3,20 @@
     <card :style="{backgroundColor: '#cecece42', boxShadow: '0px 0px 5px 1px #a5a2a2'}">
       <template #image>
         <div class="class-img">
-          <img src="http://localhost:5000/img/def-avatar.png" alt="">
+          <img :src="classInfo.classavatar" alt="">
         </div>
       </template>
       <div class="class-name">
-        <p class="name">17软件工程1班</p>
+        <p class="name">{{classInfo.classname}}</p>
       </div>
       <template #other>
         <div class="class-others">
           <p class="class-creater">
-            <img src="http://localhost:5000/img/def-avatar.png" alt="">
-            <span>大树</span>
+            <img :src="classInfo.avatar" alt="">
+            <span>{{classInfo.nickname}}</span>
           </p>
           <p class="class-count">
-            <span>3651</span>
+            <span>{{classInfo.count}}</span>
             <i class="iconfont icon-ren"></i>
           </p>
         </div>
@@ -34,6 +34,14 @@
     },
     data() {
       return {}
+    },
+    props: {
+      classInfo: {
+        type: Object,
+        default() {
+          return {};
+        }
+      }
     },
     methods: {},
   }
@@ -64,7 +72,7 @@
         line-height: 25px;
         @include toEllipse(1);
         img {
-          height: 100%;
+          height: 25px;
           border-radius: 50%;
           vertical-align: bottom;
           padding-right: 5px;

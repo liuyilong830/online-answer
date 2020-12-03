@@ -18,7 +18,9 @@
       <profile-content>
         <profile-nav-bar v-model="current" :list="list"/>
         <div class="scroll-content">
-          <router-view/>
+          <keep-alive>
+            <router-view/>
+          </keep-alive>
         </div>
       </profile-content>
     </redirect-dialog>
