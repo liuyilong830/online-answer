@@ -80,6 +80,9 @@
           return false;
         }
       },
+      getContainer: {
+        type: Element,
+      },
     },
     model: {
       prop: 'isShow',
@@ -132,6 +135,11 @@
           this.$emit('open');
         }
       }
+    },
+    mounted() {
+      if (this.getContainer) {
+        this.getContainer.append(this.$el);
+      }
     }
   }
 </script>
@@ -143,6 +151,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    z-index: 4;
     .pt-popup-mask {
       position: fixed;
       width: 100%;
