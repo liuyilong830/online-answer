@@ -97,6 +97,7 @@
     },
     created() {
       let index = this.list.findIndex(item => item.path === this.$route.path);
+      if (index === -1) return;
       this.current = index;
     },
     mounted() {

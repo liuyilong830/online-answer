@@ -54,6 +54,7 @@
           arr.push(ref.getBoundingClientRect());
         })
         this.rects = arr;
+        if (this.value < 0) return;
         this.move(this.value);
       },
       move(index) {

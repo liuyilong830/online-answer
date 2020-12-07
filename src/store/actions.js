@@ -4,7 +4,6 @@ import profile from '../api/profile';
 
 import {
   initUserInfo,
-  resetUserInfo,
 } from './mutation-types';
 const actions = {
   async isExistPhone(ctx, phone) {
@@ -36,6 +35,9 @@ const actions = {
   },
   async getClass(ctx, uid) {
     return await profile.getClass(uid);
+  },
+  async createClass(ctx, payload) {
+    return await profile.createClass(payload);
   }
 }
 

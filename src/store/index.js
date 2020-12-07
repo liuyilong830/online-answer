@@ -9,6 +9,8 @@ Vue.use(Vuex);
 
 const state = {
   user: {}, // 登录用户的信息
+  clsDetail: {}, // 班级详情页信息
+
 }
 
 export default new Vuex.Store({

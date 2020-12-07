@@ -13,8 +13,8 @@ const Message = () => import('../views/message/Message');
 const Profile = () => import('../views/profile/Profile');
 const ProfileChallenge = () => import('../views/profile/child/profile-challenge/ProfileChallenge');
 const ProfileCollection = () => import('../views/profile/child/profile-collection/ProfileCollection');
-const ProfileHistory = () => import('../views/profile/child/ProfileHistory');
 const ProfileClass = () => import('../views/profile/child/profile-class/ProfileClass');
+const ProfileDetail = () => import('../views/profile/child/profile-class/ClassDetail');
 
 Vue.use(VueRouter);
 
@@ -29,6 +29,7 @@ const routes = [
       { path: 'class', component: ProfileClass, meta: { isShowTab: true } },
       { path: 'challenge', component: ProfileChallenge, meta: { isShowTab: true } },
       { path: 'collection', component: ProfileCollection, meta: { isShowTab: true } },
+      { path: 'detail/:id', component: ProfileDetail, meta: { isShowTab: false } },
     ]
   },
 

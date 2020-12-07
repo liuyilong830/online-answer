@@ -1,6 +1,7 @@
 import {
   initUserInfo,
   resetUserInfo,
+  classDetailInfo,
 } from './mutation-types';
 
 const mutations = {
@@ -10,6 +11,12 @@ const mutations = {
   },
   [resetUserInfo](state, info) {
     state.user = info;
+    state.clsDetail = JSON.parse(sessionStorage.getItem('clsDetail')) || {};
+  },
+  [classDetailInfo](state, info) {
+    state.clsDetail = info;
+    // 本地存储化
+    sessionStorage.setItem('clsDetail', JSON.stringify(info));
   }
 }
 

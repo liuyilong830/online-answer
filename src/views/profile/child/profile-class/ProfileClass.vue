@@ -17,8 +17,8 @@
       </div>
       <p class="not-found-text">{{notFoundText}}</p>
     </div>
-    <popup position="bottom" :box-style="{height: '75%'}" round closeable :get-container="getBody()" v-model="iscreated">
-      <class-create/>
+    <popup :box-style="{width: '85%'}" round closeable :get-container="getBody()" v-model="iscreated">
+      <class-create v-bind.sync="clsinfo" @toCreateClass="toCreateClass"/>
     </popup>
   </div>
 </template>
@@ -28,7 +28,10 @@
   import Popup from "../../../../components/popup/Popup";
   import ClassCreate from "./ClassCreate";
   import { root } from '../../../../util/Mixin';
-  import { mapActions } from 'vuex';
+  import { mapActions, mapMutations } from 'vuex';
+  import {
+    classDetailInfo,
+  } from '../../../../store/mutation-types';
   import Toast from "../../../../components/toast";
   export default {
     name: "ProfileClass",
@@ -46,6 +49,10 @@
         joins: [],
         creates: [],
         iscreated: false,
+        clsinfo: {
+          classname: '',
+          description: ''
+        },
       }
     },
     computed: {
@@ -65,10 +72,12 @@
       },
     },
     methods: {
-      ...mapActions(['getClass']),
+      ...mapMutations([classDetailInfo]),
+      ...mapActions(['getClass', 'createClass']),
       getBody() {
         return document.body;
       },
+      /* 创建班级的逻辑 */
       toCreate() {
         if (this.text === '创建') {
           console.log('去创建班级');
@@ -77,8 +86,17 @@
           console.log('去加入班级');
         }
       },
+      toCreateClass() {
+        if (!this.isTea) return;
+        this.iscreated = false;
+        let createid = this.getUserInfo.uid;
+        this.asyncCreateClass({createid, ...this.clsinfo});
+      },
+      /* 进入班级详情页逻辑 */
       toClass(item) {
         console.log(item);
+        this.$router.push(`/profile/detail/${item.classid}`);
+        this.classDetailInfo(item);
       },
       changeText() {
         if (this.isTea) {
@@ -87,6 +105,7 @@
           Toast('学生用户不能切换哟!');
         }
       },
+      /* 滑动过程中给按钮增添特效逻辑 */
       bindEvent() {
         if (this.scroller) {
           this.scroller.$el.addEventListener('scroll', (event) => {
@@ -106,6 +125,7 @@
           }, delay);
         }
       },
+      /* 相关逻辑的请求方法 */
       async asyncGetClass(uid) {
         let res = await this.getClass(uid);
         if (res.status === 200) {
@@ -113,6 +133,15 @@
           this.creates = res.data.creates;
         } else {
           Toast(res.message);
+        }
+      },
+      async asyncCreateClass(payload) {
+        let res = await this.createClass(payload);
+        if (res.data) {
+          this.creates.unshift(res.data);
+          this.clsinfo.description = '';
+          this.clsinfo.classname = '';
+          Toast('创建班级成功');
         }
       }
     },
