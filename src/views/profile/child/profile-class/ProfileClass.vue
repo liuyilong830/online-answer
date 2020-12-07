@@ -17,11 +17,16 @@
       </div>
       <p class="not-found-text">{{notFoundText}}</p>
     </div>
+    <popup position="bottom" :box-style="{height: '75%'}" round closeable :get-container="getBody()" v-model="iscreated">
+      <class-create/>
+    </popup>
   </div>
 </template>
 
 <script>
   import ClassList from "./ClassList";
+  import Popup from "../../../../components/popup/Popup";
+  import ClassCreate from "./ClassCreate";
   import { root } from '../../../../util/Mixin';
   import { mapActions } from 'vuex';
   import Toast from "../../../../components/toast";
@@ -29,6 +34,8 @@
     name: "ProfileClass",
     components: {
       ClassList,
+      Popup,
+      ClassCreate,
     },
     mixins: [root],
     inject: ['scroller'],
@@ -38,6 +45,7 @@
         text: '创建',
         joins: [],
         creates: [],
+        iscreated: false,
       }
     },
     computed: {
@@ -58,9 +66,13 @@
     },
     methods: {
       ...mapActions(['getClass']),
+      getBody() {
+        return document.body;
+      },
       toCreate() {
         if (this.text === '创建') {
           console.log('去创建班级');
+          this.iscreated = true;
         } else if (this.text === '参与') {
           console.log('去加入班级');
         }
