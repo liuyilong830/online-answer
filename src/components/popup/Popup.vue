@@ -243,6 +243,9 @@
     &.pt-content-right {
       transform: translateX(100%);
     }
+    &.pt-content-center {
+      opacity: 0;
+    }
   }
   .pt-mask-enter, .pt-mask-leave-to {
     opacity: 0;

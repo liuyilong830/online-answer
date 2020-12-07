@@ -37,7 +37,6 @@
   .tt {
     position: fixed;
     padding: 10px;
-    /*width: 200px;*/
     padding: 5px 10px;
     text-align: center;
     max-width: 200px;
@@ -48,6 +47,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 100;
   }
   .toast-enter, .toast-leave-to {
     opacity: 0;
