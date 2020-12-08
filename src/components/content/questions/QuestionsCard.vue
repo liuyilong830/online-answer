@@ -4,7 +4,10 @@
       <template #image>
         <img class="qsbk-img" :src="bank.icon" alt="">
       </template>
-      <div class="qscd-content">{{bank.qname}}</div>
+      <div class="qscd-content">
+        <span class="tag" v-if="bank.istoclass === 1">仅班级成员</span>
+        <span>{{bank.qname}}</span>
+      </div>
       <template #other>
         <div class="my-card-other">
           <p class="qsbk-info-author">
@@ -23,7 +26,7 @@
 </template>
 
 <script>
-  import Card from "../../../components/common/card/Card";
+  import Card from "../../common/card/Card";
   export default {
     name: "QuestionsCard",
     components: {
@@ -69,6 +72,15 @@
       font-size: 15px;
       color: #000;
       padding-left: 5px;
+      min-height: 25px;
+      .tag {
+        padding: 2px 5px;
+        border: 1px solid #5754fd;
+        border-radius: 5px;
+        color: #5754fd;
+        font-size: 12px;
+        margin-right: 5px;
+      }
     }
     .my-card-other {
       display: flex;

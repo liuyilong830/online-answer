@@ -11,12 +11,7 @@
       </div>
     </transition>
     <class-list :list="getList" v-if="getList.length" @toClass="toClass"></class-list>
-    <div class="class-no" v-else>
-      <div class="not-found-img">
-        <img src="../../../../assets/images/not-found.png" alt="">
-      </div>
-      <p class="not-found-text">{{notFoundText}}</p>
-    </div>
+    <not-found :text="notFoundText" v-else/>
     <popup :box-style="{width: '85%'}" round closeable :get-container="getBody()" v-model="iscreated">
       <class-create v-bind.sync="clsinfo" @toCreateClass="toCreateClass"/>
     </popup>
@@ -27,6 +22,7 @@
   import ClassList from "./ClassList";
   import Popup from "../../../../components/popup/Popup";
   import ClassCreate from "./ClassCreate";
+  import NotFound from "../../../../components/content/not-found/NotFound";
   import { root } from '../../../../util/Mixin';
   import { mapActions, mapMutations } from 'vuex';
   import {
@@ -39,6 +35,7 @@
       ClassList,
       Popup,
       ClassCreate,
+      NotFound,
     },
     mixins: [root],
     inject: ['scroller'],
@@ -180,22 +177,6 @@
           border-top: 1px solid #fff;
         }
       }
-    }
-    .not-found-img {
-      height: 200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      img {
-        height: 150px;
-      }
-    }
-    .not-found-text {
-      height: 30px;
-      line-height: 30px;
-      text-align: center;
-      font-size: 16px;
-      font-weight: bold;
     }
   }
   .btn-enter, .btn-leave-to {

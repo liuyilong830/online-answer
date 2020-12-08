@@ -1,7 +1,10 @@
 const getters = {
   getUserInfo(state) {
-    return state.user ? state.user : {};
-  }
+    return state.user || {};
+  },
+  getClsDetailInfo(state) {
+    return state.clsDetail || {};
+  },
 }
 
 export default getters;

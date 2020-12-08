@@ -38,6 +38,12 @@ const actions = {
   },
   async createClass(ctx, payload) {
     return await profile.createClass(payload);
+  },
+  async queryClassByUid(ctx, payload) {
+    return await profile.queryClassByUid(payload);
+  },
+  async queryClassPeople(ctx, classid) {
+    return await profile.queryClassPeople(classid);
   }
 }
 

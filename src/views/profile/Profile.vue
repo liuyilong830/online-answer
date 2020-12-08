@@ -18,7 +18,7 @@
       <profile-content>
         <profile-nav-bar v-model="current" :list="list"/>
         <div class="scroll-content">
-          <keep-alive>
+          <keep-alive :exclude="['ClassDetail']">
             <router-view/>
           </keep-alive>
         </div>

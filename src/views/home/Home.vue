@@ -36,16 +36,12 @@
       <drop-down v-model="current" :list="menu" ref="dropDown"/>
       <list v-model="islistload" :finished="finished" @load="onListLoad" finished-text="到底了">
         <div class="qsbk">
-          <ul class="qsbk-list">
-            <li class="qsbk-item" v-for="bank in quesList.left" :key="bank.qid">
-              <questions-card :bank="bank"/>
-            </li>
-          </ul>
-          <ul class="qsbk-list qsbk-list-right">
-            <li class="qsbk-item" v-for="bank in quesList.right" :key="bank.qid">
-              <questions-card :bank="bank"/>
-            </li>
-          </ul>
+          <div class="qsbk-public">
+            <questions-list :list="quesList.left"/>
+          </div>
+          <div class="qsbk-public">
+            <questions-list :list="quesList.right"/>
+          </div>
         </div>
       </list>
     </pull-refresh>
@@ -57,9 +53,9 @@
   import NavBar from "../../components/nav-bar/NavBar";
   import Swipe from "../../components/common/swipe/Swipe";
   import SwipeItem from "../../components/common/swipe/SwipeItem";
-  import QuestionsCard from "./child/QuestionsCard";
   import DropDown from "./child/DropDown";
   import List from "../../components/common/list/List";
+  import QuestionsList from "../../components/content/questions/QuestionsList";
   import { mapActions } from 'vuex';
   export default {
     name: "Home",
@@ -68,9 +64,9 @@
       NavBar,
       Swipe,
       SwipeItem,
-      QuestionsCard,
       DropDown,
       List,
+      QuestionsList,
     },
     data() {
       return {
@@ -238,17 +234,8 @@
       padding: 0 5px;
       display: flex;
       justify-content: space-between;
-      .qsbk-list {
+      .qsbk-public {
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        .qsbk-item {
-          width: 97%;
-          background-color: lightcoral;
-          border-radius: 5px;
-          margin-bottom: 10px;
-        }
       }
     }
   }
