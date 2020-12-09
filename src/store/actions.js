@@ -44,7 +44,10 @@ const actions = {
   },
   async queryClassPeople(ctx, classid) {
     return await profile.queryClassPeople(classid);
-  }
+  },
+  async updateClass(ctx, info) {
+    return await profile.updateClass(info);
+  },
 }
 
 export default actions;

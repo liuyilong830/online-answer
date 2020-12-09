@@ -2,6 +2,7 @@ import {
   initUserInfo,
   resetUserInfo,
   classDetailInfo,
+  signOutUser,
 } from './mutation-types';
 
 const mutations = {
@@ -17,7 +18,15 @@ const mutations = {
     state.clsDetail = info;
     // 本地存储化
     sessionStorage.setItem('clsDetail', JSON.stringify(info));
-  }
+  },
+  [signOutUser](state) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('tologin');
+    sessionStorage.removeItem('clsDetail');
+    state.user = {};
+    state.clsDetail = {};
+    console.log('退出成功');
+  },
 }
 
 export default mutations;

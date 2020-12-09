@@ -1,6 +1,12 @@
 <template>
   <transition name="cls-detail">
     <div class="cls-detail">
+      <transition name="opt">
+        <ul class="opertations" v-if="isoperation">
+          <li class="opt-item" @click.stop="toUpdateCls">编辑信息</li>
+          <li class="opt-item" @click.stop="toDeleteCls">注销班级</li>
+        </ul>
+      </transition>
       <nav-bar>
         <template #left>
           <i class="iconfont icon-fanhui" @click="onclose"></i>
@@ -9,10 +15,10 @@
           <profile-nav-bar v-model="index" :list="list" :style="pflnavbarStyle"/>
         </div>
         <template #right>
-          <i class="iconfont icon-19"></i>
+          <i class="iconfont icon-19" @click.stop="operationClick"></i>
         </template>
       </nav-bar>
-      <div class="detail-scroller">
+      <div class="detail-scroller" @scroll="onscroll">
         <class-detail-info/>
         <div class="scroller-ct">
           <not-found v-if="showNotFound" :text="notFoundText"/>
@@ -22,6 +28,7 @@
           </div>
         </div>
       </div>
+      <update-info v-model="isupdate" :form-data="formData" :info="info" @changeData="changeData"/>
     </div>
   </transition>
 </template>
@@ -33,7 +40,12 @@
   import QuestionsList from "../../../../components/content/questions/QuestionsList";
   import PeopleList from "../../../../components/content/people-list/PeopleList";
   import NotFound from "../../../../components/content/not-found/NotFound";
-  import { mapActions, mapGetters } from 'vuex';
+  import UpdateInfo from "../../../../components/content/update-info/UpdateInfo";
+  import { mapActions, mapGetters, mapMutations } from 'vuex';
+  import {
+    classDetailInfo
+  } from "../../../../store/mutation-types";
+  import Toast from "../../../../components/toast";
 
   export default {
     name: "ClassDetail",
@@ -44,6 +56,7 @@
       QuestionsList,
       PeopleList,
       NotFound,
+      UpdateInfo,
     },
     data() {
       return {
@@ -54,6 +67,19 @@
         ],
         creates: [],
         people: [],
+        isoperation: false,
+        isupdate: false,
+        isdel: false,
+        formData: [
+          { mode: 'img', key: 'classavatar', name: '头像', type: String },
+          { mode: 'text', key: 'classname', name: '班级名称', type: String },
+          { mode: 'textarea', key: 'description', name: '班级描述', type: String }
+        ],
+        info: {
+          classavatar: '',
+          classname: '',
+          description: ''
+        }
       }
     },
     computed: {
@@ -80,9 +106,37 @@
       }
     },
     methods: {
-      ...mapActions(['queryClassByUid', 'queryClassPeople']),
+      ...mapMutations([classDetailInfo]),
+      ...mapActions(['queryClassByUid', 'queryClassPeople', 'updateClass']),
+      init() {
+        let {classavatar, classname, description} = this.getClsDetailInfo;
+        this.info.classavatar = classavatar;
+        this.info.classname = classname;
+        this.info.description = description;
+      },
       onclose() {
         this.$router.go(-1);
+      },
+      onscroll() {
+        if (this.isoperation) {
+          this.isoperation = false;
+        }
+      },
+      operationClick() {
+        this.isoperation = !this.isoperation;
+      },
+      toUpdateCls() {
+        this.isoperation = false;
+        this.isupdate = true;
+      },
+      toDeleteCls() {
+        this.isoperation = false;
+      },
+      changeData(key, val) {
+        let info = {};
+        info[key] = val;
+        info.classid = this.getClsDetailInfo.classid;
+        this.asyncUpdateClass(info, key, val);
       },
       async asyncClassByUid(payload) {
         let res = await this.queryClassByUid(payload);
@@ -94,6 +148,14 @@
         let res = await this.queryClassPeople(classid);
         if (res.data && res.data.people) {
           this.people = res.data.people;
+        }
+      },
+      async asyncUpdateClass(info, key, val) {
+        let res = await this.updateClass(info);
+        if (res.status === 200) {
+          this.info[key] = val;
+          this.classDetailInfo({...this.getClsDetailInfo, ...this.info});
+          Toast(res.message, 1000);
         }
       },
     },
@@ -108,11 +170,15 @@
     },
     mounted() {
       if (this.getClsDetailInfo) {
+        this.init();
         let obj = {};
         obj.uid = this.getClsDetailInfo.uid;
         obj.classid = this.getClsDetailInfo.classid;
         this.asyncClassByUid(obj);
       }
+      document.body.addEventListener('click', () => {
+        this.onscroll();
+      })
     },
   }
 </script>
@@ -126,6 +192,38 @@
     left: 0;
     z-index: 4;
     background-color: #f2f3f5;
+    .opertations {
+      position: absolute;
+      top: 58px;
+      right: 10px;
+      width: 90px;
+      border-radius: 5px;
+      background-color: #fff;
+      z-index: 5;
+      box-shadow: 0px 0px 6px 0px #00000069;
+      &::before {
+        content: '';
+        position: absolute;
+        right: 11px;
+        top: -15px;
+        z-index: 6;
+        width: 0;
+        height: 0;
+        border: 8px solid #fff;
+        border-top-color: transparent;
+        border-left-color: transparent;
+        border-right-color: transparent;
+      }
+      .opt-item {
+        height: 30px;
+        border-bottom: 1px solid #ccc;
+        line-height: 30px;
+        text-align: center;
+      }
+      & .opt-item:last-of-type {
+        border-bottom: none;
+      }
+    }
     .cls-detail-ct {
       height: 100%;
       display: flex;
@@ -147,6 +245,12 @@
     top: 60px;
   }
   .cls-detail-enter-active, .cls-detail-leave-active {
+    transition: all .3s;
+  }
+  .opt-enter, .opt-leave-to {
+    opacity: 0;
+  }
+  .opt-enter-active, .opt-leave-active {
     transition: all .3s;
   }
 </style>

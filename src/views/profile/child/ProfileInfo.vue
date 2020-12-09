@@ -26,20 +26,45 @@
           <p class="zan-num"><span>{{info.zan}}</span><span>获赞</span></p>
         </div>
         <div class="others-of-setting">
-          <p class="edit-data public">编辑资料</p>
-          <p class="setting public"><i class="iconfont icon-shezhi"></i></p>
+          <p class="edit-data public" @click.stop="editorClick">编辑资料</p>
+          <p class="setting public" @click.stop="signOut">退出</p>
         </div>
       </div>
     </div>
+    <update-info v-model="isupdate" :form-data="formData" :info="changeInfo" @changeData="changeData" />
   </div>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex';
+  import { mapGetters, mapMutations } from 'vuex';
+  import { signOutUser } from '../../../store/mutation-types';
+  import Dialog from "../../../components/dialog";
+  import UpdateInfo from "../../../components/content/update-info/UpdateInfo";
   export default {
     name: "ProfileInfo",
+    components: {
+      UpdateInfo,
+    },
     data() {
-      return {}
+      return {
+        isupdate: false,
+        formData: [
+          { mode: 'img', key: 'avatar', name: '头像' },
+          { mode: 'text', key: 'nickname', name: '昵称' },
+          { mode: 'sex', key: 'sex', name: '性别' },
+          { mode: 'birthday', key: 'birthday', name: '生日' },
+          { mode: 'text', key: 'sname', name: '毕业学校' },
+          { mode: 'textarea', key: 'signature', name: '个人简介' }
+        ],
+        changeInfo: {
+          avatar: '',
+          nickname: '',
+          sex: '',
+          birthday: '',
+          sname: '',
+          signature: '',
+        }
+      }
     },
     computed: {
       ...mapGetters(['getUserInfo']),
@@ -57,6 +82,16 @@
       },
       getSignature() {
         return this.info.signature ? this.info.signature : '该用户比较懒，什么都没留下...'
+      },
+      getBirthday() {
+        let arr = new Date(this.info.birthday).toLocaleDateString().split('/');
+        arr = arr.map(str => {
+          if (str.length < 2) {
+            str = 0 + str;
+          }
+          return str;
+        })
+        return arr.join('-')
       },
       getAge() {
         let time = parseInt((new Date() - this.info.birthday) / 1000);
@@ -79,7 +114,35 @@
         }
       },
     },
-    methods: {},
+    methods: {
+      ...mapMutations([signOutUser]),
+      init() {
+        let { avatar, nickname, sex, sname, signature } = this.info;
+        this.changeInfo.avatar = avatar;
+        this.changeInfo.nickname = nickname;
+        this.changeInfo.sex = sex === 0 ? '男' : '女';
+        this.changeInfo.birthday = this.getBirthday;
+        this.changeInfo.sname = sname;
+        this.changeInfo.signature = signature;
+      },
+      editorClick() {
+        this.isupdate = true;
+      },
+      changeData(key, val) {
+        console.log(key, val);
+      },
+      signOut() {
+        Dialog.confirm({
+          message: '您确定退出登录吗？'
+        }).then(() => {
+          this.signOutUser();
+          this.$router.replace('/login');
+        }, () => {});
+      }
+    },
+    mounted() {
+      this.init();
+    }
   }
 </script>
 
