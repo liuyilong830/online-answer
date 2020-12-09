@@ -12,11 +12,11 @@
       </nav-bar>
       <div class="mask-bg" :style="maskStyle"></div>
       <div class="copy" :style="copyStyle" v-if="isShow">
-        <profile-nav-bar v-model="current" :list="list"/>
+        <profile-nav-bar v-model="current" :list="list" @changeIndex="changeIndex"/>
       </div>
       <profile-info ref="pflInfoRef"/>
       <profile-content>
-        <profile-nav-bar v-model="current" :list="list"/>
+        <profile-nav-bar v-model="current" :list="list" @changeIndex="changeIndex"/>
         <div class="scroll-content">
           <keep-alive :exclude="['ClassDetail']">
             <router-view/>
@@ -93,7 +93,10 @@
       },
       onrender(flag) {
         this.isrender = flag;
-      }
+      },
+      changeIndex(index) {
+        this.$router.replace(this.list[index].path);
+      },
     },
     created() {
       let index = this.list.findIndex(item => item.path === this.$route.path);

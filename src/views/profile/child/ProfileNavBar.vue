@@ -45,7 +45,7 @@
       changeTag(index) {
         if (index === this.value) return;
         this.$emit('input', index);
-        this.$router.replace(this.list[index].path);
+        this.$emit('changeIndex', index);
       },
       init() {
         this.dotRect = this.$refs.dotRef.getBoundingClientRect();
