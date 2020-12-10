@@ -15,7 +15,8 @@
           <profile-nav-bar v-model="index" :list="list" :style="pflnavbarStyle"/>
         </div>
         <template #right>
-          <i class="iconfont icon-19" @click.stop="operationClick"></i>
+          <i class="iconfont icon-19" v-if="isTea" @click.stop="operationClick"></i>
+          <i v-else></i>
         </template>
       </nav-bar>
       <div class="detail-scroller" @scroll="onscroll">
@@ -43,9 +44,12 @@
   import UpdateInfo from "../../../../components/content/update-info/UpdateInfo";
   import { mapActions, mapGetters, mapMutations } from 'vuex';
   import {
-    classDetailInfo
+    classDetailInfo,
+    resetDetailInfo
   } from "../../../../store/mutation-types";
   import Toast from "../../../../components/toast";
+  import Dialog from "../../../../components/dialog";
+  import { root } from '../../../../util/Mixin';
 
   export default {
     name: "ClassDetail",
@@ -58,6 +62,7 @@
       NotFound,
       UpdateInfo,
     },
+    mixins: [root],
     data() {
       return {
         index: 0,
@@ -106,8 +111,8 @@
       }
     },
     methods: {
-      ...mapMutations([classDetailInfo]),
-      ...mapActions(['queryClassByUid', 'queryClassPeople', 'updateClass']),
+      ...mapMutations([classDetailInfo, resetDetailInfo]),
+      ...mapActions(['queryClassByUid', 'queryClassPeople', 'updateClass', 'deleteClass']),
       init() {
         let {classavatar, classname, description} = this.getClsDetailInfo;
         this.info.classavatar = classavatar;
@@ -115,6 +120,7 @@
         this.info.description = description;
       },
       onclose() {
+        this.resetDetailInfo();
         this.$router.go(-1);
       },
       onscroll() {
@@ -131,6 +137,14 @@
       },
       toDeleteCls() {
         this.isoperation = false;
+        Dialog.confirm({
+          message: '你确定要删除该班级吗'
+        }).then(() => {
+          if (this.getClsDetailInfo) {
+            let {classid} = this.getClsDetailInfo;
+            this.asyncDeleteClass(classid);
+          }
+        }, () => {});
       },
       changeData(key, val) {
         let info = {};
@@ -158,6 +172,16 @@
           Toast(res.message, 1000);
         }
       },
+      async asyncDeleteClass(classid) {
+        let res = await this.deleteClass(classid);
+        if (res.status === 200) {
+          this.resetDetailInfo();
+          this.$router.replace('/profile/class');
+          // 使用事件总线的方式通知另一个路由组件此时有班级被删除
+          this.$bus.$emit('deleteCreateClass', classid);
+          Toast(res.message, 1000);
+        }
+      }
     },
     watch: {
       index(val) {

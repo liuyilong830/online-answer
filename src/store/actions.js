@@ -33,8 +33,8 @@ const actions = {
   async getQuestionsList(ctx, {limit, start}) {
     return await home.getQuestionsList(limit, start)
   },
-  async getClass(ctx, uid) {
-    return await profile.getClass(uid);
+  async getClass() {
+    return await profile.getClass();
   },
   async createClass(ctx, payload) {
     return await profile.createClass(payload);
@@ -47,6 +47,12 @@ const actions = {
   },
   async updateClass(ctx, info) {
     return await profile.updateClass(info);
+  },
+  async deleteClass(ctx, classid) {
+    return await profile.deleteClass(classid);
+  },
+  async updateUser(ctx, info) {
+    return await profile.updateUser(info);
   },
 }
 

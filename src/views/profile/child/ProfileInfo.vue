@@ -36,10 +36,11 @@
 </template>
 
 <script>
-  import { mapGetters, mapMutations } from 'vuex';
-  import { signOutUser } from '../../../store/mutation-types';
+  import { mapGetters, mapMutations, mapActions } from 'vuex';
+  import { signOutUser, changeUserInfo } from '../../../store/mutation-types';
   import Dialog from "../../../components/dialog";
   import UpdateInfo from "../../../components/content/update-info/UpdateInfo";
+  import Toast from "../../../components/toast";
   export default {
     name: "ProfileInfo",
     components: {
@@ -115,7 +116,8 @@
       },
     },
     methods: {
-      ...mapMutations([signOutUser]),
+      ...mapActions(['updateUser']),
+      ...mapMutations([signOutUser, changeUserInfo]),
       init() {
         let { avatar, nickname, sex, sname, signature } = this.info;
         this.changeInfo.avatar = avatar;
@@ -129,7 +131,15 @@
         this.isupdate = true;
       },
       changeData(key, val) {
-        console.log(key, val);
+        let info = {};
+        if (key === 'birthday') {
+          info[key] = new Date(val).getTime();
+        } else if (key === 'sex') {
+          info[key] = val === '男' ? 0 : 1;
+        } else {
+          info[key] = val;
+        }
+        this.asyncUpdateUser(info, key, val);
       },
       signOut() {
         Dialog.confirm({
@@ -138,6 +148,14 @@
           this.signOutUser();
           this.$router.replace('/login');
         }, () => {});
+      },
+      async asyncUpdateUser(info, key, val) {
+        let res = await this.updateUser(info);
+        if (res.status === 200) {
+          this.changeInfo[key] = val;
+          this.changeUserInfo({...this.info, ...info});
+          Toast(res.message, 1000);
+        }
       }
     },
     mounted() {

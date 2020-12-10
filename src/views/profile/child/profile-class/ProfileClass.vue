@@ -86,8 +86,7 @@
       toCreateClass() {
         if (!this.isTea) return;
         this.iscreated = false;
-        let createid = this.getUserInfo.uid;
-        this.asyncCreateClass({createid, ...this.clsinfo});
+        this.asyncCreateClass({...this.clsinfo});
       },
       /* 进入班级详情页逻辑 */
       toClass(item) {
@@ -123,8 +122,8 @@
         }
       },
       /* 相关逻辑的请求方法 */
-      async asyncGetClass(uid) {
-        let res = await this.getClass(uid);
+      async asyncGetClass() {
+        let res = await this.getClass();
         if (res.status === 200) {
           this.joins = res.data.joins;
           this.creates = res.data.creates;
@@ -147,9 +146,11 @@
       if (!this.isTea) {
         this.text = '参与';
       }
-      if (this.getUserInfo) {
-        this.asyncGetClass(this.getUserInfo.uid);
-      }
+      this.asyncGetClass();
+      this.$bus.$on('deleteCreateClass', (classid) => {
+        let index = this.creates.findIndex(item => item.classid === classid);
+        this.creates.splice(index, 1);
+      })
     }
   }
 </script>

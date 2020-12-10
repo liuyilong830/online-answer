@@ -18,8 +18,27 @@
           <textarea v-model="content"></textarea>
         </div>
         <div class="img" v-else-if="target.mode === 'img'"></div>
-        <div class="birthday" v-else-if="target.mode === 'birthday'"></div>
-        <div class="sex" v-else-if="target.mode === 'sex'"></div>
+        <div class="birthday" v-else-if="target.mode === 'birthday'">
+          <p class="title">选择生日</p>
+          <div class="picker">
+            <van-datetime-picker
+              :min-date="minDate"
+              :max-date="maxDate"
+              v-model="currentDate"
+              type="date"
+              :show-toolbar="false"
+              visible-item-count="5"
+            />
+          </div>
+        </div>
+        <div class="sex" v-else-if="target.mode === 'sex'">
+          <p class="title">选择性别</p>
+          <ul class="checkbox">
+            <li class="item" @click="checkSex('男')">男<i class="iconfont icon-tick" v-if="content === '男'"></i></li>
+            <li class="item dot"></li>
+            <li class="item" @click="checkSex('女')">女<i class="iconfont icon-tick" v-if="content === '女'"></i></li>
+          </ul>
+        </div>
       </div>
     </div>
   </transition>
@@ -27,14 +46,19 @@
 
 <script>
   import NavBar from "../../nav-bar/NavBar";
+  import { DatetimePicker } from 'vant';
   export default {
     name: "UpdateBox",
     components: {
       NavBar,
+      'VanDatetimePicker': DatetimePicker,
     },
     data() {
       return {
         content: null,
+        minDate: new Date(1949, 0, 1),
+        maxDate: new Date(),
+        currentDate: null,
       }
     },
     computed: {
@@ -77,12 +101,28 @@
         if (this.btnCls.length < 2) return;
         this.$emit('changeData', this.key, this.content);
         this.toclose();
-      }
+      },
+      checkSex(sex) {
+        this.content = sex;
+      },
     },
     watch: {
       val(val) {
         this.content = val;
-      }
+        if (this.target.mode === 'birthday') {
+          this.currentDate = new Date(val);
+        }
+      },
+      currentDate(date) {
+        let arr = date.toLocaleDateString().split('/');
+        arr = arr.map(str => {
+          if (str.length < 2) {
+            str = 0 + str;
+          }
+          return str;
+        });
+        this.content = arr.join('-');
+      },
     },
   }
 </script>
@@ -134,6 +174,45 @@
         border-radius: 10px;
         box-sizing: border-box;
         padding: 5px 10px;
+      }
+      .birthday, .sex {
+        .title {
+          font-size: 12px;
+          color: #b1b1b1;
+          margin-bottom: 5px;
+        }
+      }
+      .birthday {
+        .picker {
+          border-radius: 10px;
+          background-color: #fff;
+          overflow: hidden;
+        }
+      }
+      .sex {
+        .checkbox {
+          background-color: #fff;
+          border-radius: 10px;
+          box-sizing: border-box;
+          padding: 5px 10px;
+          .item {
+            position: relative;
+            height: 40px;
+            line-height: 40px;
+            &.dot {
+              height: 0;
+              border-bottom: 1px solid #a0a0a059;
+            }
+            .iconfont {
+              position: absolute;
+              top: 50%;
+              right: 0px;
+              transform: translateY(-50%);
+              color: #5754fd;
+              font-size: 25px;
+            }
+          }
+        }
       }
     }
     &.box-enter, &.box-leave-to {
