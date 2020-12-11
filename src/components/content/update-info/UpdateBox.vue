@@ -17,7 +17,6 @@
         <div class="textarea" v-else-if="target.mode === 'textarea'">
           <textarea v-model="content"></textarea>
         </div>
-        <div class="img" v-else-if="target.mode === 'img'"></div>
         <div class="birthday" v-else-if="target.mode === 'birthday'">
           <p class="title">选择生日</p>
           <div class="picker">

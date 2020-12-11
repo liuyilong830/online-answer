@@ -54,6 +54,11 @@ const actions = {
   async updateUser(ctx, info) {
     return await profile.updateUser(info);
   },
+  async uploadImg(ctx, file) {
+    let form = new FormData();
+    form.append('file', file);
+    return await profile.upload(form);
+  }
 }
 
 export default actions;

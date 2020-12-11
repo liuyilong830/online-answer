@@ -1,12 +1,12 @@
 import Axios from 'axios';
-import router from "../router";
 import Toast from "../components/toast";
+const baseURL = 'http://localhost:5000';
 
 /**
  * 二次封装 axios 库，方便请求
  */
 const instance = Axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL,
   withCredentials: true,
   timeout: 10000
 });

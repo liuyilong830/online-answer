@@ -10,9 +10,10 @@
       </nav-bar>
       <div class="upd-content">
         <div class="upd-avatar">
-          <div class="avatar" v-for="item in imgArr" :key="item.name" @click.stop="toUpdate(item)">
+          <div class="avatar" v-for="item in imgArr" :key="item.name">
             <img :src="info[item.key]" alt="">
             <div class="icon"><i class="iconfont icon-xiangji"></i></div>
+            <input type="file" accept="image/*" @change="getImgFile($event, item)">
           </div>
         </div>
         <div class="upd-text" v-for="item in textOrAreaArr" :key="item.name" @click.stop="toUpdate(item)">
@@ -31,6 +32,7 @@
 <script>
   import NavBar from "../../nav-bar/NavBar";
   import UpdateBox from "./UpdateBox";
+  import { mapActions } from 'vuex';
   export default {
     name: "UpdateInfo",
     components: {
@@ -74,10 +76,16 @@
       },
     },
     methods: {
+      ...mapActions(['uploadImg']),
       toUpdate(info) {
         this.isShow = true;
         this.current = info;
         this.val = this.info[info.key];
+      },
+      getImgFile(e, item) {
+        let file = e.target.files[0];
+        file = new File([file], encodeURI(file.name), { type: file.type });
+        this.asyncUploadImg(file, item);
       },
       afterClose() {
         this.val = null;
@@ -85,6 +93,13 @@
       changeData(key, val) {
         this.$emit('changeData', key, val);
       },
+      async asyncUploadImg(file, info) {
+        let res = await this.uploadImg(file);
+        console.log(res);
+        if (res.status === 200) {
+          this.$emit('changeData', info.key, res.data.path);
+        }
+      }
     },
   }
 </script>
@@ -128,6 +143,15 @@
             border-radius: 50%;
             overflow: hidden;
             border: 1px solid #cccccc73;
+          }
+          input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            opacity: 0;
           }
           .icon {
             position: absolute;

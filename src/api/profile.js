@@ -8,5 +8,5 @@ export default {
   updateClass: (info) => Request.patch('/profile/class/update', info, true),
   deleteClass: (classid) => Request.delete('/profile/class/delete', {classid}, true),
   updateUser: (info) => Request.patch('profile/user/update', info, true),
-
+  upload: (file) => Request.post('profile/upload', file, true),
 }
