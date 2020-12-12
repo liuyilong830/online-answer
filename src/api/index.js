@@ -7,7 +7,6 @@ const baseURL = 'http://localhost:5000';
  */
 const instance = Axios.create({
   baseURL,
-  withCredentials: true,
   timeout: 10000
 });
 

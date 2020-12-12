@@ -25,6 +25,7 @@
         </div>
       </div>
       <update-box v-model="isShow" :target="current" :val="val" @afterClose="afterClose" @changeData="changeData"/>
+      <cropper-box v-model="iscropper"/>
     </div>
   </transition>
 </template>
@@ -32,18 +33,21 @@
 <script>
   import NavBar from "../../nav-bar/NavBar";
   import UpdateBox from "./UpdateBox";
+  import CropperBox from "../cropper-box/CropperBox";
   import { mapActions } from 'vuex';
   export default {
     name: "UpdateInfo",
     components: {
       NavBar,
       UpdateBox,
+      CropperBox,
     },
     data() {
       return {
         isShow: false,
         current: {},
         val: null,
+        iscropper: false,
       }
     },
     computed: {
@@ -84,8 +88,9 @@
       },
       getImgFile(e, item) {
         let file = e.target.files[0];
-        file = new File([file], encodeURI(file.name), { type: file.type });
-        this.asyncUploadImg(file, item);
+        /*file = new File([file], encodeURI(file.name), { type: file.type });
+        this.asyncUploadImg(file, item);*/
+        this.iscropper = true;
       },
       afterClose() {
         this.val = null;
