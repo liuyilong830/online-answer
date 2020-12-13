@@ -1,7 +1,7 @@
 <template>
   <ul class="cls-list">
     <li class="cls-item" v-for="item in list" :key="item.classid">
-      <class-card :class-info="item" @click.native.stop="toClass(item)"/>
+      <class-card :class-info="item" :card-style="cardStyle" @click.native.stop="toClass(item)"/>
     </li>
   </ul>
 </template>
@@ -21,6 +21,15 @@
         type: Array,
         default() {
           return [];
+        }
+      },
+      cardStyle: {
+        type: Object,
+        default() {
+          return {
+            backgroundColor: '#cecece42',
+            boxShadow: '0px 0px 5px 1px #a5a2a2',
+          };
         }
       }
     },

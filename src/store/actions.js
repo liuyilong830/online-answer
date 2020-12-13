@@ -58,7 +58,13 @@ const actions = {
     let form = new FormData();
     form.append('file', file);
     return await profile.upload(form);
-  }
+  },
+  async classList() {
+    return await profile.getClassList();
+  },
+  async appendClass(ctx, classid) {
+    return await profile.appendClass(classid);
+  },
 }
 
 export default actions;

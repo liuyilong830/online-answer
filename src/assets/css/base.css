@@ -107,6 +107,9 @@ input {
   /*由于 input 默认不继承父元素的居中样式，所以设置：「text-align: inherit」*/
   text-align: inherit;
 }
+input[type='search']::-webkit-search-cancel-button {
+  display: none;
+}
 
 textarea {
   /*textarea 默认不可以放缩*/

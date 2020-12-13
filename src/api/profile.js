@@ -7,6 +7,8 @@ export default {
   queryClassPeople: (classid) => Request.get('/profile/class/people', {classid}, true),
   updateClass: (info) => Request.patch('/profile/class/update', info, true),
   deleteClass: (classid) => Request.delete('/profile/class/delete', {classid}, true),
-  updateUser: (info) => Request.patch('profile/user/update', info, true),
-  upload: (file) => Request.post('profile/upload', file, true),
+  updateUser: (info) => Request.patch('/profile/user/update', info, true),
+  upload: (file) => Request.post('/profile/upload', file, true),
+  getClassList: () => Request.get('/profile/class/list', {}),
+  appendClass: (classid) => Request.post('/profile/class/append', {classid}, true),
 }

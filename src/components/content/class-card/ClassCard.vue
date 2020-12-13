@@ -1,6 +1,6 @@
 <template>
   <div class="class-card">
-    <card :style="{backgroundColor: '#cecece42', boxShadow: '0px 0px 5px 1px #a5a2a2'}">
+    <card :style="cardStyle">
       <template #image>
         <div class="class-img">
           <img :src="classInfo.classavatar" alt="">
@@ -37,6 +37,12 @@
     },
     props: {
       classInfo: {
+        type: Object,
+        default() {
+          return {};
+        }
+      },
+      cardStyle: {
         type: Object,
         default() {
           return {};

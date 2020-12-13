@@ -15,6 +15,7 @@
     <popup :box-style="{width: '85%'}" round closeable :get-container="getBody()" v-model="iscreated">
       <class-create v-bind.sync="clsinfo" @toCreateClass="toCreateClass"/>
     </popup>
+    <search-class v-model="isjoined"/>
   </div>
 </template>
 
@@ -23,6 +24,7 @@
   import Popup from "../../../../components/popup/Popup";
   import ClassCreate from "./ClassCreate";
   import NotFound from "../../../../components/content/not-found/NotFound";
+  import SearchClass from "../../../../components/content/search-class/SearchClass";
   import { root } from '../../../../util/Mixin';
   import { mapActions, mapMutations } from 'vuex';
   import {
@@ -36,6 +38,7 @@
       Popup,
       ClassCreate,
       NotFound,
+      SearchClass,
     },
     mixins: [root],
     inject: ['scroller'],
@@ -50,6 +53,7 @@
           classname: '',
           description: ''
         },
+        isjoined: false,
       }
     },
     computed: {
@@ -81,6 +85,7 @@
           this.iscreated = true;
         } else if (this.text === '参与') {
           console.log('去加入班级');
+          this.isjoined = true;
         }
       },
       toCreateClass() {

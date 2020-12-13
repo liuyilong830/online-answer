@@ -3,8 +3,10 @@
     <div class="cls-detail">
       <transition name="opt">
         <ul class="opertations" v-if="isoperation">
-          <li class="opt-item" @click.stop="toUpdateCls">编辑信息</li>
-          <li class="opt-item" @click.stop="toDeleteCls">注销班级</li>
+          <li class="opt-item" v-if="isauthor" @click.stop="toUpdateCls">编辑信息</li>
+          <li class="opt-item" v-if="isauthor" @click.stop="toDeleteCls">注销班级</li>
+          <li class="opt-item" v-if="isjoined" @click.stop="toAppendCls">加入班级</li>
+          <li class="opt-item" v-if="!isauthor && !isjoined">无</li>
         </ul>
       </transition>
       <nav-bar>
@@ -15,8 +17,7 @@
           <profile-nav-bar v-model="index" :list="list" :style="pflnavbarStyle"/>
         </div>
         <template #right>
-          <i class="iconfont icon-19" v-if="isTea" @click.stop="operationClick"></i>
-          <i v-else></i>
+          <i class="iconfont icon-19" @click.stop="operationClick"></i>
         </template>
       </nav-bar>
       <div class="detail-scroller" @scroll="onscroll">
@@ -89,6 +90,12 @@
     },
     computed: {
       ...mapGetters(['getClsDetailInfo']),
+      isauthor() {
+        return this.getClsDetailInfo.uid === this.getUserInfo.uid;
+      },
+      isjoined() {
+        return !this.isauthor && this.people.findIndex(item => item.uid === this.getUserInfo.uid) === -1
+      },
       pflnavbarStyle() {
         return {
           'borderRadius': '0px',
@@ -112,7 +119,7 @@
     },
     methods: {
       ...mapMutations([classDetailInfo, resetDetailInfo]),
-      ...mapActions(['queryClassByUid', 'queryClassPeople', 'updateClass', 'deleteClass']),
+      ...mapActions(['queryClassByUid', 'queryClassPeople', 'updateClass', 'deleteClass', 'appendClass']),
       init() {
         let {classavatar, classname, description} = this.getClsDetailInfo;
         this.info.classavatar = classavatar;
@@ -143,6 +150,16 @@
           if (this.getClsDetailInfo) {
             let {classid} = this.getClsDetailInfo;
             this.asyncDeleteClass(classid);
+          }
+        }, () => {});
+      },
+      toAppendCls() {
+        Dialog.confirm({
+          message: '你确定要加入该班级吗'
+        }).then(() => {
+          if (this.getClsDetailInfo) {
+            let {classid} = this.getClsDetailInfo;
+            this.asyncAppendClass(classid);
           }
         }, () => {});
       },
@@ -181,14 +198,23 @@
           this.$bus.$emit('deleteCreateClass', classid);
           Toast(res.message, 1000);
         }
-      }
+      },
+      async asyncAppendClass(classid) {
+        let res = await this.appendClass(classid);
+        if (res.status === 200) {
+          let { avatar, nickname, sex, sname, uid } = this.getUserInfo;
+          let user = {avatar, nickname, sex, sname, uid};
+          this.people.push(user);
+          let details = this.getClsDetailInfo;
+          this.classDetailInfo({...details, count: details.count+1});
+          Toast(res.message, 1000);
+        }
+      },
     },
     watch: {
       index(val) {
         if (val === 1) {
           this.asyncClassPeople(this.getClsDetailInfo.classid);
-        } else {
-          this.people = [];
         }
       }
     },
@@ -199,6 +225,7 @@
         obj.uid = this.getClsDetailInfo.uid;
         obj.classid = this.getClsDetailInfo.classid;
         this.asyncClassByUid(obj);
+        this.asyncClassPeople(this.getClsDetailInfo.classid);
       }
       document.body.addEventListener('click', () => {
         this.onscroll();
