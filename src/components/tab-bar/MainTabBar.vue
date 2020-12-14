@@ -1,7 +1,7 @@
 <template>
   <div class="mtb">
     <tab-bar>
-      <tab-bar-item v-for="item in tabBarList" :key="item.id" :path="item.path">
+      <tab-bar-item v-for="item in tabBarList" :key="item.id" :path="item.path" :other="item.other" v-on="$listeners">
         <span v-if="!item.other">{{item.title}}</span>
         <div v-else class="rls">
           <div class="rect">

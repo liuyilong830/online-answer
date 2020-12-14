@@ -3,7 +3,7 @@
     <redirect-dialog ref="scrollRef" @scroll.native="onscroll" @isrender="onrender">
       <nav-bar class="pfl-navbar" ref="navbar">
         <template #left>
-          <i class="iconfont icon-liebiao"></i>
+          <i class="iconfont icon-liebiao" @click.stop="toMore"></i>
         </template>
         <div class="pfl-navbar-ct"></div>
         <template #right>
@@ -24,6 +24,9 @@
         </div>
       </profile-content>
     </redirect-dialog>
+    <popup :is-show.sync="ispopup" position="left" :style="{width: '60%'}">
+      <more-list/>
+    </popup>
   </div>
 </template>
 
@@ -33,6 +36,8 @@
   import ProfileInfo from "./child/ProfileInfo";
   import ProfileContent from "./child/ProfileContent";
   import ProfileNavBar from "./child/ProfileNavBar";
+  import Popup from "../../components/popup/Popup";
+  import MoreList from "./MoreList";
   export default {
     name: "Profile",
     components: {
@@ -41,6 +46,8 @@
       ProfileInfo,
       ProfileContent,
       ProfileNavBar,
+      Popup,
+      MoreList,
     },
     data() {
       return {
@@ -56,6 +63,7 @@
           { title: '挑战记录', path: '/profile/challenge' },
           { title: '收藏夹', path: '/profile/collection' },
         ],
+        ispopup: false,
       }
     },
     computed: {
@@ -78,9 +86,11 @@
     methods: {
       init() {
         if (!this.isrender) return;
-        this.navbarRect = this.$refs.navbar.$el.getBoundingClientRect();
-        this.infoRect = this.$refs.pflInfoRef.$el.getBoundingClientRect();
-        this.positionY = this.infoRect.height - this.navbarRect.height - 11;
+        this.$nextTick(() => {
+          this.navbarRect = this.$refs.navbar.$el.getBoundingClientRect();
+          this.infoRect = this.$refs.pflInfoRef.$el.getBoundingClientRect();
+          this.positionY = this.infoRect.height - this.navbarRect.height - 11;
+        })
       },
       onscroll() {
         const rect = this.$refs.scrollRef.$el.children[0].getBoundingClientRect();
@@ -97,6 +107,9 @@
       changeIndex(index) {
         this.$router.replace(this.list[index].path);
       },
+      toMore() {
+        this.ispopup = true;
+      },
     },
     created() {
       let index = this.list.findIndex(item => item.path === this.$route.path);
@@ -105,7 +118,10 @@
     },
     mounted() {
       this.init();
-    }
+      this.$bus.$on('resetPosition', () => {
+        this.init();
+      })
+    },
   }
 </script>
 

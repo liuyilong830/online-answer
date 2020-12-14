@@ -6,19 +6,27 @@
       </div>
       <div class="item-nickname">
         <span>{{item.nickname}}</span>
+        <span class="yourself" v-if="item.uid === getUserInfo.uid">自己</span>
+        <span class="creater" v-if="item.uid === getClsDetailInfo.uid">创始人</span>
       </div>
     </li>
   </ul>
 </template>
 
 <script>
+  import { root } from '../../../util/Mixin';
+  import { mapGetters } from 'vuex';
   export default {
     name: "PeopleList",
     data() {
       return {}
     },
+    mixins: [root],
     props: {
       people: Array,
+    },
+    computed: {
+      ...mapGetters(['getClsDetailInfo'])
     },
     methods: {},
   }
@@ -51,6 +59,17 @@
         display: flex;
         align-items: center;
         font-size: 14px;
+        .yourself, .creater {
+          padding: 0 5px;
+          border-radius: 5px;
+          border: 1px solid #5754fd;
+          color: #5754fd;
+          margin-left: 10px;
+        }
+        .creater {
+          border: 1px solid #fd546b;
+          color: #fd546b;
+        }
       }
     }
   }

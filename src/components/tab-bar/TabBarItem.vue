@@ -12,6 +12,7 @@
     },
     props: {
       path: String,
+      other: Boolean,
     },
     computed: {
       isActive() {
@@ -21,7 +22,11 @@
     },
     methods: {
       toPathClick() {
-        this.$router.replace(this.path);
+        if (this.other) {
+          this.$emit('otherEvent');
+        } else {
+          this.$router.replace(this.path);
+        }
       }
     },
   }

@@ -61,7 +61,6 @@
         this.$emit('input', false);
       },
       toClass(item) {
-        console.log(item);
         this.$router.push(`/profile/detail/${item.classid}`);
         this.classDetailInfo(item);
       },

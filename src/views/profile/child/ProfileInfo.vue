@@ -154,6 +154,7 @@
         if (res.status === 200) {
           this.changeInfo[key] = val;
           this.changeUserInfo({...this.info, ...info});
+          this.$bus.$emit('resetPosition');
           Toast(res.message, 1000);
         }
       }
@@ -165,6 +166,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import "../../../assets/css/base";
   .pfl-info {
     position: relative;
     &::before {
@@ -246,11 +248,11 @@
         }
       }
       .pfl-info-signature {
-        height: 30px;
+        min-height: 30px;
         margin-bottom: 5px;
-        line-height: 30px;
         color: #fff;
         font-size: 13px;
+        @include toEllipse(3);
       }
       .pfl-info-others {
         height: 50px;
