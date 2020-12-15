@@ -38,7 +38,8 @@
             <p class="title">选项内容，对应ABCD或更多依次排列</p>
             <div class="input-group" v-for="(item, i) in form.tnum" :key="item">
               <textarea class="radio-input" placeholder="请输入选项内容" ref="resultRefs"></textarea>
-              <span class="name">{{formatTnum(i)}}</span>
+              <p class="name" @click="setRes(i)" v-if="formatTnum(i) !== form.res">{{formatTnum(i)}}</p>
+              <i class="name iconfont icon-gou" v-else></i>
             </div>
           </div>
         </div>
@@ -63,6 +64,7 @@
     this.tname = tname;
     this.tnum = tnum;
     this.result = result;
+    this.res = null;
   }
   export default {
     name: "SingleQuestion",
@@ -107,6 +109,9 @@
         this.iscustom = false;
         this.form.tnum = num;
       },
+      setRes(num) {
+        this.form.res = String.fromCharCode(65 + num);
+      },
       tocustom() {
         this.iscustom = true;
         this.form.tnum = null;
@@ -134,13 +139,15 @@
         console.log('成功');
       },
       validation() {
-        let { tname, tnum, result } = this.form;
+        let { tname, tnum, result, res } = this.form;
         if (!tname) {
           Toast('题目描述是必须的');
         } else if (tnum < 2 || tnum > 10) {
           Toast('题目的选项数量必须在两个到10个之间');
         } else if (result.some(str => str === '')) {
           Toast('题目的每个选项都必须有内容');
+        } else if (!res) {
+          Toast('必须选择一个选项作为结果');
         } else {
           return true;
         }
@@ -356,6 +363,10 @@
               top: 8px;
               left: 15px;
               font-size: 20px;
+              &.iconfont {
+                left: 10px;
+                color: #5754fd;
+              }
             }
           }
         }
