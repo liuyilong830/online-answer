@@ -18,6 +18,9 @@
         index: 0,
       }
     },
+    props: {
+      value: Number,
+    },
     provide() {
       return {
         swipe: this
@@ -66,7 +69,10 @@
     watch: {
       children() {
         this.init();
-      }
+      },
+      index(val) {
+        this.$emit('input', val);
+      },
     }
   }
 </script>

@@ -30,8 +30,8 @@
         <p class="title">设置题库的封面图</p>
         <div class="bg">
           <div class="upload">
-            <input type="file" @change="changeFile">
             <i class="iconfont icon-jiahao"></i>
+            <input type="file" @change="changeFile" accept="image/*" ref="file">
           </div>
           <transition name="img">
             <div class="view" v-if="form.icon">
@@ -43,12 +43,13 @@
       </div>
     </div>
     <div class="next">
-      <button @click.stop="tonext">下一步</button>
+      <button :class="{disable: isdisable}" @click.stop="tonext">下一步</button>
     </div>
   </div>
 </template>
 
 <script>
+  import Toast from "../../toast";
   export default {
     name: "QuestionsCreate",
     data() {
@@ -62,6 +63,11 @@
         },
       }
     },
+    computed: {
+      isdisable() {
+        return !this.form.qname || !this.form.icon;
+      },
+    },
     methods: {
       changeHidden() {
         this.form.ishidden = this.form.ishidden ? 0 : 1;
@@ -74,9 +80,21 @@
         this.form.icon = 'http://localhost:5000/img/356.jpg';
       },
       deleteImg() {
+        this.$refs.file.value = '';
         this.form.icon = '';
       },
+      validation() {
+        let { qname, icon } = this.form;
+        if (!qname || qname.length > 16) {
+          Toast('题库名称是必填的，且长度不得超过16个字');
+        } else if (!icon) {
+          Toast('请选择一个题库的封面图片');
+        } else {
+          return true;
+        }
+      },
       tonext() {
+        if (!this.validation()) return;
         this.$emit('tonext', this.form);
       },
     },
@@ -111,6 +129,10 @@
         border-radius: 5px;
         background-color: #5754fd;
         color: #fff;
+        &.disable {
+          background-color: #e4e4e4;
+          color: #c1c0c0;
+        }
       }
     }
     .public {

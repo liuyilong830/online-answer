@@ -5,3 +5,8 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
 }
+
+@mixin disable() {
+  background-color: #e4e4e4;
+  color: #c1c0c0;
+}
