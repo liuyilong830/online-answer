@@ -12,6 +12,7 @@
   import Login from "./views/login/Login";
   import MainTabBar from "./components/tab-bar/MainTabBar";
   import Release from "./views/release/Release";
+  import { islogin } from './util/Mixin';
   export default {
     name: 'App',
     components: {
@@ -19,6 +20,7 @@
       MainTabBar,
       Release,
     },
+    mixins: [islogin()],
     data() {
       return {
         isShow: false,
@@ -26,7 +28,9 @@
     },
     methods: {
       otherEvent() {
-        this.isShow = true;
+        this.valdation(function () {
+          this.isShow = true;
+        })
       },
     },
   }
@@ -35,7 +39,7 @@
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_h6cxhh89vxa.css');
+    @import url('http://at.alicdn.com/t/font_2194746_bg9oekrgs0q.css');
     width: 100vw;
     height: 100vh;
     display: flex;

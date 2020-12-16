@@ -3,7 +3,7 @@
     <div class="content">
       <div class="question-name public">
         <p class="title">题库名称</p>
-        <input type="text" placeholder="请输入题库名称" v-model="form.qname">
+        <input type="text" placeholder="请输入题库名称" v-model="form.qname" maxlength="16">
         <p class="description">名称长度限制为16个字</p>
       </div>
       <div class="question-desc public">

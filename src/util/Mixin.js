@@ -1,24 +1,36 @@
 import { mapActions, mapGetters } from 'vuex';
-const showModelBox = {
-  data() {
-    return {
-      isShowModel: false
-    }
-  },
-  methods: {
-    ...mapActions(['isLogined']),
-  },
-  async created() {
-    let token = window.localStorage.getItem('token');
-    console.log(token)
-    if (!token) {
-      this.isShowModel = true;
-    } else {
-      let res = await this.isLogined();
-      if (res.status === 401) {
-        this.isShowModel = true;
-      }
-    }
+import Dialog from "../components/dialog";
+const islogin = function (fn) {
+  return {
+    methods: {
+      ...mapActions(['isLogined']),
+      openDialog() {
+        if (fn) {
+          fn.call(this);
+        }
+        Dialog.confirm({
+          message: '您还未登录哟，请麻烦进行登录!'
+        }).then(() => {
+          this.$router.replace('/login');
+        }, () => {
+          this.$router.replace('/home');
+        })
+      },
+      async valdation(func) {
+        let token = localStorage.getItem('token');
+        if (!token) {
+          this.openDialog();
+        } else {
+          let res = await this.isLogined();
+          if (res.status === 401) {
+            this.openDialog();
+            localStorage.removeItem('token');
+          } else {
+            func && func.call(this);
+          }
+        }
+      },
+    },
   }
 }
 
@@ -35,6 +47,6 @@ const root = {
 }
 
 export {
-  showModelBox,
+  islogin,
   root
 }

@@ -8,8 +8,11 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex';
-  import Dialog from "../../dialog";
+  import { islogin } from '../../../util/Mixin';
+  let m1 = islogin(function () {
+    this.isShow = true;
+    this.$emit('isrender', false);
+  })
   export default {
     name: "RedirectDialog",
     data() {
@@ -17,36 +20,14 @@
         isShow: false,
       }
     },
+    mixins: [m1],
     provide() {
       return {
         scroller: this
       }
     },
-    methods: {
-      ...mapActions(['isLogined']),
-      openDialog() {
-        this.isShow = true;
-        this.$emit('isrender', false);
-        Dialog.confirm({
-          message: '您还未登录哟，请麻烦进行登录!'
-        }).then(() => {
-          this.$router.replace('/login');
-        }, () => {
-          this.$router.replace('/home');
-        })
-      }
-    },
-    async created() {
-      let token = localStorage.getItem('token');
-      if (!token) {
-        this.openDialog();
-      } else {
-        let res = await this.isLogined();
-        if (res.status === 401) {
-          this.openDialog();
-          localStorage.removeItem('token');
-        }
-      }
+    created() {
+      this.valdation();
     }
   }
 </script>
