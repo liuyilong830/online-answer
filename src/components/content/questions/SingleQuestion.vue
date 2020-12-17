@@ -144,7 +144,6 @@
         if (curr === this.maxLen) {
           return this.form = new Template();
         } else {
-          this.disable = true;
           return this.form = this.created[curr-1];
         }
       },
