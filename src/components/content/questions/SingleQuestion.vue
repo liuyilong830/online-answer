@@ -76,6 +76,7 @@
     methods: {
       toprev() {
         this.$emit('toprev');
+        console.log('lalala');
       },
       tonext() {
         if (!this.created.length) {
