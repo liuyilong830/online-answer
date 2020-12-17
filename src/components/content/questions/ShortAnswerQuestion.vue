@@ -1,8 +1,8 @@
 <template>
   <div class="short-answer-question">
-    <div class="content">
+    <question-form v-model="ismore" :len="len" :curr.sync="curr">
       short-answer-question
-    </div>
+    </question-form>
     <div class="opeartion">
       <button class="prev-btn" @click="toprev">上一步</button>
       <button class="next-btn" @click="onfinish">完成</button>
@@ -11,10 +11,23 @@
 </template>
 
 <script>
+  import QuestionForm from "../form/QuestionForm";
   export default {
     name: "ShortAnswerQuestion",
+    components: {
+      QuestionForm,
+    },
     data() {
-      return {}
+      return {
+        ismore: false,
+        created: [],
+        curr: 1,
+      }
+    },
+    computed: {
+      len() {
+        return this.created.length;
+      },
     },
     methods: {
       toprev() {
@@ -28,6 +41,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import "../../../assets/css/base";
   .short-answer-question {
     width: 100vw;
     height: 100%;
