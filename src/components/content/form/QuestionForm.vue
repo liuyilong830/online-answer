@@ -42,8 +42,6 @@
 </template>
 
 <script>
-  import Dialog from "../../dialog";
-
   export default {
     name: "QuestionForm",
     data() {
@@ -80,40 +78,32 @@
       },
       changeCurr(index) {
         this.$emit('update:curr', index + 1);
-        this.$emit('setForm', this.curr);
-        /*this.curr = index + 1;
-        this.setForm(this.curr);*/
+        this.setForm();
       },
       toprevForm() {
         if (this.prevFormDisable) return;
         this.$emit('update:curr', this.curr - 1);
-        this.$emit('setForm', this.curr);
-        // this.curr -= 1;
-        // this.setForm(this.curr);
+        this.setForm();
       },
       tonextForm() {
         this.$emit('update:curr', this.curr + 1);
-        this.$emit('setForm', this.curr);
-        /*this.curr += 1;
-        this.setForm(this.curr);*/
+        this.setForm();
+      },
+      setForm() {
+        this.$nextTick(() => {
+          this.disable = true;
+          this.$emit('setForm', this.curr);
+        })
       },
       tomodify() {
         this.disable = false;
       },
       toupdate() {
         this.$emit('toupdate', this.curr);
-        /*this.form.result = this.$refs.resultRefs.map(dom => dom.value);
-        this.created[this.curr-1] = this.form;*/
         this.disable = true;
       },
       todelete() {
-        Dialog.confirm({
-          message: '您确定删除该题目吗？'
-        }).then(() => {
-          /*this.created.splice(this.curr-1, 1);
-          this.setForm(this.curr);*/
-          this.$emit('todelete', this.curr);
-        }, () => {});
+        this.$emit('todelete', this.curr);
       },
       onsubmit() {
         this.$emit('onsubmit');
@@ -121,7 +111,7 @@
     },
     mounted() {
       document.body.addEventListener('click', () => {
-        this.toMore();
+        this.$emit('input', false);
       })
     }
   }
