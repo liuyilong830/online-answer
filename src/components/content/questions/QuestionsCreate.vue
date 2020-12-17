@@ -95,7 +95,8 @@
       },
       tonext() {
         if (!this.validation()) return;
-        this.$emit('tonext', this.form);
+        this.$bus.$emit('createQues', this.form);
+        this.$emit('tonext');
       },
     },
   }

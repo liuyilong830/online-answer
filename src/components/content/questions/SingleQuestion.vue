@@ -82,10 +82,11 @@
           Dialog.confirm({
             message: '如果跳过，则不需要单选题'
           }).then(() => {
-            console.log('跳过');
+            this.$bus.$emit('createMultiple', this.created);
             this.$emit('tonext');
           }, () => {})
         } else {
+          this.$bus.$emit('createMultiple', this.created);
           this.$emit('tonext');
         }
       },

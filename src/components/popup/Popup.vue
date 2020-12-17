@@ -151,7 +151,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 4;
+    z-index: 100;
     .pt-popup-mask {
       position: fixed;
       width: 100%;
@@ -165,6 +165,7 @@
       background-color: #fff;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
       &.pt-content-center {
         top: 50%;
         left: 50%;

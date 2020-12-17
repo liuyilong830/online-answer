@@ -10,7 +10,8 @@
         <static-swipe ref="swipe" v-model="curr">
           <static-swipe-item><questions-create @tonext="tonext"/></static-swipe-item>
           <static-swipe-item><single-question @toprev="toprev" @tonext="tonext"/></static-swipe-item>
-          <static-swipe-item><short-answer-question @toprev="toprev"/></static-swipe-item>
+          <static-swipe-item><short-answer-question @toprev="toprev" @tonext="tonext"/></static-swipe-item>
+          <static-swipe-item><finish-question @toprev="toprev"/></static-swipe-item>
         </static-swipe>
       </div>
     </div>
@@ -22,9 +23,10 @@
   import QuestionsCreate from "../../components/content/questions/QuestionsCreate";
   import SingleQuestion from "../../components/content/questions/SingleQuestion";
   import ShortAnswerQuestion from "../../components/content/questions/ShortAnswerQuestion";
+  import FinishQuestion from "../../components/content/questions/FinishQuestion";
   import StaticSwipe from "../../components/content/static-swipe/StaticSwipe";
   import StaticSwipeItem from "../../components/content/static-swipe/StaticSwipeItem";
-  const titles = ['创建题库', '创建选择题', '创建简答题'];
+  const titles = ['创建题库', '创建选择题', '创建简答题', '发布题库'];
   export default {
     name: "Release",
     components: {
@@ -32,6 +34,7 @@
       QuestionsCreate,
       SingleQuestion,
       ShortAnswerQuestion,
+      FinishQuestion,
       StaticSwipe,
       StaticSwipeItem,
     },
@@ -57,7 +60,7 @@
       toclose() {
         this.$emit('input', false);
       },
-      tonext(form) {
+      tonext() {
         this.$refs.swipe.next();
       },
       toprev() {
