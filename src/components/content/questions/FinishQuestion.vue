@@ -58,14 +58,14 @@
         <div class="public" v-if="ismult">
           <p class="title">选项</p>
           <ul class="options">
-            <li class="option-item" v-for="(item, index) in info.result">
+            <li class="option-item" v-for="(item, index) in info.options" :key="index">
               <span>{{`${formatTnum(index)}. ${item}`}}</span>
             </li>
           </ul>
         </div>
-        <div class="public" v-if="ismult">
-          <p class="title">正确选项</p>
-          <p class="result">{{info.res.join(',')}}</p>
+        <div class="public" v-if="info.res">
+          <p class="title">正确答案</p>
+          <p class="result">{{formatRes(info.res)}}</p>
         </div>
         <div class="public">
           <p class="title">答案解析</p>
@@ -77,6 +77,10 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex';
+  import { deepClone } from '../../../util/util';
+  import Dialog from "../../dialog";
+  import Toast from "../../toast";
   import Popup from "../../popup/Popup";
   export default {
     name: "FinishQuestion",
@@ -91,8 +95,10 @@
         isshow: false,
         ismult: false,
         info: {},
+        iconname: '',
       }
     },
+    inject: ['Release'],
     computed: {
       getqname() {
         return this.bank.qname || '空';
@@ -113,15 +119,30 @@
       },
     },
     methods: {
+      ...mapActions(['createQuesBank', 'createTimus']),
       toprev() {
         this.$emit('toprev');
       },
       tofinish() {
-        console.log('发送请求');
+        Dialog.confirm({
+          message: '确定根据相关配置项进行创建题库吗？'
+        }).then(() => {
+          this.bank.createtime = Date.now();
+          this.asyncCreateQuesBank({...this.bank, icon: this.iconname}, (qid) => {
+            let multiples = deepClone(this.multiples);
+            multiples = multiples.map(item => {
+              item.res = item.res.map(i => item.options[i]);
+              return item;
+            });
+            let list = [...multiples, ...this.shortanswer];
+            this.asyncCreateTimus(qid, list);
+          }, () => {});
+        });
       },
       init() {
-        this.$bus.$on('createQues', (bank) => {
+        this.$bus.$on('createQues', (bank, iconname) => {
           this.bank = bank;
+          this.iconname = iconname;
         })
         this.$bus.$on('createMultiple', (multiples) => {
           this.multiples = multiples;
@@ -145,9 +166,31 @@
       formatTnum(num) {
         return String.fromCharCode(65 + num);
       },
+      formatRes(res) {
+        if (typeof res === 'string') {
+          return res;
+        } else {
+          return res.map(i => this.formatTnum(i)).join('');
+        }
+      },
       closed() {
         this.info = {};
         this.ismult = false;
+      },
+      async asyncCreateQuesBank(bank, cb) {
+        let res = await this.createQuesBank(bank);
+        if (res.status === 200) {
+          let { qid } = res.data;
+          cb(qid)
+        }
+      },
+      async asyncCreateTimus(quesid, list) {
+        let res = await this.createTimus({quesid, list});
+        console.log(res);
+        if (res.status === 200) {
+          Toast('创建成功', 2000);
+          this.Release.toclose();
+        }
       },
     },
     mounted() {

@@ -19,12 +19,23 @@
         </div>
       </div>
       <div class="question-istoclass public">
-        <p class="title">是否将题库设置为只出现在班级内</p>
-        <div class="checkbox">
-          <span :class="{item: true, active: form.istoclass === 0}" @click="changeToCls">否</span>
+        <p class="title">是否将题库设置为只出现在班级内（仅供教师选择）</p>
+        <div class="checkbox" v-if="isTea">
+          <span :class="{item: true, active: form.istoclass === 0}" @click="changeToCls(false)">否</span>
           <sub class="dot"></sub>
-          <span :class="{item: true, active: form.istoclass === 1}" @click="changeToCls">是</span>
+          <span :class="{item: true, active: form.istoclass === 1}" @click="changeToCls(true)">是</span>
         </div>
+        <div class="checkbox" v-else>
+          <span class="item active">否</span>
+        </div>
+      </div>
+      <div class="public" v-if="cls.length">
+        <p class="title">选择需要该题库的班级</p>
+        <ul class="cls-list">
+          <li class="list-item" v-for="item in cls" :key="item.classid">
+            <div class="item-text" :class="{active: form.cls.includes(item.classid)}" @click="checkCls(item)">{{item.classname}}</div>
+          </li>
+        </ul>
       </div>
       <div class="question-bg public">
         <p class="title">设置题库的封面图</p>
@@ -36,7 +47,7 @@
           <transition name="img">
             <div class="view" v-if="form.icon">
               <img :src="form.icon" alt="">
-              <div class="mask"><i class="iconfont icon-lajitong" @click="deleteImg"></i></div>
+              <div class="mask"><i class="iconfont icon-lajitong" @click="todeleteImg"></i></div>
             </div>
           </transition>
         </div>
@@ -50,6 +61,8 @@
 
 <script>
   import Toast from "../../toast";
+  import { root } from '../../../util/Mixin';
+  import { mapActions } from 'vuex';
   export default {
     name: "QuestionsCreate",
     data() {
@@ -59,29 +72,51 @@
           description: '',
           ishidden: 0,
           istoclass: 0,
-          icon: ''
+          icon: '',
+          cls: [],
         },
+        cls: [],
       }
     },
+    mixins: [root],
     computed: {
       isdisable() {
         return !this.form.qname || !this.form.icon;
       },
     },
     methods: {
+      ...mapActions(['getCreatedCls', 'uploadImg', 'deleteImg']),
       changeHidden() {
         this.form.ishidden = this.form.ishidden ? 0 : 1;
       },
-      changeToCls() {
+      async changeToCls(flag) {
+        if (!this.isTea) return;
         this.form.istoclass = this.form.istoclass ? 0 : 1;
+        if (flag) {
+          let res = await this.getCreatedCls();
+          this.cls = res.data;
+        } else {
+          this.cls = [];
+        }
+      },
+      checkCls(cls) {
+        let index = this.form.cls.findIndex(classid => classid === cls.classid);
+        if (index > -1) {
+          this.form.cls.splice(index, 1);
+        } else {
+          this.form.cls.push(cls.classid);
+        }
       },
       changeFile(e) {
         let file = e.target.files[0];
-        this.form.icon = 'http://localhost:5000/img/356.jpg';
+        console.log(file);
+        this.asyncUploadImg(file);
+        // this.form.icon = 'http://localhost:5000/img/356.jpg';
       },
-      deleteImg() {
+      todeleteImg() {
         this.$refs.file.value = '';
         this.form.icon = '';
+        this.asyncDeleteImg(this.filename);
       },
       validation() {
         let { qname, icon } = this.form;
@@ -95,14 +130,25 @@
       },
       tonext() {
         if (!this.validation()) return;
-        this.$bus.$emit('createQues', this.form);
+        this.$bus.$emit('createQues', this.form, this.filename);
         this.$emit('tonext');
       },
+      async asyncUploadImg(file) {
+        let res = await this.uploadImg(file);
+        console.log(res);
+        let { path, filename } = res.data;
+        this.form.icon = path;
+        this.filename = filename;
+      },
+      async asyncDeleteImg(filename) {
+        await this.deleteImg(filename);
+      }
     },
   }
 </script>
 
 <style scoped lang="scss">
+  @import "../../../assets/css/base";
   @mixin desc{
     font-size: 12px;
     color: #b1b1b1;
@@ -161,6 +207,7 @@
         @include desc;
       }
       .checkbox {
+        position: relative;
         height: 40px;
         border-radius: 10px;
         display: flex;
@@ -243,6 +290,32 @@
           }
           &.img-enter-active, &.img-leave-active {
             transition: all .3s;
+          }
+        }
+      }
+      .cls-list {
+        max-height: 150px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-sizing: border-box;
+        padding: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        .list-item {
+          width: 50%;
+          box-sizing: border-box;
+          padding: 5px;
+          .item-text {
+            text-align: center;
+            height: 30px;
+            line-height: 30px;
+            background-color: #1989fa;
+            border-radius: 7px;
+            color: #fff;
+            @include toEllipse(1);
+            &.active {
+              background-color: #5754fd;
+            }
           }
         }
       }

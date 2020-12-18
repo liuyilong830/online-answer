@@ -6,6 +6,10 @@
         <input class="text" type="text" placeholder="请输入题目名称" v-model="form.tname">
       </div>
       <div class="public">
+        <p class="title">参考答案</p>
+        <textarea placeholder="请输入参考答案" v-model="form.res"></textarea>
+      </div>
+      <div class="public">
         <p class="title">题目解析</p>
         <textarea placeholder="一个好的题目解析能够帮助到答题者哟" v-model="form.description"></textarea>
       </div>
@@ -24,6 +28,9 @@
   function Template() {
     this.tname = '';
     this.description = '';
+    this.res = '';
+    this.tnum = 0;
+    this.options = [];
   }
   export default {
     name: "ShortAnswerQuestion",
@@ -65,9 +72,11 @@
         }
       },
       validation() {
-        let { tname } = this.form;
+        let { tname, res } = this.form;
         if (!tname) {
           Toast('题目描述是必须的', 1000);
+        } else if (!res) {
+          Toast('参考答案是必须的', 1000);
         } else {
           return true;
         }

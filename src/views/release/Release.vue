@@ -47,6 +47,11 @@
     props: {
       value: Boolean,
     },
+    provide() {
+      return {
+        'Release': this
+      }
+    },
     computed: {
       navbarStyle() {
         return {

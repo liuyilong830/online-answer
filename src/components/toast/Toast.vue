@@ -47,7 +47,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 100;
+    z-index: 200;
   }
   .toast-enter, .toast-leave-to {
     opacity: 0;

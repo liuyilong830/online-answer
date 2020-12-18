@@ -1,6 +1,7 @@
 import login  from '../api/login';
 import home from '../api/home';
 import profile from '../api/profile';
+import questions from "../api/questions";
 
 import {
   initUserInfo,
@@ -57,13 +58,25 @@ const actions = {
   async uploadImg(ctx, file) {
     let form = new FormData();
     form.append('file', file);
-    return await profile.upload(form);
+    return await home.uploadImg(form);
+  },
+  async deleteImg(ctx, filename) {
+    return await home.deleteImg(filename);
   },
   async classList() {
     return await profile.getClassList();
   },
   async appendClass(ctx, classid) {
     return await profile.appendClass(classid);
+  },
+  async getCreatedCls() {
+    return await profile.getCreatedCls();
+  },
+  async createQuesBank(ctx, info) {
+    return await questions.createQuesBank(info);
+  },
+  async createTimus(ctx, {quesid, list}) {
+    return await questions.createTimus(quesid, list);
   },
 }
 
