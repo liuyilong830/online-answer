@@ -94,7 +94,6 @@
   import Card from "../../../components/card/Card";
   import Popup from "../../../components/popup/Popup";
   import columns from '../../../assets/json/universityData';
-  import Toast from "../../../components/toast";
   import Dialog from "../../../components/dialog";
   import { mapActions } from 'vuex';
   const schools = columns.campus;
@@ -229,7 +228,10 @@
         }
       },
       setToast(msg, delay = 2000) {
-        Toast(msg, delay);
+        this.$toast({
+          message: msg,
+          duration: delay
+        });
       }
     },
   }

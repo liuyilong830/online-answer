@@ -48,7 +48,6 @@
     classDetailInfo,
     resetDetailInfo
   } from "../../../../store/mutation-types";
-  import Toast from "../../../../components/toast";
   import Dialog from "../../../../components/dialog";
   import { root } from '../../../../util/Mixin';
 
@@ -186,7 +185,10 @@
         if (res.status === 200) {
           this.info[key] = val;
           this.classDetailInfo({...this.getClsDetailInfo, ...this.info});
-          Toast(res.message, 1000);
+          this.$toast({
+            message: res.message,
+            duration: 1000
+          })
         }
       },
       async asyncDeleteClass(classid) {
@@ -196,7 +198,10 @@
           this.$router.replace('/profile/class');
           // 使用事件总线的方式通知另一个路由组件此时有班级被删除
           this.$bus.$emit('deleteCreateClass', classid);
-          Toast(res.message, 1000);
+          this.$toast({
+            message: res.message,
+            duration: 1000
+          })
         }
       },
       async asyncAppendClass(classid) {
@@ -207,7 +212,10 @@
           this.people.push(user);
           let details = this.getClsDetailInfo;
           this.classDetailInfo({...details, count: details.count+1});
-          Toast(res.message, 1000);
+          this.$toast({
+            message: res.message,
+            duration: 1000
+          });
         }
       },
     },

@@ -41,7 +41,6 @@
 </template>
 
 <script>
-  import Toast from "../../toast";
   import Dialog from "../../dialog";
   import QuestionForm from "../form/QuestionForm";
   function Template(tname = '', tnum = 2, options = [], description = '') {
@@ -129,13 +128,13 @@
       validation() {
         let { tname, tnum, options, res } = this.form;
         if (!tname) {
-          Toast('题目描述是必须的');
+          this.$toast('题目描述是必须的');
         } else if (tnum < 2 || tnum > 10) {
-          Toast('题目的选项数量必须在两个到10个之间');
+          this.$toast('题目的选项数量必须在两个到10个之间');
         } else if (options.some(str => str === '')) {
-          Toast('题目的每个选项都必须有内容');
+          this.$toast('题目的每个选项都必须有内容');
         } else if (!res.length) {
-          Toast('必须选择至少一个选项作为正确答案');
+          this.$toast('必须选择至少一个选项作为正确答案');
         } else {
           return true;
         }

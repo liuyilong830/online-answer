@@ -40,7 +40,6 @@
   import { signOutUser, changeUserInfo } from '../../../store/mutation-types';
   import Dialog from "../../../components/dialog";
   import UpdateInfo from "../../../components/content/update-info/UpdateInfo";
-  import Toast from "../../../components/toast";
   export default {
     name: "ProfileInfo",
     components: {
@@ -155,7 +154,10 @@
           this.changeInfo[key] = val;
           this.changeUserInfo({...this.info, ...info});
           this.$bus.$emit('resetPosition');
-          Toast(res.message, 1000);
+          this.$toast({
+            message: res.message,
+            duration: 1000
+          })
         }
       }
     },

@@ -30,7 +30,6 @@
   import {
     classDetailInfo,
   } from '../../../../store/mutation-types';
-  import Toast from "../../../../components/toast";
   export default {
     name: "ProfileClass",
     components: {
@@ -103,7 +102,7 @@
         if (this.isTea) {
           this.text = this.text === '创建' ? '参与' : '创建';
         } else {
-          Toast('学生用户不能切换哟!');
+          this.$toast('学生用户不能切换哟');
         }
       },
       /* 滑动过程中给按钮增添特效逻辑 */
@@ -133,7 +132,7 @@
           this.joins = res.data.joins;
           this.creates = res.data.creates;
         } else {
-          Toast(res.message);
+          this.$toast(res.message);
         }
       },
       async asyncCreateClass(payload) {
@@ -142,7 +141,7 @@
           this.creates.unshift(res.data);
           this.clsinfo.description = '';
           this.clsinfo.classname = '';
-          Toast('创建班级成功');
+          this.$toast('创建班级成功');
         }
       }
     },

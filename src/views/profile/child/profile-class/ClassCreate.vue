@@ -18,7 +18,6 @@
 
 <script>
   import Dialog from "../../../../components/dialog";
-  import Toast from "../../../../components/toast";
   export default {
     name: "ClassCreate",
     data() {
@@ -39,7 +38,10 @@
       },
       validation() {
         if (this.classname === '') {
-          Toast('班级名称不能为空', 1000);
+          this.$toast({
+            message: '班级名称不能为空',
+            duration: 1000
+          });
           return false;
         } else {
           return true;

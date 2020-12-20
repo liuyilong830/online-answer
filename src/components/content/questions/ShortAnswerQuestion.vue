@@ -23,7 +23,6 @@
 
 <script>
   import QuestionForm from "../form/QuestionForm";
-  import Toast from "../../toast";
   import Dialog from "../../dialog";
   function Template() {
     this.tname = '';
@@ -74,9 +73,15 @@
       validation() {
         let { tname, res } = this.form;
         if (!tname) {
-          Toast('题目描述是必须的', 1000);
+          this.$toast({
+            message: '题目描述是必须的',
+            duration: 1000
+          });
         } else if (!res) {
-          Toast('参考答案是必须的', 1000);
+          this.$toast({
+            message: '参考答案是必须的',
+            duration: 1000
+          });
         } else {
           return true;
         }

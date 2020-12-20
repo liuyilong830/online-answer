@@ -60,7 +60,6 @@
 </template>
 
 <script>
-  import Toast from "../../toast";
   import { root } from '../../../util/Mixin';
   import { mapActions } from 'vuex';
   export default {
@@ -121,9 +120,9 @@
       validation() {
         let { qname, icon } = this.form;
         if (!qname || qname.length > 16) {
-          Toast('题库名称是必填的，且长度不得超过16个字');
+          this.$toast('题库名称是必填的，且长度不得超过16个字')
         } else if (!icon) {
-          Toast('请选择一个题库的封面图片');
+          this.$toast('请选择一个题库的封面图片')
         } else {
           return true;
         }

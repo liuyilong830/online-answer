@@ -24,7 +24,6 @@
 </template>
 
 <script>
-  import Toast from "../../components/toast";
   import LoginByPhone from "./child/LoginByPhone";
   export default {
     name: "Login",
@@ -43,7 +42,7 @@
           return true;
         }
         // 下面进行弹窗提示
-        Toast('请勾选下方同意《用户协议》《隐私政策》《儿童隐私政策》《中国移动认证服务协议》');
+        this.$toast('请勾选下方同意《用户协议》《隐私政策》《儿童隐私政策》《中国移动认证服务协议》');
         return false;
       },
       loginClick() {

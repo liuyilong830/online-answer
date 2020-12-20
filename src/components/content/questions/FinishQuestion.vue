@@ -80,7 +80,6 @@
   import { mapActions } from 'vuex';
   import { deepClone } from '../../../util/util';
   import Dialog from "../../dialog";
-  import Toast from "../../toast";
   import Popup from "../../popup/Popup";
   export default {
     name: "FinishQuestion",
@@ -127,6 +126,10 @@
         Dialog.confirm({
           message: '确定根据相关配置项进行创建题库吗？'
         }).then(() => {
+          this.loading = this.$toast.loading({
+            message: '正在创建中',
+            duration: 0
+          })
           this.bank.createtime = Date.now();
           this.asyncCreateQuesBank({...this.bank, icon: this.iconname}, (qid) => {
             let multiples = deepClone(this.multiples);
@@ -188,7 +191,11 @@
         let res = await this.createTimus({quesid, list});
         console.log(res);
         if (res.status === 200) {
-          Toast('创建成功', 2000);
+          this.loading.clear();
+          this.$toast.success({
+            message: '创建成功',
+            duration: 1000
+          });
           this.Release.toclose();
         }
       },

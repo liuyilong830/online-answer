@@ -37,7 +37,6 @@
   import NavBar from "../../../components/nav-bar/NavBar";
   import LoginPwd from "./LoginPwd";
   import Register from "./Register";
-  import Toast from "../../../components/toast";
   import { mapActions } from 'vuex';
 
   let regPhone = /1[3-9]\d{9}/;
@@ -75,7 +74,7 @@
       },
       validationPhone() {
         if (regPhone.test(this.phone)) return true;
-        Toast('输入的手机号不符合中国大陆手机号');
+        this.$toast('输入的手机号不符合中国大陆手机号');
         return false;
       },
       async nextByPhone() {
