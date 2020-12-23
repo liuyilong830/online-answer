@@ -41,8 +41,8 @@
 </template>
 
 <script>
-  import Dialog from "../../dialog";
-  import QuestionForm from "../form/QuestionForm";
+  import Dialog from "../../../components/dialog";
+  import QuestionForm from "../../../components/content/form/QuestionForm";
   function Template(tname = '', tnum = 2, options = [], description = '') {
     this.tname = tname;
     this.tnum = tnum;

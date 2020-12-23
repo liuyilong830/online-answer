@@ -25,8 +25,9 @@
       </profile-content>
     </redirect-dialog>
     <popup :is-show.sync="ispopup" position="left" :style="{width: '60%'}">
-      <more-list/>
+      <more-list @change="changeOpt"/>
     </popup>
+    <my-bank v-model="isbank"/>
   </div>
 </template>
 
@@ -38,6 +39,7 @@
   import ProfileNavBar from "./child/ProfileNavBar";
   import Popup from "../../components/popup/Popup";
   import MoreList from "./MoreList";
+  import MyBank from "../bank/MyBank";
   export default {
     name: "Profile",
     components: {
@@ -48,6 +50,7 @@
       ProfileNavBar,
       Popup,
       MoreList,
+      MyBank,
     },
     data() {
       return {
@@ -64,6 +67,7 @@
           { title: '收藏夹', path: '/profile/collection' },
         ],
         ispopup: false,
+        isbank: false,
       }
     },
     computed: {
@@ -109,6 +113,11 @@
       },
       toMore() {
         this.ispopup = true;
+      },
+      changeOpt(info) {
+        if (info.title === '我的题库') {
+          this.isbank = true;
+        }
       },
     },
     created() {

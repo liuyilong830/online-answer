@@ -97,6 +97,7 @@
         this.ispulling = true;
         this.setTransition(0);
         this.startY = event.touches[0].clientY;
+        this.rect = this.getElementRect(this.$el);
       },
       ontouchMove(event) {
         this.trackRect = this.getElementRect(this.$refs.pullRefreshRef);

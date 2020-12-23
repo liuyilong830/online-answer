@@ -79,8 +79,8 @@
 <script>
   import { mapActions } from 'vuex';
   import { deepClone } from '../../../util/util';
-  import Dialog from "../../dialog";
-  import Popup from "../../popup/Popup";
+  import Dialog from "../../../components/dialog";
+  import Popup from "../../../components/popup/Popup";
   export default {
     name: "FinishQuestion",
     components: {
@@ -194,9 +194,11 @@
           this.loading.clear();
           this.$toast.success({
             message: '创建成功',
-            duration: 1000
+            duration: 1000,
+            onClose: () => {
+              this.Release.toclose();
+            }
           });
-          this.Release.toclose();
         }
       },
     },

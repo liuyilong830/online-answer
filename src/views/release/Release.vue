@@ -1,6 +1,6 @@
 <template>
   <transition name="release">
-    <div class="release" v-if="value">
+    <div class="release" v-if="value" :style="zindexStyle">
       <nav-bar :style="navbarStyle">
         <template #left><i class="iconfont icon-cha" @click.stop="toclose"></i></template>
         <div class="release-title">{{title}}</div>
@@ -20,12 +20,13 @@
 
 <script>
   import NavBar from "../../components/nav-bar/NavBar";
-  import QuestionsCreate from "../../components/content/questions/QuestionsCreate";
-  import SingleQuestion from "../../components/content/questions/SingleQuestion";
-  import ShortAnswerQuestion from "../../components/content/questions/ShortAnswerQuestion";
-  import FinishQuestion from "../../components/content/questions/FinishQuestion";
+  import QuestionsCreate from "./child/QuestionsCreate";
+  import SingleQuestion from "./child/SingleQuestion";
+  import ShortAnswerQuestion from "./child/ShortAnswerQuestion";
+  import FinishQuestion from "./child/FinishQuestion";
   import StaticSwipe from "../../components/content/static-swipe/StaticSwipe";
   import StaticSwipeItem from "../../components/content/static-swipe/StaticSwipeItem";
+  import onlyZIndex from '../../util/mixins/zindex';
   const titles = ['创建题库', '创建选择题', '创建简答题', '发布题库'];
   export default {
     name: "Release",
@@ -38,6 +39,7 @@
       StaticSwipe,
       StaticSwipeItem,
     },
+    mixins: [onlyZIndex],
     data() {
       return {
         curr: 0,
@@ -85,7 +87,6 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 50;
     width: 100vw;
     height: 100vh;
     background-color: #f2f3f5;

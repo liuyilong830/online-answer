@@ -25,7 +25,7 @@
   import ClassCreate from "./ClassCreate";
   import NotFound from "../../../../components/content/not-found/NotFound";
   import SearchClass from "../../../../components/content/search-class/SearchClass";
-  import { root } from '../../../../util/Mixin';
+  import { root } from '../../../../util/mixins/root';
   import { mapActions, mapMutations } from 'vuex';
   import {
     classDetailInfo,

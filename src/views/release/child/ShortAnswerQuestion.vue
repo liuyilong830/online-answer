@@ -22,8 +22,8 @@
 </template>
 
 <script>
-  import QuestionForm from "../form/QuestionForm";
-  import Dialog from "../../dialog";
+  import QuestionForm from "../../../components/content/form/QuestionForm";
+  import Dialog from "../../../components/dialog";
   function Template() {
     this.tname = '';
     this.description = '';

@@ -49,7 +49,7 @@
     resetDetailInfo
   } from "../../../../store/mutation-types";
   import Dialog from "../../../../components/dialog";
-  import { root } from '../../../../util/Mixin';
+  import { root } from '../../../../util/mixins/root';
 
   export default {
     name: "ClassDetail",

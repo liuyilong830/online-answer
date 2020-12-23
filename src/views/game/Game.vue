@@ -29,7 +29,8 @@
 
 <style scoped lang="scss">
   .game {
-    height: 100%;
+    height: calc(100% - 50px);
     background-color: #fff;
+    overflow: hidden;
   }
 </style>

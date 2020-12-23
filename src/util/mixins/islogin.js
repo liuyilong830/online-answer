@@ -1,5 +1,6 @@
-import { mapActions, mapGetters } from 'vuex';
-import Dialog from "../components/dialog";
+import { mapActions } from 'vuex';
+import Dialog from "../../components/dialog";
+
 const islogin = function (fn) {
   return {
     methods: {
@@ -34,19 +35,4 @@ const islogin = function (fn) {
   }
 }
 
-const root = {
-  computed: {
-    ...mapGetters(['getUserInfo']),
-    getRoot() {
-      return this.getUserInfo.rid;
-    },
-    isTea() {
-      return this.getRoot === 1;
-    }
-  },
-}
-
-export {
-  islogin,
-  root
-}
+export default islogin;

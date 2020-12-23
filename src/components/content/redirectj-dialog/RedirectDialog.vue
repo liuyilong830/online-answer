@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import { islogin } from '../../../util/Mixin';
+  import islogin from '../../../util/mixins/islogin';
   let m1 = islogin(function () {
     this.isShow = true;
     this.$emit('isrender', false);

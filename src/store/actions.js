@@ -78,6 +78,9 @@ const actions = {
   async createTimus(ctx, {quesid, list}) {
     return await questions.createTimus(quesid, list);
   },
+  async createdBank(ctx, {limit, start}) {
+    return await questions.createdBank({limit, start});
+  },
 }
 
 export default actions;

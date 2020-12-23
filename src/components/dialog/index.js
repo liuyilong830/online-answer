@@ -1,6 +1,41 @@
 import Vue from 'vue';
-import dialog, { props } from "./Dialog";
+import dialog from "./Dialog";
 
+const defaultOptions = {
+  isShow: { type: Boolean },
+  title: { type: String },
+  message: { type: String, default: '' },
+  messageAlign: {
+    type: String,
+    default: 'center',
+    validator(value) {
+      let arr = ['left', 'center', 'right'];
+      return arr.includes(value);
+    }
+  },
+  type: {
+    type: String,
+    default: '',
+    validator(value) {
+      return value === 'alert' || value === 'confirm' || value === '';
+    }
+  },
+  confirmButtonText: { type: String, default: '确认' },
+  cancelButtonText: { type: String, default: '取消' },
+  width: { type: String, default: '320px' },
+  beforeClose: {
+    type: Function
+  },
+  overlay: { type: Boolean, default: true },
+  confirmButtonStyle: {
+    type: Object,
+    default() { return {} }
+  },
+  cancelButtonStyle: {
+    type: Object,
+    default() { return {} }
+  },
+};
 const DialogConstructor = Vue.extend(dialog);
 let instance = null;
 
@@ -17,10 +52,10 @@ const Dialog = function (options) {
           oncancel: reject
         }
       },
-      props
+      props: defaultOptions,
     });
     instance.useFunc = true;
-    Object.keys(props).forEach(key => {
+    Object.keys(defaultOptions).forEach(key => {
       if (options[key]) {
         instance[key] = options[key];
       }
@@ -48,6 +83,3 @@ Dialog.close = function () {
 }
 
 export default Dialog;
-export {
-  props,
-}

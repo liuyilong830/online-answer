@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-popup" v-show="veriable">
+  <div class="pt-popup" v-show="veriable" :style="zindexStyle">
     <transition name="pt-mask">
       <div class="pt-popup-mask" v-if="overlay && isShow" @click="closeByMask"></div>
     </transition>
@@ -20,8 +20,10 @@
 </template>
 
 <script>
+  import onlyZIndex from '../../util/mixins/zindex';
   export default {
     name: "Popup",
+    mixins: [onlyZIndex],
     data() {
       return {
         veriable: false,
@@ -105,7 +107,7 @@
       iconPositonClass() {
         let arr = this.closeIconPositon.split('-');
         return ['icon-p', `icon-position-${arr[1]}`];
-      }
+      },
     },
     methods: {
       closeByMask() {
@@ -151,7 +153,6 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 100;
     .pt-popup-mask {
       position: fixed;
       width: 100%;

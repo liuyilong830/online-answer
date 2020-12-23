@@ -12,7 +12,7 @@
   import Login from "./views/login/Login";
   import MainTabBar from "./components/tab-bar/MainTabBar";
   import Release from "./views/release/Release";
-  import { islogin } from './util/Mixin';
+  import islogin from './util/mixins/islogin';
   export default {
     name: 'App',
     components: {
@@ -39,7 +39,7 @@
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_q637fkfzulb.css');
+    @import url('http://at.alicdn.com/t/font_2194746_6dxpli022k7.css');
     width: 100vw;
     height: 100vh;
     display: flex;

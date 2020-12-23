@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import { root } from '../../../util/Mixin';
+  import { root } from '../../../util/mixins/root';
   import { mapActions } from 'vuex';
   export default {
     name: "QuestionsCreate",

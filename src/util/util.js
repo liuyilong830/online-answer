@@ -5,6 +5,14 @@ const toType = function (target) {
   return str.slice(8, str.length-1);
 }
 
+const fullZero = function (num) {
+  num = num.toString();
+  if (num.length < 2) {
+    num = 0 + num;
+  }
+  return num;
+}
+
 const deepClone = function (target) {
   let type = toType(target);
   let res = null;
@@ -24,7 +32,22 @@ const deepClone = function (target) {
   return res;
 }
 
+const formatTime = function (time) {
+  let str = '';
+  if (toType(time) === 'Number' || toType(time) === 'String') {
+    time = new Date(time);
+  }
+  if (toType(time) === 'Date') {
+    let year = time.getFullYear();
+    let month = time.getMonth() + 1;
+    let date = time.getDate();
+    str = `${year}-${fullZero(month)}-${fullZero(date)}`
+  }
+  return str;
+}
+
 export {
   toType,
   deepClone,
+  formatTime,
 }

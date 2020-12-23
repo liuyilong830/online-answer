@@ -1,6 +1,6 @@
 <template>
   <transition @after-enter="dlgAfterEnter" @enter="() => this.$emit('open')" @after-leave="() => this.$emit('closed')">
-    <div class="pt-dialog" v-if="isShow">
+    <div class="pt-dialog" v-if="isShow" :style="zindexStyle">
       <transition name="pt-mk">
         <div class="pt-dialog-mask" v-if="veriable && overlay"></div>
       </transition>
@@ -27,43 +27,10 @@
 </template>
 
 <script>
-  export const props = {
-    isShow: { type: Boolean },
-    title: { type: String },
-    message: { type: String, default: '' },
-    messageAlign: {
-      type: String,
-      default: 'center',
-      validator(value) {
-        let arr = ['left', 'center', 'right'];
-        return arr.includes(value);
-      }
-    },
-    type: {
-      type: String,
-      default: '',
-      validator(value) {
-        return value === 'alert' || value === 'confirm' || value === '';
-      }
-    },
-    confirmButtonText: { type: String, default: '确认' },
-    cancelButtonText: { type: String, default: '取消' },
-    width: { type: String, default: '320px' },
-    beforeClose: {
-      type: Function
-    },
-    overlay: { type: Boolean, default: true },
-    confirmButtonStyle: {
-      type: Object,
-      default() { return {} }
-    },
-    cancelButtonStyle: {
-      type: Object,
-      default() { return {} }
-    },
-  };
+  import onlyZIndex from "../../util/mixins/zindex";
   export default {
     name: "Dialog",
+    mixins: [onlyZIndex],
     data() {
       return {
         veriable: false, // 控制 Dialog组件 和 遮罩层 和 弹框的显示和隐藏
@@ -77,7 +44,41 @@
       prop: 'isShow',
       event: 'click'
     },
-    props,
+    props: {
+      isShow: { type: Boolean },
+      title: { type: String },
+      message: { type: String, default: '' },
+      messageAlign: {
+        type: String,
+        default: 'center',
+        validator(value) {
+          let arr = ['left', 'center', 'right'];
+          return arr.includes(value);
+        }
+      },
+      type: {
+        type: String,
+        default: '',
+        validator(value) {
+          return value === 'alert' || value === 'confirm' || value === '';
+        }
+      },
+      confirmButtonText: { type: String, default: '确认' },
+      cancelButtonText: { type: String, default: '取消' },
+      width: { type: String, default: '320px' },
+      beforeClose: {
+        type: Function
+      },
+      overlay: { type: Boolean, default: true },
+      confirmButtonStyle: {
+        type: Object,
+        default() { return {} }
+      },
+      cancelButtonStyle: {
+        type: Object,
+        default() { return {} }
+      },
+    },
     computed: {
       messageClass() {
         let msgCls = [`dlg-ct-${this.messageAlign}`];
@@ -141,7 +142,6 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 99;
     .pt-dialog-mask {
       position: fixed;
       top: 0;

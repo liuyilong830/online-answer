@@ -29,7 +29,7 @@
     },
     methods: {
       itemClick(info) {
-        console.log(info);
+        this.$emit('change', info);
       },
     },
   }

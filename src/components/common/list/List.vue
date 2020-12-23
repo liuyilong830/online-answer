@@ -27,7 +27,7 @@
         type: Number,
         default: 300
       },
-      loadingText: { type: String, default: '加载中...' },
+      loadingText: { type: String },
       finishedText: { type: String },
       errorText: { type: String },
       immediate: { type: Boolean, default: true }
