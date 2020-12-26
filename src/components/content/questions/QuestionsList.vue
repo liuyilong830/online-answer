@@ -32,7 +32,7 @@
     },
     methods: {
       tobank(bank) {
-        console.log(bank);
+        this.$emit('tobank', bank);
       },
     },
   }

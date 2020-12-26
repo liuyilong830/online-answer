@@ -81,6 +81,9 @@ const actions = {
   async createdBank(ctx, {limit, start}) {
     return await questions.createdBank({limit, start});
   },
+  async queryTimus(ctx, qid) {
+    return await questions.queryTimus(qid);
+  },
 }
 
 export default actions;

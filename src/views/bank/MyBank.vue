@@ -1,5 +1,5 @@
 <template>
-  <transition name="bank" v-if="value">
+  <transition name="bank" v-if="value" @beforeLeave="beforeleave">
     <div class="my-bank" :style="zindexStyle">
       <nav-bar :style="navbarStyle">
         <template #left>
@@ -10,11 +10,12 @@
       </nav-bar>
       <div class="bank-content">
         <pull-refresh v-model="isloading" @refresh="refresh" success-text="刷新成功">
-          <list v-model="islistload" :finished="finished" @load="onListLoad" finished-text="到底了">
-            <questions-list :list="list" :mode="2"/>
+          <list v-model="islistload" :finished="finished" @load="onListLoad" finished-text="到底了" :loadingText="showLoadText">
+            <questions-list :list="list" :mode="2" @tobank="tobank"/>
           </list>
         </pull-refresh>
       </div>
+      <bank-detail v-model="isdetaled" :detail="detailinfo"/>
     </div>
   </transition>
 </template>
@@ -24,6 +25,7 @@
   import QuestionsList from "../../components/content/questions/QuestionsList";
   import PullRefresh from "../../components/common/pull-refresh/PullRefresh";
   import List from "../../components/common/list/List";
+  import BankDetail from "./BankDetail";
   import onlyZIndex from '../../util/mixins/zindex';
   import { mapActions } from 'vuex';
   export default {
@@ -34,15 +36,18 @@
       QuestionsList,
       PullRefresh,
       List,
+      BankDetail,
     },
     mixins: [ onlyZIndex ],
     data() {
       return {
         list: [],
-        isloading: false,
-        islistload: false,
-        finished: false,
+        isloading: false, // 控制下拉刷新时候是否处于加载状态，设置为 false 表示为完成， true 为正在加载中
+        islistload: false, // 控制 list 组件是否处于加载状态，设置为 false 表示当前不需要请求数据，true 为需要请求数据，并且会触发下方的 onListLoad 事件。
+        finished: false, // 如果请求完成了，则可以设置该参数为 true， 这样的话就不会在继续请求了
         start: 0,
+        isdetaled: false,
+        detailinfo: {},
       }
     },
     props: {
@@ -54,13 +59,20 @@
           boxShadow: 'none'
         }
       },
+      showLoadText() {
+        return this.isloading ? '' : '加载中...';
+      },
     },
     methods: {
       ...mapActions(['createdBank']),
       toclose() {
         this.$emit('input', false);
       },
-      refresh() {
+      tobank(info) {
+        this.detailinfo = info;
+        this.isdetaled = true;
+      },
+      refresh() { // 下拉时触发的方法，表示需要重新请求。
         this.list = [];
         this.finished = false;
         this.islistload = true;
@@ -71,6 +83,11 @@
         setTimeout(() => {
           this.asyncCreatedBank(4, this.start);
         }, 500);
+      },
+      beforeleave() {
+        this.list = [];
+        this.finished = false;
+        this.start = 0;
       },
       async asyncCreatedBank(limit = 10, start = 0) {
         let res = await this.createdBank({limit, start});

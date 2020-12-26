@@ -5,7 +5,10 @@
       <span class="createtime">{{getcreatetime}}</span>
       <span class="qname">{{bank.qname}}</span>
     </p>
-    <p class="card-desc">{{bank.description}}</p>
+    <div class="card-img_desc">
+      <img :src="bank.icon" alt="">
+      <p class="card-desc">{{bank.description}}</p>
+    </div>
     <ul class="icons-list">
       <li class="item">
         <i class="iconfont icon-pinglun"></i>
@@ -85,12 +88,22 @@
         @include toEllipse(1);
       }
     }
-    .card-desc {
-      min-height: 30px;
+    .card-img_desc {
       display: flex;
-      align-items: center;
-      @include toEllipse(2);
-      margin-bottom: 5px;
+      img {
+        width: 100px;
+        margin-right: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .card-desc {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        @include toEllipse(3);
+        margin-bottom: 5px;
+      }
     }
     .icons-list {
       display: flex;

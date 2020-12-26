@@ -24,7 +24,7 @@
         </div>
       </profile-content>
     </redirect-dialog>
-    <popup :is-show.sync="ispopup" position="left" :style="{width: '60%'}">
+    <popup :is-show.sync="ispopup" position="left" :box-style="{width: '60%'}">
       <more-list @change="changeOpt"/>
     </popup>
     <my-bank v-model="isbank"/>

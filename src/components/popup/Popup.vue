@@ -178,7 +178,6 @@
       &.pt-content-top {
         top: 0;
         width: 100%;
-        height: 100%;
         &.pt-top-round {
           border-bottom-left-radius: 15px;
           border-bottom-right-radius: 15px;
@@ -187,7 +186,6 @@
       &.pt-content-bottom {
         bottom: 0;
         width: 100%;
-        height: 100%;
         &.pt-bottom-round {
           border-top-left-radius: 15px;
           border-top-right-radius: 15px;
@@ -195,7 +193,6 @@
       }
       &.pt-content-left {
         left: 0;
-        width: 100%;
         height: 100%;
         &.pt-left-round {
           border-top-right-radius: 15px;
@@ -204,7 +201,6 @@
       }
       &.pt-content-right {
         right: 0;
-        width: 100%;
         height: 100%;
         &.pt-right-round {
           border-top-left-radius: 15px;
