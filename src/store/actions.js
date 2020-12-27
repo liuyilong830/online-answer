@@ -81,6 +81,9 @@ const actions = {
   async createdBank(ctx, {limit, start}) {
     return await questions.createdBank({limit, start});
   },
+  async queryTimus(ctx, payload) {
+    return await questions.queryTimus(payload);
+  },
   async querySingles(ctx, payload) {
     return await questions.querySingles(payload);
   },
@@ -90,6 +93,9 @@ const actions = {
   async queryShortAnswers(ctx, payload) {
     return await questions.queryShortAnswers(payload);
   },
+  async queryAboutuser(ctx, qid) {
+    return await questions.queryAboutuser(qid);
+  }
 }
 
 export default actions;

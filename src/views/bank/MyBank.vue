@@ -15,9 +15,9 @@
           </list>
         </pull-refresh>
       </div>
-      <model-box2 v-model="isdetaled">
-        <bank-detail :detail="detailinfo"/>
-      </model-box2>
+      <model-box1 v-model="isdetaled" @enterd="onenter" @closed="onclose">
+        <bank-detail :detail="detailinfo" :isenter="isenter"/>
+      </model-box1>
     </div>
   </transition>
 </template>
@@ -28,7 +28,7 @@
   import PullRefresh from "../../components/common/pull-refresh/PullRefresh";
   import List from "../../components/common/list/List";
   import BankDetail from "./BankDetail";
-  import ModelBox2 from "../../components/content/model-box/ModelBox2";
+  import ModelBox1 from "../../components/content/model-box/ModelBox1";
   import onlyZIndex from '../../util/mixins/zindex';
   import { mapActions } from 'vuex';
   export default {
@@ -40,7 +40,7 @@
       PullRefresh,
       List,
       BankDetail,
-      ModelBox2,
+      ModelBox1,
     },
     mixins: [ onlyZIndex ],
     data() {
@@ -52,6 +52,7 @@
         start: 0,
         isdetaled: false,
         detailinfo: {},
+        isenter: false,
       }
     },
     props: {
@@ -92,6 +93,12 @@
         this.list = [];
         this.finished = false;
         this.start = 0;
+      },
+      onenter() {
+        this.isenter = true;
+      },
+      onclose() {
+        this.isenter = false;
       },
       async asyncCreatedBank(limit = 10, start = 0) {
         let res = await this.createdBank({limit, start});

@@ -1,41 +1,73 @@
 <template>
   <div class="bank-detail">
-    <nav-bar :style="navbarStyle">
-      <template #left><i class="iconfont icon-fanhui1" @click="toclose"></i></template>
-      <div class="detail-title">详情页</div>
-      <template #right><i class="iconfont icon-19"></i></template>
-    </nav-bar>
-    <div class="copy-tabs" v-if="iscopyed">
-      <tabs :tablist="tablist" v-model="currtab"/>
-    </div>
-    <div class="detail" @scroll="onscroll">
-      <div class="content" ref="contentRef">
-        <div class="detail-img">
-          <img :src="detail.icon" alt="">
-        </div>
-        <div class="detail-baseinfo">
-          <p class="createtime">发布于：{{getCreatetime}}</p>
-          <p class="name">{{detail.qname}}</p>
-          <p class="desc">{{detail.description}}</p>
-        </div>
-        <div class="detail-tabs" ref="tabRef">
-          <tabs :tablist="tablist" v-model="currtab"/>
-        </div>
-        <div class="normal">
-          <div class="public" v-for="(key, index) in types" :key="key">
-            <p class="title" ref="titleRefs">{{`${index+1}.${formatTitle(key)}`}}</p>
-            <ul class="timus" v-if="timus[key].length">
-              <li class="timu" v-for="(item, i) in timus[key]" :key="item.tid">
-                <div class="number">{{i + 1}}</div>
-                <div class="tname">{{item.tname}}</div>
-                <div class="opeations" @click="checkTimu(item)"><i class="iconfont icon-gengduo3"></i></div>
-              </li>
-            </ul>
-            <div class="equal" v-else>空</div>
+    <div class="contain">
+      <nav-bar :style="navbarStyle">
+        <template #left><i class="iconfont icon-fanhui1" @click="toclose"></i></template>
+        <div class="detail-title">详情页</div>
+        <template #right><i class="iconfont icon-19"></i></template>
+      </nav-bar>
+      <div class="copy-tabs" v-if="iscopyed">
+        <tabs :tablist="tablist" v-model="currtab" @check="checkTab"/>
+      </div>
+      <div class="detail" @scroll="onscroll">
+        <div class="content" ref="contentRef">
+          <div class="detail-img">
+            <img :src="detail.icon" alt="">
           </div>
+          <div class="detail-baseinfo">
+            <p class="createtime">发布于：{{getCreatetime}}</p>
+            <p class="name">{{detail.qname}}</p>
+            <p class="desc">{{detail.description}}</p>
+          </div>
+          <div class="detail-tabs" ref="tabRef">
+            <tabs :tablist="tablist" v-model="currtab" @check="checkTab"/>
+          </div>
+          <div class="normal">
+            <div class="public" v-for="(key, index) in types" :key="key">
+              <p class="title" ref="titleRefs">
+                <span>{{`${index+1}.${formatTitle(key)}`}}</span>
+                <button v-if="iscreater" @click="tocreated(key)">创建</button>
+              </p>
+              <div v-if="timus[key][key].length">
+                <ul class="timus">
+                  <li class="timu" v-for="(item, i) in timus[key][key]" :key="item.tid">
+                    <div class="number">{{i + 1}}</div>
+                    <div class="tname">{{item.tname}}</div>
+                    <div class="opeations" @click="checkTimu(item)"><i class="iconfont icon-gengduo3"></i></div>
+                  </li>
+                </ul>
+                <div class="more" v-if="!timus[key].finished" @click="tomore(key)">点击加载更多</div>
+                <div class="more" v-else>全部读取完成</div>
+              </div>
+              <div class="equal" v-else>空</div>
+            </div>
+          </div>
+          <ul>
+            <li>第1个</li>
+            <li>第2个</li>
+            <li>第3个</li>
+            <li>第4个</li>
+            <li>第5个</li>
+            <li>第6个</li>
+            <li>第7个</li>
+            <li>第8个</li>
+            <li>第9个</li>
+            <li>第10个</li>
+            <li>第11个</li>
+            <li>第12个</li>
+            <li>第13个</li>
+            <li>第14个</li>
+            <li>第15个</li>
+            <li>第16个</li>
+            <li>第17个</li>
+            <li>第18个</li>
+            <li>第19个</li>
+            <li>第20个</li>
+          </ul>
         </div>
       </div>
     </div>
+    <answers-action v-if="operation" :operation.sync="operation" @check="checkOpera"/>
     <popup :is-show.sync="isinfo" position="bottom" round closeable>
       <div class="timuinfo" v-if="timuinfo">
         <div class="public">
@@ -60,7 +92,7 @@
           <div class="textarea" v-if="timuinfo.description">{{timuinfo.description}}</div>
           <div class="equal" v-else>空</div>
         </div>
-        <div class="btns">
+        <div class="btns" v-if="iscreater">
           <div class="btn eqit" @click="toeqit">编辑</div>
           <div class="btn delete" @click="todelete">删除</div>
         </div>
@@ -73,8 +105,16 @@
   import NavBar from "../../components/nav-bar/NavBar";
   import Tabs from '../../components/common/tabs/Tabs';
   import Popup from "../../components/popup/Popup";
+  import AnswersAction from "../../components/content/answer-action/AnswersAction";
   import { formatTime } from '../../util/util';
+  import {root} from '../../util/mixins/root';
   import { mapActions } from 'vuex';
+  const Template = function (type, res = [], start = 0, limit = 10, finished = false) {
+    this[type] = res;
+    this.start = start;
+    this.limit = limit;
+    this.finished = finished;
+  };
   export default {
     name: "BankDetail",
     inheritAttrs: false,
@@ -82,7 +122,9 @@
       Popup,
       Tabs,
       NavBar,
+      AnswersAction,
     },
+    mixins: [root],
     inject: ['box2'],
     data() {
       return {
@@ -93,18 +135,14 @@
         height: 0,
         top: 0,
         timus: {
-          singles: [],
-          multis: [],
-          shortanswers: [],
+          singles: new Template('singles'),
+          multis: new Template('multis'),
+          shortanswers: new Template('shortanswers'),
         },
         types: ['singles', 'multis', 'shortanswers'],
         isinfo: false,
         timuinfo: null,
-        starts: {
-          singles: 0,
-          multis: 0,
-          shortanswers: 0
-        }
+        operation: null,
       }
     },
     props: {
@@ -112,6 +150,7 @@
         type: Object,
         default() { return {} }
       },
+      isenter: Boolean,
     },
     computed: {
       opacity() {
@@ -141,18 +180,31 @@
       getCreatetime() {
         return formatTime(this.detail.createtime);
       },
+      iscreater() {
+        return this.getUid === this.detail.uid;
+      },
     },
     methods: {
-      ...mapActions(['querySingles', 'queryMultis', 'queryShortAnswers']),
+      ...mapActions(['queryTimus', 'querySingles', 'queryMultis', 'queryShortAnswers', 'queryAboutuser']),
       toclose() {
         this.box2.toclose();
       },
       init() {
         this.$nextTick(() => {
-          this.tabsRect = this.$refs.tabRef.getBoundingClientRect();
-          this.height = this.tabsRect.top - this.navbarheight;
-          this.titlesRect = this.$refs.titleRefs.map(ref => ref.getBoundingClientRect());
+          this.tabsRef = this.$refs.tabRef.getBoundingClientRect();
+          let { top } = this.tabsRef;
+          let navbarheight = this.navbarheight;
+          this.height = top - navbarheight;
+          this.getTitlesRect();
         })
+      },
+      getTitlesRect() {
+        let {height} = this.tabsRef;
+        let navbarheight = this.navbarheight;
+        let titlesRect = this.$refs.titleRefs.map(ref => ref.getBoundingClientRect());
+        this.scrollTops = titlesRect.map(rect => {
+          return this.top + rect.top - (height + navbarheight);
+        });
       },
       onscroll() {
         this.contentRect = this.$refs.contentRef.getBoundingClientRect();
@@ -177,48 +229,92 @@
       },
       toeqit() {},
       todelete() {},
-      async asyncQuerySingles(qid, start = 0, limit = 10) {
-        let res = await this.querySingles({qid, start, limit})
-        if (res.status === 200 && res.data) {
-          let singles = res.data.singles;
-          this.timus.singles = singles;
-          this.starts.singles += singles.length;
+      checkOpera(key, val) {
+        console.log(key, val);
+      },
+      checkTab(index) {
+        if (index < this.types.length) {
+          this.$refs.contentRef.parentNode.scrollTop = this.scrollTops[index];
+        } else {
+          console.log(index);
         }
       },
-      async asyncQueryMultis(qid, start = 0, limit = 10) {
-        let res = await this.queryMultis({qid, start, limit})
+      tocreated(key) {
+        console.log(key);
+      },
+      tomore(key) {
+        let qid = this.detail.qid;
+        let { start, limit } = this.timus[key];
+        this.asyncQueryTypes(key, qid, start, limit, () => {
+          this.$nextTick(() => {
+            this.getTitlesRect()
+          })
+        });
+      },
+      async asyncQueryTimus(qid, start = 0, limit = 10) {
+        let res = await this.queryTimus({qid, start, limit});
         if (res.status === 200 && res.data) {
-          let multis = res.data.multis;
-          this.timus.multis = multis;
-          this.starts.multis += multis.length;
+          let { singles, multis, shortanswers } = res.data;
+          this.timus.singles = new Template('singles', singles, singles.length, limit, singles.length < limit);
+          this.timus.multis = new Template('multis', multis, multis.length, limit, singles.length < limit);
+          this.timus.shortanswers = new Template('shortanswers', shortanswers, shortanswers.length, limit, singles.length < limit);
+          this.$nextTick(() => {
+            this.getTitlesRect()
+          })
         }
       },
-      async asyncQueryShortAnswers(qid, start = 0, limit = 10) {
-        let res = await this.queryShortAnswers({qid, start, limit})
-        if (res.status === 200 && res.data) {
-          let shortanswers = res.data.shortanswers;
-          this.timus.shortanswers = shortanswers;
-          this.starts.shortanswers += shortanswers.length;
+      async asyncQueryAboutuser(qid) {
+        let res = await this.queryAboutuser(qid);
+        if (res.status === 200) {
+          this.operation = res.data;
         }
-      }
+      },
+      async asyncQueryTypes(type, qid, start = 0, limit = 10, func) {
+        if (!type) return;
+        let res;
+        if (type === 'singles') {
+          res = await this.querySingles({qid, start, limit});
+        } else if (type === 'multis') {
+          res = await this.queryMultis({qid, start, limit})
+        } else {
+          res = await this.queryShortAnswers({qid, start, limit})
+        }
+        if (res && res.status === 200 && res.data) {
+          let timus = res.data[type];
+          if (!timus.length) {
+            return this.timus[type].finished = true;
+          }
+          let arr = [...this.timus[type][type], ...timus];
+          this.timus[type] = new Template(type, arr, arr.length, limit);
+          if (func && typeof func === 'function') {
+            func.call(this);
+          }
+        }
+      },
     },
     watch: {
-      currtab(val) {
-        if (val < this.types.length) {
-          let navbarheight = this.navbarheight;
-          let tabsheight = this.tabsRect.height;
-          this.$refs.contentRef.parentNode.scrollTop = this.titlesRect[val].top - (tabsheight + navbarheight);
-        } else {
-          console.log(val);
+      top(val) {
+        let index = this.currtab;
+        let prev = this.scrollTops[index];
+        let next = this.scrollTops[index + 1];
+        if (val > next) {
+          this.currtab += 1;
+        } else if (val + 1 < prev && this.currtab >= 1) {
+          this.currtab -= 1;
+        }
+      },
+      isenter(val) {
+        if (val) {
+          this.init();
         }
       }
     },
     mounted() {
       this.init();
-      this.asyncQuerySingles(this.detail.qid, this.starts.singles, 10);
-      this.asyncQueryMultis(this.detail.qid, this.starts.multis, 10);
-      this.asyncQueryShortAnswers(this.detail.qid, this.starts.shortanswers, 10);
-    }
+      let qid = this.detail.qid;
+      this.asyncQueryTimus(qid, 0, 1);
+      this.asyncQueryAboutuser(qid);
+    },
   }
 </script>
 
@@ -226,8 +322,15 @@
   @import "../../assets/css/base";
   .bank-detail {
     height: 100%;
-    overflow: auto;
     position: relative;
+    background-color: #fff;
+    .contain {
+      height: calc(100% - 50px);
+      overflow: auto;
+      &::-webkit-scrollbar {
+        width: 0 !important;
+      }
+    }
     .detail-title {
       height: 100%;
       display: flex;
@@ -259,7 +362,7 @@
         box-sizing: border-box;
         padding: 0 10px;
         background-color: #fff;
-        margin-bottom: 5px;
+        border-bottom: 5px solid #f2f3f5;
         .createtime, .name {
           height: 30px;
           line-height: 30px;
@@ -292,13 +395,25 @@
       }
     }
     .public {
+      margin-bottom: 20px;
       .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         font-size: 12px;
         color: #b1b1b1;
         margin-bottom: 5px;
+        button {
+          display: flex;
+          align-items: center;
+          padding: 1px 5px;
+          border-radius: 5px;
+          background-color: #5754fd;
+          color: #fff;
+        }
       }
       .timus {
-        margin-bottom: 20px;
+        margin-bottom: 5px;
         .timu {
           margin-bottom: 5px;
           border-radius: 5px;
@@ -324,6 +439,14 @@
             justify-content: center;
           }
         }
+      }
+      .more {
+        height: 25px;
+        line-height: 25px;
+        text-align: center;
+        color: #797979;
+        background-color: #f2f3f5;
+        border-radius: 5px;
       }
       .equal {
         height: 35px;
@@ -397,9 +520,6 @@
           }
         }
       }
-    }
-    &::-webkit-scrollbar {
-      width: 0 !important;
     }
   }
 </style>

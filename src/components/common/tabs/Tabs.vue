@@ -60,6 +60,7 @@
         if (this.value !== index) {
           this.$emit('input', index);
           this.istrans = true;
+          this.$emit('check', index);
           this.move();
         }
       },

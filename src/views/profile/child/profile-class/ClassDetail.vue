@@ -24,13 +24,16 @@
         <class-detail-info/>
         <div class="scroller-ct">
           <not-found v-if="showNotFound" :text="notFoundText"/>
-          <questions-list :list="creates" :style="{marginTop: '10px'}" v-else-if="index === 0"/>
+          <questions-list :list="creates" :style="{marginTop: '10px'}" v-else-if="index === 0" @tobank="tobank"/>
           <div class="cls-people" v-else-if="index === 1">
             <people-list :people="people"/>
           </div>
         </div>
       </div>
       <update-info v-model="isupdate" :form-data="formData" :info="info" @changeData="changeData"/>
+      <model-box1 v-model="isdetailed" @enterd="onenter" @closed="onCloseModel">
+        <bank-detail :detail="detailinfo" :isenter="isenter"/>
+      </model-box1>
     </div>
   </transition>
 </template>
@@ -43,6 +46,8 @@
   import PeopleList from "../../../../components/content/people-list/PeopleList";
   import NotFound from "../../../../components/content/not-found/NotFound";
   import UpdateInfo from "../../../../components/content/update-info/UpdateInfo";
+  import ModelBox1 from "../../../../components/content/model-box/ModelBox1";
+  import BankDetail from "../../../bank/BankDetail";
   import { mapActions, mapGetters, mapMutations } from 'vuex';
   import {
     classDetailInfo,
@@ -50,7 +55,6 @@
   } from "../../../../store/mutation-types";
   import Dialog from "../../../../components/dialog";
   import { root } from '../../../../util/mixins/root';
-
   export default {
     name: "ClassDetail",
     components: {
@@ -61,6 +65,8 @@
       PeopleList,
       NotFound,
       UpdateInfo,
+      ModelBox1,
+      BankDetail,
     },
     mixins: [root],
     data() {
@@ -84,7 +90,10 @@
           classavatar: '',
           classname: '',
           description: ''
-        }
+        },
+        isdetailed: false,
+        detailinfo: {},
+        isenter: false,
       }
     },
     computed: {
@@ -167,6 +176,16 @@
         info[key] = val;
         info.classid = this.getClsDetailInfo.classid;
         this.asyncUpdateClass(info, key, val);
+      },
+      tobank(detail) {
+        this.detailinfo = detail;
+        this.isdetailed = true;
+      },
+      onenter() {
+        this.isenter = true;
+      },
+      onCloseModel() {
+        this.isenter = false;
       },
       async asyncClassByUid(payload) {
         let res = await this.queryClassByUid(payload);

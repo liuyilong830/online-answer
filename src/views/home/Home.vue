@@ -37,14 +37,17 @@
       <list v-model="islistload" :finished="finished" @load="onListLoad" finished-text="到底了">
         <div class="qsbk">
           <div class="qsbk-public">
-            <questions-list :list="quesList.left"/>
+            <questions-list :list="quesList.left" @tobank="tobank"/>
           </div>
           <div class="qsbk-public">
-            <questions-list :list="quesList.right"/>
+            <questions-list :list="quesList.right" @tobank="tobank"/>
           </div>
         </div>
       </list>
     </pull-refresh>
+    <model-box1 v-model="isdetailed" @enterd="onenter" @closed="onCloseModel">
+      <bank-detail :detail="detailinfo" :isenter="isenter"/>
+    </model-box1>
   </div>
 </template>
 
@@ -56,6 +59,8 @@
   import DropDown from "./child/DropDown";
   import List from "../../components/common/list/List";
   import QuestionsList from "../../components/content/questions/QuestionsList";
+  import ModelBox1 from "../../components/content/model-box/ModelBox1";
+  import BankDetail from "../bank/BankDetail";
   import { mapActions } from 'vuex';
   export default {
     name: "Home",
@@ -67,6 +72,8 @@
       DropDown,
       List,
       QuestionsList,
+      ModelBox1,
+      BankDetail,
     },
     data() {
       return {
@@ -84,6 +91,9 @@
         start: 0,
         top: 0,
         offsetY: 0,
+        detailinfo: {},
+        isdetailed: false,
+        isenter: false,
       }
     },
     computed: {
@@ -125,6 +135,16 @@
             this.ismenu = false;
           }
         }
+      },
+      tobank(detail) {
+        this.detailinfo = detail;
+        this.isdetailed = true;
+      },
+      onenter() {
+        this.isenter = true;
+      },
+      onCloseModel() {
+        this.isenter = false;
       },
       async asyncGetQuestList(limit = 10, start = 0) {
         let res = await this.getQuestionsList({limit, start});
