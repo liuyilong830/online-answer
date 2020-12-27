@@ -103,6 +103,11 @@
         types: ['singles', 'multis', 'shortanswers'],
         isinfo: false,
         timuinfo: null,
+        starts: {
+          singles: 0,
+          multis: 0,
+          shortanswers: 0
+        }
       }
     },
     props: {
@@ -141,7 +146,7 @@
       },
     },
     methods: {
-      ...mapActions(['queryTimus']),
+      ...mapActions(['querySingles', 'queryMultis', 'queryShortAnswers']),
       toclose() {
         this.$emit('input', false);
       },
@@ -150,6 +155,7 @@
         this.top = 0;
         this.iscopyed = false;
         this.height = 0;
+        this.starts = { singles: 0, multis: 0, shortanswers: 0 };
       },
       init() {
         this.$nextTick(() => {
@@ -169,7 +175,9 @@
       },
       entered() {
         this.init();
-        this.asyncQueryTimus(this.detail.qid);
+        this.asyncQuerySingles(this.detail.qid, this.starts.singles, 10);
+        this.asyncQueryMultis(this.detail.qid, this.starts.multis, 10);
+        this.asyncQueryShortAnswers(this.detail.qid, this.starts.shortanswers, 10);
       },
       closed() {
         this.resetData();
@@ -188,12 +196,30 @@
       },
       toeqit() {},
       todelete() {},
-      async asyncQueryTimus(qid) {
-        let res = await this.queryTimus(qid);
-        if (res.status === 200) {
-          this.timus = res.data;
+      async asyncQuerySingles(qid, start = 0, limit = 10) {
+        let res = await this.querySingles({qid, start, limit})
+        if (res.status === 200 && res.data) {
+          let singles = res.data.singles;
+          this.timus.singles = singles;
+          this.starts.singles += singles.length;
         }
       },
+      async asyncQueryMultis(qid, start = 0, limit = 10) {
+        let res = await this.queryMultis({qid, start, limit})
+        if (res.status === 200 && res.data) {
+          let multis = res.data.multis;
+          this.timus.multis = multis;
+          this.starts.multis += multis.length;
+        }
+      },
+      async asyncQueryShortAnswers(qid, start = 0, limit = 10) {
+        let res = await this.queryShortAnswers({qid, start, limit})
+        if (res.status === 200 && res.data) {
+          let shortanswers = res.data.shortanswers;
+          this.timus.shortanswers = shortanswers;
+          this.starts.shortanswers += shortanswers.length;
+        }
+      }
     },
     watch: {
       currtab(val) {

@@ -81,8 +81,14 @@ const actions = {
   async createdBank(ctx, {limit, start}) {
     return await questions.createdBank({limit, start});
   },
-  async queryTimus(ctx, qid) {
-    return await questions.queryTimus(qid);
+  async querySingles(ctx, payload) {
+    return await questions.querySingles(payload);
+  },
+  async queryMultis(ctx, payload) {
+    return await questions.queryMultis(payload);
+  },
+  async queryShortAnswers(ctx, payload) {
+    return await questions.queryShortAnswers(payload);
   },
 }
 

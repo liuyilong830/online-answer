@@ -101,7 +101,7 @@
             return this.finished = true;
           }
           this.list.push(...list);
-          this.start += limit;
+          this.start += list.length;
         }
       },
     },
