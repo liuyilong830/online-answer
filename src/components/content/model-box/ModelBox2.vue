@@ -1,9 +1,9 @@
 <template>
-  <transtion name="box2" @afterEnter="entered" @beforeLeave="closed">
+  <transition name="box2" @afterEnter="entered" @beforeLeave="closed">
     <div class="model-box2" v-if="value" :style="zindexStyle">
       <slot></slot>
     </div>
-  </transtion>
+  </transition>
 </template>
 
 <script>
@@ -11,6 +11,11 @@
   export default {
     name: "ModelBox2",
     mixins: [ onlyZIndex ],
+    provide() {
+      return {
+        box2: this
+      }
+    },
     data() {
       return {}
     },
@@ -20,6 +25,9 @@
     methods: {
       entered() {},
       closed() {},
+      toclose() {
+        this.$emit('input', false);
+      },
     },
   }
 </script>

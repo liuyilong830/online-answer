@@ -15,7 +15,9 @@
           </list>
         </pull-refresh>
       </div>
-      <bank-detail v-model="isdetaled" :detail="detailinfo"/>
+      <model-box2 v-model="isdetaled">
+        <bank-detail :detail="detailinfo"/>
+      </model-box2>
     </div>
   </transition>
 </template>
@@ -26,6 +28,7 @@
   import PullRefresh from "../../components/common/pull-refresh/PullRefresh";
   import List from "../../components/common/list/List";
   import BankDetail from "./BankDetail";
+  import ModelBox2 from "../../components/content/model-box/ModelBox2";
   import onlyZIndex from '../../util/mixins/zindex';
   import { mapActions } from 'vuex';
   export default {
@@ -37,6 +40,7 @@
       PullRefresh,
       List,
       BankDetail,
+      ModelBox2,
     },
     mixins: [ onlyZIndex ],
     data() {

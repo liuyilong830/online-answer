@@ -1,43 +1,41 @@
 <template>
   <div class="bank-detail">
-    <model-box1 v-bind="$attrs" @entered="entered" @closed="closed">
-      <nav-bar :style="navbarStyle">
-        <template #left><i class="iconfont icon-fanhui1" @click="toclose"></i></template>
-        <div class="detail-title">详情页</div>
-        <template #right><i class="iconfont icon-19"></i></template>
-      </nav-bar>
-      <div class="copy-tabs" v-if="iscopyed">
-        <tabs :tablist="tablist" v-model="currtab"/>
-      </div>
-      <div class="detail" @scroll="onscroll">
-        <div class="content" ref="contentRef">
-          <div class="detail-img">
-            <img :src="detail.icon" alt="">
-          </div>
-          <div class="detail-baseinfo">
-            <p class="createtime">发布于：{{getCreatetime}}</p>
-            <p class="name">{{detail.qname}}</p>
-            <p class="desc">{{detail.description}}</p>
-          </div>
-          <div class="detail-tabs" ref="tabRef">
-            <tabs :tablist="tablist" v-model="currtab"/>
-          </div>
-          <div class="normal">
-            <div class="public" v-for="(key, index) in types" :key="key">
-              <p class="title" ref="titleRefs">{{`${index+1}.${formatTitle(key)}`}}</p>
-              <ul class="timus" v-if="timus[key].length">
-                <li class="timu" v-for="(item, i) in timus[key]" :key="item.tid">
-                  <div class="number">{{i + 1}}</div>
-                  <div class="tname">{{item.tname}}</div>
-                  <div class="opeations" @click="checkTimu(item)"><i class="iconfont icon-gengduo3"></i></div>
-                </li>
-              </ul>
-              <div class="equal" v-else>空</div>
-            </div>
+    <nav-bar :style="navbarStyle">
+      <template #left><i class="iconfont icon-fanhui1" @click="toclose"></i></template>
+      <div class="detail-title">详情页</div>
+      <template #right><i class="iconfont icon-19"></i></template>
+    </nav-bar>
+    <div class="copy-tabs" v-if="iscopyed">
+      <tabs :tablist="tablist" v-model="currtab"/>
+    </div>
+    <div class="detail" @scroll="onscroll">
+      <div class="content" ref="contentRef">
+        <div class="detail-img">
+          <img :src="detail.icon" alt="">
+        </div>
+        <div class="detail-baseinfo">
+          <p class="createtime">发布于：{{getCreatetime}}</p>
+          <p class="name">{{detail.qname}}</p>
+          <p class="desc">{{detail.description}}</p>
+        </div>
+        <div class="detail-tabs" ref="tabRef">
+          <tabs :tablist="tablist" v-model="currtab"/>
+        </div>
+        <div class="normal">
+          <div class="public" v-for="(key, index) in types" :key="key">
+            <p class="title" ref="titleRefs">{{`${index+1}.${formatTitle(key)}`}}</p>
+            <ul class="timus" v-if="timus[key].length">
+              <li class="timu" v-for="(item, i) in timus[key]" :key="item.tid">
+                <div class="number">{{i + 1}}</div>
+                <div class="tname">{{item.tname}}</div>
+                <div class="opeations" @click="checkTimu(item)"><i class="iconfont icon-gengduo3"></i></div>
+              </li>
+            </ul>
+            <div class="equal" v-else>空</div>
           </div>
         </div>
       </div>
-    </model-box1>
+    </div>
     <popup :is-show.sync="isinfo" position="bottom" round closeable>
       <div class="timuinfo" v-if="timuinfo">
         <div class="public">
@@ -73,7 +71,6 @@
 
 <script>
   import NavBar from "../../components/nav-bar/NavBar";
-  import ModelBox1 from "../../components/content/model-box/ModelBox1";
   import Tabs from '../../components/common/tabs/Tabs';
   import Popup from "../../components/popup/Popup";
   import { formatTime } from '../../util/util';
@@ -83,10 +80,10 @@
     inheritAttrs: false,
     components: {
       Popup,
-      ModelBox1,
       Tabs,
       NavBar,
     },
+    inject: ['box2'],
     data() {
       return {
         tablist: ['单选', '多选', '简答', '汇总'],
@@ -148,14 +145,7 @@
     methods: {
       ...mapActions(['querySingles', 'queryMultis', 'queryShortAnswers']),
       toclose() {
-        this.$emit('input', false);
-      },
-      resetData() {
-        this.currtab = 0;
-        this.top = 0;
-        this.iscopyed = false;
-        this.height = 0;
-        this.starts = { singles: 0, multis: 0, shortanswers: 0 };
+        this.box2.toclose();
       },
       init() {
         this.$nextTick(() => {
@@ -172,15 +162,6 @@
         } else {
           this.iscopyed = false;
         }
-      },
-      entered() {
-        this.init();
-        this.asyncQuerySingles(this.detail.qid, this.starts.singles, 10);
-        this.asyncQueryMultis(this.detail.qid, this.starts.multis, 10);
-        this.asyncQueryShortAnswers(this.detail.qid, this.starts.shortanswers, 10);
-      },
-      closed() {
-        this.resetData();
       },
       formatTitle(key) {
         return key === 'singles' ? '单选题' : (
@@ -232,12 +213,20 @@
         }
       }
     },
+    mounted() {
+      this.init();
+      this.asyncQuerySingles(this.detail.qid, this.starts.singles, 10);
+      this.asyncQueryMultis(this.detail.qid, this.starts.multis, 10);
+      this.asyncQueryShortAnswers(this.detail.qid, this.starts.shortanswers, 10);
+    }
   }
 </script>
 
 <style scoped lang="scss">
   @import "../../assets/css/base";
   .bank-detail {
+    height: 100%;
+    overflow: auto;
     position: relative;
     .detail-title {
       height: 100%;
@@ -408,6 +397,9 @@
           }
         }
       }
+    }
+    &::-webkit-scrollbar {
+      width: 0 !important;
     }
   }
 </style>
