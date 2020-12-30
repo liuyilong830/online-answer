@@ -95,7 +95,13 @@ const actions = {
   },
   async queryAboutuser(ctx, qid) {
     return await questions.queryAboutuser(qid);
-  }
+  },
+  async updateTimu(ctx, timu) {
+    return await questions.updateTimu(timu);
+  },
+  async deleteTimu(ctx, {tid, quesid}) {
+    return await questions.deleteTimu(tid, quesid);
+  },
 }
 
 export default actions;

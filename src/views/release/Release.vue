@@ -9,8 +9,12 @@
       <div class="content">
         <static-swipe ref="swipe" v-model="curr">
           <static-swipe-item><questions-create @tonext="tonext"/></static-swipe-item>
-          <static-swipe-item><single-question @toprev="toprev" @tonext="tonext"/></static-swipe-item>
-          <static-swipe-item><short-answer-question @toprev="toprev" @tonext="tonext"/></static-swipe-item>
+          <static-swipe-item>
+            <operation @toprev="toprev" @tonext="tonext"><single-question :created="multis"/></operation>
+          </static-swipe-item>
+          <static-swipe-item>
+            <operation @toprev="toprev" @tonext="tonext"><short-answer-question :created="shortanswers"/></operation>
+          </static-swipe-item>
           <static-swipe-item><finish-question @toprev="toprev"/></static-swipe-item>
         </static-swipe>
       </div>
@@ -26,7 +30,9 @@
   import FinishQuestion from "./child/FinishQuestion";
   import StaticSwipe from "../../components/content/static-swipe/StaticSwipe";
   import StaticSwipeItem from "../../components/content/static-swipe/StaticSwipeItem";
+  import Operation from "./child/Operation";
   import onlyZIndex from '../../util/mixins/zindex';
+  import Dialog from "../../components/dialog";
   const titles = ['创建题库', '创建选择题', '创建简答题', '发布题库'];
   export default {
     name: "Release",
@@ -38,12 +44,15 @@
       FinishQuestion,
       StaticSwipe,
       StaticSwipeItem,
+      Operation,
     },
     mixins: [onlyZIndex],
     data() {
       return {
         curr: 0,
         title: titles[0],
+        multis: [],
+        shortanswers: [],
       }
     },
     props: {
@@ -68,7 +77,39 @@
         this.$emit('input', false);
       },
       tonext() {
-        this.$refs.swipe.next();
+        if (this.curr === 1) {
+          return this.validationMultiple();
+        } else if (this.curr === 2) {
+          return this.validationShortanswers();
+        } else {
+          return this.$refs.swipe.next();
+        }
+      },
+      validationMultiple() {
+        if (!this.multis.length) {
+          Dialog.confirm({
+            message: '如果跳过，则没有选择题',
+          }).then(() => {
+            this.$bus.$emit('createMultiple', this.multis);
+            this.$refs.swipe.next();
+          }, () => {})
+        } else {
+          this.$bus.$emit('createMultiple', this.multis);
+          this.$refs.swipe.next();
+        }
+      },
+      validationShortanswers() {
+        if (!this.shortanswers.length) {
+          Dialog.confirm({
+            message: '如果跳过，则没有简答题',
+          }).then(() => {
+            this.$bus.$emit('createShortAnswer', this.shortanswers);
+            this.$refs.swipe.next();
+          }, () => {})
+        } else {
+          this.$bus.$emit('createShortAnswer', this.shortanswers);
+          this.$refs.swipe.next();
+        }
       },
       toprev() {
         this.$refs.swipe.prev();

@@ -42,34 +42,12 @@
               <div class="equal" v-else>空</div>
             </div>
           </div>
-          <ul>
-            <li>第1个</li>
-            <li>第2个</li>
-            <li>第3个</li>
-            <li>第4个</li>
-            <li>第5个</li>
-            <li>第6个</li>
-            <li>第7个</li>
-            <li>第8个</li>
-            <li>第9个</li>
-            <li>第10个</li>
-            <li>第11个</li>
-            <li>第12个</li>
-            <li>第13个</li>
-            <li>第14个</li>
-            <li>第15个</li>
-            <li>第16个</li>
-            <li>第17个</li>
-            <li>第18个</li>
-            <li>第19个</li>
-            <li>第20个</li>
-          </ul>
         </div>
       </div>
     </div>
     <answers-action v-if="operation" :operation.sync="operation" @check="checkOpera"/>
-    <popup :is-show.sync="isinfo" position="bottom" round closeable>
-      <div class="timuinfo" v-if="timuinfo">
+    <popup :is-show.sync="isinfo" position="bottom" round closeable ref="popup">
+      <div class="timuinfo" v-if="Object.keys(timuinfo).length">
         <div class="public">
           <p class="title">题目名</p>
           <div class="text">{{timuinfo.tname}}</div>
@@ -77,7 +55,7 @@
         <div class="public" v-if="timuinfo.options.length">
           <p class="title">题目选项</p>
           <ul class="options">
-            <li class="option" v-for="(opt,i) in timuinfo.options" :key="opt">
+            <li class="option" v-for="(opt,i) in timuinfo.options" :key="i">
               <span :class="{active: timuinfo.res.includes(opt)}">{{`${formatTnum(i)}. ${opt}`}}</span>
             </li>
           </ul>
@@ -98,6 +76,12 @@
         </div>
       </div>
     </popup>
+    <model-box1 v-model="iscreate">
+      <timu-form :type="createtype" @success="onsuccess"/>
+    </model-box1>
+    <model-box1 v-model="isupdate">
+      <update-timu v-model="timuinfo" @closed="updateClosed"/>
+    </model-box1>
   </div>
 </template>
 
@@ -106,9 +90,13 @@
   import Tabs from '../../components/common/tabs/Tabs';
   import Popup from "../../components/popup/Popup";
   import AnswersAction from "../../components/content/answer-action/AnswersAction";
+  import ModelBox1 from "../../components/content/model-box/ModelBox1";
+  import TimuForm from "../../components/content/form/TimuForm";
+  import UpdateTimu from "../../components/content/update-info/UpdateTimu";
   import { formatTime } from '../../util/util';
   import {root} from '../../util/mixins/root';
   import { mapActions } from 'vuex';
+  import Dialog from "../../components/dialog";
   const Template = function (type, res = [], start = 0, limit = 10, finished = false) {
     this[type] = res;
     this.start = start;
@@ -123,9 +111,12 @@
       Tabs,
       NavBar,
       AnswersAction,
+      ModelBox1,
+      TimuForm,
+      UpdateTimu,
     },
     mixins: [root],
-    inject: ['box2'],
+    inject: ['box1'],
     data() {
       return {
         tablist: ['单选', '多选', '简答', '汇总'],
@@ -141,8 +132,11 @@
         },
         types: ['singles', 'multis', 'shortanswers'],
         isinfo: false,
-        timuinfo: null,
+        timuinfo: {},
         operation: null,
+        iscreate: false,
+        createtype: null,
+        isupdate: false,
       }
     },
     props: {
@@ -183,11 +177,21 @@
       iscreater() {
         return this.getUid === this.detail.uid;
       },
+      getType() {
+        let { options, res } = this.timuinfo;
+        return options.length ? (
+          res.length < 2 ? 'singles' : 'multis'
+        ) : 'shortanswers';
+      },
+      getArr() {
+        let type = this.getType;
+        return this.timus[type][type];
+      },
     },
     methods: {
-      ...mapActions(['queryTimus', 'querySingles', 'queryMultis', 'queryShortAnswers', 'queryAboutuser']),
+      ...mapActions(['queryTimus', 'querySingles', 'queryMultis', 'queryShortAnswers', 'queryAboutuser', 'createTimus', 'deleteTimu']),
       toclose() {
-        this.box2.toclose();
+        this.box1.toclose();
       },
       init() {
         this.$nextTick(() => {
@@ -227,8 +231,34 @@
         this.isinfo = true;
         this.timuinfo = info;
       },
-      toeqit() {},
-      todelete() {},
+      toeqit() {
+        this.isupdate = true;
+      },
+      updateClosed(timuinfo) {
+        let arr = this.getArr;
+        let index = arr.findIndex(tm => tm.tid === timuinfo.tid);
+        if (index > -1) {
+          arr.splice(index, 1, timuinfo);
+          this.$nextTick(() => {
+            this.getTitlesRect();
+          })
+        }
+      },
+      todelete() {
+        Dialog.confirm({
+          message: '您确定删除该题目吗?'
+        }).then(() => {
+          let { tid, quesid } = this.timuinfo;
+          this.asyncDeleteTimu(tid, quesid, () => {
+            if (!this.getArr.length && !this.timus[this.getType].finished) {
+              return this.tomore(this.getType);
+            }
+            this.$nextTick(() => {
+              this.getTitlesRect();
+            })
+          });
+        }, () => {})
+      },
       checkOpera(key, val) {
         console.log(key, val);
       },
@@ -240,7 +270,8 @@
         }
       },
       tocreated(key) {
-        console.log(key);
+        this.createtype = key;
+        this.iscreate = true;
       },
       tomore(key) {
         let qid = this.detail.qid;
@@ -251,13 +282,34 @@
           })
         });
       },
+      onsuccess(list, onclose) {
+        let type = this.createtype;
+        let arr = list.map(item => {
+          if (type === 'shortanswers') {
+            item.res = [item.res];
+          } else {
+            item.res = item.res.map(i => item.options[i]);
+          }
+          return item;
+        });
+        let qid = this.detail.qid;
+        this.asyncCreateTimus(qid, arr, () => {
+          this.$nextTick(() => {
+            this.getTitlesRect()
+          })
+        }, onclose);
+        this.loading = this.$toast.loading({
+          message: '正在创建中',
+          duration: 0
+        });
+      },
       async asyncQueryTimus(qid, start = 0, limit = 10) {
         let res = await this.queryTimus({qid, start, limit});
         if (res.status === 200 && res.data) {
-          let { singles, multis, shortanswers } = res.data;
-          this.timus.singles = new Template('singles', singles, singles.length, limit, singles.length < limit);
-          this.timus.multis = new Template('multis', multis, multis.length, limit, singles.length < limit);
-          this.timus.shortanswers = new Template('shortanswers', shortanswers, shortanswers.length, limit, singles.length < limit);
+          this.types.forEach(type => {
+            let arr = res.data[type];
+            this.timus[type] = new Template(type, arr, arr.length, limit, arr.length < limit);
+          })
           this.$nextTick(() => {
             this.getTitlesRect()
           })
@@ -284,10 +336,52 @@
           if (!timus.length) {
             return this.timus[type].finished = true;
           }
-          let arr = [...this.timus[type][type], ...timus];
-          this.timus[type] = new Template(type, arr, arr.length, limit);
+          let arr = this.timus[type][type];
+          timus.forEach(timu => {
+            let index = arr.findIndex(item => item.tid === timu.tid);
+            if (index > -1) {
+              arr.splice(index, 1);
+            }
+            arr.push(timu);
+          })
+          this.timus[type] = new Template(type, arr, start + timus.length, limit, timus.length < limit);
           if (func && typeof func === 'function') {
             func.call(this);
+          }
+        }
+      },
+      async asyncCreateTimus(qid, list, func, onclose) {
+        let res = await this.createTimus({quesid: qid, list});
+        if (res.status === 200) {
+          let type = this.createtype;
+          let {insertId: tid} = res.data;
+          list.forEach((timu, index) => {
+            timu.quesid = qid;
+            timu.tid = tid + index;
+            this.timus[type][type].push(timu);
+          })
+          this.loading.close();
+          this.$toast.success({
+            message: '创建成功',
+            duration: 500,
+            onClose: onclose
+          });
+          if (func && typeof func === 'function') func();
+        }
+      },
+      async asyncDeleteTimu(tid, quesid, func) {
+        let res = await this.deleteTimu({tid, quesid});
+        if (res.status === 200) {
+          let arr = this.getArr;
+          let index = arr.findIndex(tm => tm.tid === tid);
+          if (index > -1) {
+            this.$toast.success({
+              message: '创建成功',
+              duration: 500,
+              onClose: () => this.$refs.popup.closePopup()
+            })
+            arr.splice(index, 1);
+            if (func && typeof func === 'function') func();
           }
         }
       },
@@ -312,7 +406,7 @@
     mounted() {
       this.init();
       let qid = this.detail.qid;
-      this.asyncQueryTimus(qid, 0, 1);
+      this.asyncQueryTimus(qid, 0, 3);
       this.asyncQueryAboutuser(qid);
     },
   }

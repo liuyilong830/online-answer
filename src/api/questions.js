@@ -9,4 +9,7 @@ export default {
   queryMultis: ({qid, start, limit}) => Request.get('/questions/timus/multis', {qid, start, limit}, true),
   queryShortAnswers: ({qid, start, limit}) => Request.get('/questions/timus/shortanswers', {qid, start, limit}, true),
   queryAboutuser: (qid) => Request.get('/questions/aboutuser', {qid}, true),
+  updateTimu: (timu) => Request.patch('/questions/timus/update', timu, true),
+  deleteTimu: (tid, quesid) => Request.delete('/questions/timus/delete', {tid, quesid}, true),
+
 }

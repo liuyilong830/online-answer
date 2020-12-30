@@ -1,6 +1,6 @@
 <template>
   <transition name="upd">
-    <div class="update-info" v-show="value">
+    <div class="update-info" v-show="value" :style="zindexStyle">
       <nav-bar :style="navbarStyle">
         <template #left>
           <i class="iconfont icon-fanhui" @click.stop="$emit('input', false)"></i>
@@ -9,7 +9,7 @@
         <template #right><i></i></template>
       </nav-bar>
       <div class="upd-content">
-        <div class="upd-avatar">
+        <div class="upd-avatar" v-if="imgArr.length">
           <div class="avatar" v-for="item in imgArr" :key="item.name">
             <img :src="info[item.key]" alt="">
             <div class="icon"><i class="iconfont icon-xiangji"></i></div>
@@ -34,6 +34,7 @@
   import NavBar from "../../nav-bar/NavBar";
   import UpdateBox from "./UpdateBox";
   import CropperBox from "../cropper-box/CropperBox";
+  import onlyZIndex from "../../../util/mixins/zindex";
   import { mapActions } from 'vuex';
   export default {
     name: "UpdateInfo",
@@ -42,6 +43,7 @@
       UpdateBox,
       CropperBox,
     },
+    mixins: [ onlyZIndex ],
     data() {
       return {
         isShow: false,
@@ -117,7 +119,6 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 10;
     background-color: #fff;
     .upd-navbar-center {
       height: 100%;

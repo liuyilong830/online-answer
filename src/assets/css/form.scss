@@ -1,0 +1,74 @@
+.public {
+  margin-bottom: 10px;
+  .title {
+    font-size: 12px;
+    color: #b1b1b1;
+    padding-left: 4px;
+    margin-bottom: 5px;
+  }
+  .text {
+    width: 100%;
+    height: 40px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 5px 10px;
+  }
+  .redio {
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    overflow: hidden;
+    .item {
+      height: 100%;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      &.active {
+        background-color: #5754fd;
+        color: #fff;
+      }
+      input {
+        width: 100%;
+        height: 100%;
+        padding: 0 10px;
+        font-size: 14px;
+      }
+    }
+    .dot {
+      width: 1px;
+      height: 80%;
+      background-color: #ccc6;
+    }
+  }
+  .input-group {
+    position: relative;
+    margin-bottom: 10px;
+    .radio-input {
+      width: 100%;
+      height: 60px;
+      border-radius: 10px;
+      box-sizing: border-box;
+      padding: 5px 10px 5px 40px;
+    }
+    .name {
+      position: absolute;
+      top: 8px;
+      left: 15px;
+      font-size: 20px;
+      &.iconfont {
+        left: 10px;
+        color: #5754fd;
+      }
+    }
+  }
+  textarea {
+    width: 100%;
+    height: 120px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 5px 10px;
+  }
+}

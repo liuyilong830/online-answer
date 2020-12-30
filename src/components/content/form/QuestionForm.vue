@@ -123,7 +123,7 @@
     position: relative;
     box-sizing: border-box;
     padding-top: 40px;
-    height: calc(100% - 50px);
+    height: 100%;
     .query-more {
       position: absolute;
       top: 0;

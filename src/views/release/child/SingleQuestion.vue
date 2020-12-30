@@ -22,7 +22,7 @@
       </div>
       <div class="public">
         <p class="title">选项内容，对应ABCD或更多依次排列</p>
-        <div class="input-group" v-for="(item, i) in form.tnum" :key="item">
+        <div class="input-group" v-for="(item, i) in form.tnum" :key="i">
           <textarea class="radio-input" placeholder="请输入选项内容" ref="resultRefs"></textarea>
           <p class="name" @click="setRes(i)" v-if="!form.res.includes(i)">{{formatTnum(i)}}</p>
           <i class="name iconfont icon-gou" @click="setRes(i)" v-else></i>
@@ -33,10 +33,6 @@
         <textarea placeholder="一个好的题目解析能够帮助到答题者哟" v-model="form.description"></textarea>
       </div>
     </question-form>
-    <div class="opeartion">
-      <button class="prev-btn" @click="toprev">上一步</button>
-      <button class="next-btn" @click="tonext">下一步</button>
-    </div>
   </div>
 </template>
 
@@ -58,10 +54,19 @@
     data() {
       return {
         ismore: false,
-        created: [],
         form: new Template(),
         curr: 1,
         iscustom: false,
+      }
+    },
+    props: {
+      created: {
+        type: Array,
+        default() { return [] }
+      },
+      ismultis: {
+        type: Boolean,
+        default: true
       }
     },
     computed: {
@@ -73,22 +78,6 @@
       },
     },
     methods: {
-      toprev() {
-        this.$emit('toprev');
-      },
-      tonext() {
-        if (!this.created.length) {
-          Dialog.confirm({
-            message: '如果跳过，则不需要单选题'
-          }).then(() => {
-            this.$bus.$emit('createMultiple', this.created);
-            this.$emit('tonext');
-          }, () => {})
-        } else {
-          this.$bus.$emit('createMultiple', this.created);
-          this.$emit('tonext');
-        }
-      },
       setTnum(num) {
         this.iscustom = false;
         this.form.tnum = num;
@@ -97,8 +86,10 @@
         let index = this.form.res.findIndex(str => str === num);
         if (index > -1) {
           this.form.res.splice(index, 1);
-        } else {
+        } else if (this.ismultis) {
           this.form.res.push(num);
+        } else {
+          this.form.res = [num];
         }
       },
       tocustom() {
@@ -179,10 +170,7 @@
     padding-left: 4px;
   }
   .single-question {
-    width: 100vw;
     height: 100%;
-    box-sizing: border-box;
-    padding: 10px 15px 0;
     .public {
       margin-bottom: 10px;
       .title {

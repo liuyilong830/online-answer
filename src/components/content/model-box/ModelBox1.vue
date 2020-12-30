@@ -13,7 +13,7 @@
     mixins: [ onlyZIndex ],
     provide() {
       return {
-        box2: this,
+        box1: this,
       }
     },
     data() {

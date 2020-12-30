@@ -88,16 +88,6 @@
       changeHidden() {
         this.form.ishidden = this.form.ishidden ? 0 : 1;
       },
-      async changeToCls(flag) {
-        if (!this.isTea) return;
-        this.form.istoclass = this.form.istoclass ? 0 : 1;
-        if (flag) {
-          let res = await this.getCreatedCls();
-          this.cls = res.data;
-        } else {
-          this.cls = [];
-        }
-      },
       checkCls(cls) {
         let index = this.form.cls.findIndex(classid => classid === cls.classid);
         if (index > -1) {
@@ -131,6 +121,16 @@
         if (!this.validation()) return;
         this.$bus.$emit('createQues', this.form, this.filename);
         this.$emit('tonext');
+      },
+      async changeToCls(flag) {
+        if (!this.isTea) return;
+        this.form.istoclass = this.form.istoclass ? 0 : 1;
+        if (flag) {
+          let res = await this.getCreatedCls();
+          this.cls = res.data;
+        } else {
+          this.cls = [];
+        }
       },
       async asyncUploadImg(file) {
         let res = await this.uploadImg(file);

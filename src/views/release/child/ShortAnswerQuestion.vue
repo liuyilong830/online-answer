@@ -14,10 +14,6 @@
         <textarea placeholder="一个好的题目解析能够帮助到答题者哟" v-model="form.description"></textarea>
       </div>
     </question-form>
-    <div class="opeartion">
-      <button class="prev-btn" @click="toprev">上一步</button>
-      <button class="next-btn" @click="tonext">下一步</button>
-    </div>
   </div>
 </template>
 
@@ -39,7 +35,6 @@
     data() {
       return {
         ismore: false,
-        created: [],
         curr: 1,
         form: new Template(),
       }
@@ -52,24 +47,13 @@
         return this.len + 1;
       },
     },
+    props: {
+      created: {
+        type: Array,
+        default() { return [] }
+      }
+    },
     methods: {
-      toprev() {
-        this.$emit('toprev');
-      },
-      tonext() {
-        if (!this.created.length) {
-          Dialog.confirm({
-            message: '如果跳过，则不需要简答题'
-          }).then(() => {
-            this.$bus.$emit('createShortAnswer', this.created);
-            this.$emit('tonext');
-          }, () => {})
-        } else {
-          console.log(11);
-          this.$bus.$emit('createShortAnswer', this.created);
-          this.$emit('tonext');
-        }
-      },
       validation() {
         let { tname, res } = this.form;
         if (!tname) {
@@ -117,10 +101,7 @@
 <style scoped lang="scss">
   @import "../../../assets/css/base";
   .short-answer-question {
-    width: 100vw;
     height: 100%;
-    box-sizing: border-box;
-    padding: 10px 15px 0;
     .public {
       margin-bottom: 10px;
       .title {
