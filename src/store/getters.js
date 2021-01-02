@@ -5,6 +5,9 @@ const getters = {
   getClsDetailInfo(state) {
     return state.clsDetail || {};
   },
+  getTestQues(state) {
+    return state.ques;
+  },
 }
 
 export default getters;

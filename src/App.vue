@@ -5,6 +5,9 @@
     </keep-alive>
     <main-tab-bar class="main-tab-bar" v-if="$route.meta.isShowTab" @otherEvent="otherEvent"/>
     <release v-model="isShow"/>
+    <model-box1 v-model="isanswer" ref="box1">
+      <answer-box/>
+    </model-box1>
   </div>
 </template>
 
@@ -12,6 +15,8 @@
   import Login from "./views/login/Login";
   import MainTabBar from "./components/tab-bar/MainTabBar";
   import Release from "./views/release/Release";
+  import AnswerBox from "./views/answer-box/AnswerBox";
+  import ModelBox1 from "./components/content/model-box/ModelBox1";
   import islogin from './util/mixins/islogin';
   export default {
     name: 'App',
@@ -19,11 +24,14 @@
       Login,
       MainTabBar,
       Release,
+      AnswerBox,
+      ModelBox1,
     },
     mixins: [islogin()],
     data() {
       return {
         isShow: false,
+        isanswer: false,
       }
     },
     methods: {
@@ -33,13 +41,21 @@
         })
       },
     },
+    created() {
+      this.$bus.$on('openAnswers', (value) => {
+        this.isanswer = value;
+      })
+    },
+    mounted() {
+      this.$refs.box1.updateZIndex(100);
+    }
   }
 </script>
 
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_2btylc2x484.css');
+    @import url('http://at.alicdn.com/t/font_2194746_98bkaqvdk7m.css');
     width: 100vw;
     height: 100vh;
     display: flex;

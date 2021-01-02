@@ -102,6 +102,9 @@ const actions = {
   async deleteTimu(ctx, {tid, quesid}) {
     return await questions.deleteTimu(tid, quesid);
   },
+  async queryAllTimus(ctx, quesid) {
+    return await questions.queryAllTimus(quesid);
+  },
 }
 
 export default actions;

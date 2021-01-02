@@ -13,7 +13,7 @@
       <span>收藏</span>
     </div>
     <div class="btn">
-      <button>开始答题</button>
+      <button @click="totestQuestions">开始答题</button>
     </div>
   </div>
 </template>
@@ -45,6 +45,9 @@
         let obj = {...this.operation, [type]: num};
         this.$emit('update:operation', obj);
         this.$emit('check', type, num);
+      },
+      totestQuestions() {
+        this.$emit('totest');
       },
     },
   }

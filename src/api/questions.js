@@ -11,5 +11,6 @@ export default {
   queryAboutuser: (qid) => Request.get('/questions/aboutuser', {qid}, true),
   updateTimu: (timu) => Request.patch('/questions/timus/update', timu, true),
   deleteTimu: (tid, quesid) => Request.delete('/questions/timus/delete', {tid, quesid}, true),
+  queryAllTimus: (quesid) => Request.get('/questions/timus/all', {quesid}, true),
 
 }

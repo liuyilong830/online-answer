@@ -5,6 +5,7 @@ import {
   signOutUser,
   changeUserInfo,
   resetDetailInfo,
+  totestQuest,
 } from './mutation-types';
 
 const mutations = {
@@ -35,6 +36,9 @@ const mutations = {
     state.user = {};
     state.clsDetail = {};
     console.log('退出成功');
+  },
+  [totestQuest](state, ques) {
+    state.ques = ques;
   },
 }
 

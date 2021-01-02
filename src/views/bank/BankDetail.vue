@@ -45,7 +45,7 @@
         </div>
       </div>
     </div>
-    <answers-action v-if="operation" :operation.sync="operation" @check="checkOpera"/>
+    <answers-action v-if="operation" :operation.sync="operation" @check="checkOpera" @totest="totest"/>
     <popup :is-show.sync="isinfo" position="bottom" round closeable ref="popup">
       <div class="timuinfo" v-if="Object.keys(timuinfo).length">
         <div class="public">
@@ -95,8 +95,9 @@
   import UpdateTimu from "../../components/content/update-info/UpdateTimu";
   import { formatTime } from '../../util/util';
   import {root} from '../../util/mixins/root';
-  import { mapActions } from 'vuex';
+  import { mapActions, mapMutations } from 'vuex';
   import Dialog from "../../components/dialog";
+  import {totestQuest} from "../../store/mutation-types";
   const Template = function (type, res = [], start = 0, limit = 10, finished = false) {
     this[type] = res;
     this.start = start;
@@ -189,6 +190,7 @@
       },
     },
     methods: {
+      ...mapMutations([totestQuest]),
       ...mapActions(['queryTimus', 'querySingles', 'queryMultis', 'queryShortAnswers', 'queryAboutuser', 'createTimus', 'deleteTimu']),
       toclose() {
         this.box1.toclose();
@@ -281,6 +283,14 @@
             this.getTitlesRect()
           })
         });
+      },
+      totest() {
+        Dialog.confirm({
+          message: '您确定开始刷题吗？'
+        }).then(() => {
+          this[totestQuest](this.detail);
+          this.$bus.$emit('openAnswers', true);
+        }, () => {});
       },
       onsuccess(list, onclose) {
         let type = this.createtype;
