@@ -13,8 +13,8 @@ const onlyZIndex = {
     }
   },
   methods: {
-    updateZIndex(index = 0) {
-      this.zIndex += 1 + index;
+    updateZIndex(i = 0) {
+      this.zIndex = index += 1 + i;
     },
   }
 }

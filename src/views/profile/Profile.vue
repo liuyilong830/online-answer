@@ -16,8 +16,8 @@
       </div>
       <profile-info ref="pflInfoRef"/>
       <profile-content>
-        <profile-nav-bar v-model="current" :list="list" @changeIndex="changeIndex"/>
-        <div class="scroll-content">
+        <profile-nav-bar ref="profilenavbar" v-model="current" :list="list" @changeIndex="changeIndex"/>
+        <div class="scroll-content" :style="scrollContentStyle">
           <keep-alive :exclude="['ClassDetail']">
             <router-view/>
           </keep-alive>
@@ -68,6 +68,8 @@
         ],
         ispopup: false,
         isbank: false,
+        navbarHeigth: 0,
+        elRect: {},
       }
     },
     computed: {
@@ -85,6 +87,14 @@
           'background-position': `0 -${this.positionY + 40}px`,
           'background-size': 'cover',
         }
+      },
+      scrollContentStyle() {
+        let navbarH = this.navbarRect ? this.navbarRect.height : 50;
+        let profilenavbarH = this.profilenavbarRect ? this.profilenavbarRect.height : 45;
+        let marginBottom = this.profilenavbarMarginBottom || 10;
+        return {
+          minHeight: `${this.elRect.height - navbarH - profilenavbarH - marginBottom}px`
+        }
       }
     },
     methods: {
@@ -93,6 +103,9 @@
         this.$nextTick(() => {
           this.navbarRect = this.$refs.navbar.$el.getBoundingClientRect();
           this.infoRect = this.$refs.pflInfoRef.$el.getBoundingClientRect();
+          this.elRect = this.$el.getBoundingClientRect();
+          this.profilenavbarRect = this.$refs.profilenavbar.$el.getBoundingClientRect();
+          this.profilenavbarMarginBottom = parseFloat(window.getComputedStyle(this.$refs.profilenavbar.$el).marginBottom);
           this.positionY = this.infoRect.height - this.navbarRect.height - 11;
         })
       },

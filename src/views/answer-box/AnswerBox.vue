@@ -6,7 +6,7 @@
         <div class="answer-title">{{answertitle}}</div>
         <div class="answer-operations">
           <i class="iconfont icon-datiqia"></i>
-          <count-timer :time="70000" mode="up" class="answer-timer">
+          <count-timer ref="countTimer" :time="time" mode="up" :autoplay="false" class="answer-timer" @currtime="currtime">
             <template #default="time">
               <i class="iconfont icon-jishiqi"></i>
               <span class="currtime">{{formatTime(time)}}</span>
@@ -15,21 +15,24 @@
         </div>
       </div>
     </nav-bar>
+    <transition name="ready">
+      <div class="ready" v-if="!isready"></div>
+    </transition>
     <div class="answer-content">
       <div class="curr-count">
         <span>当前题目序号：{{curr+1}}/{{len}}</span>
       </div>
       <div class="content">
         <static-swipe ref="swipe" v-model="curr">
-          <static-swipe-item v-for="timu in list" :key="timu.tid">
-            <div class="timu"><answer-timu :timu="timu"/></div>
+          <static-swipe-item v-for="(timu, i) in list" :key="timu.tid">
+            <div class="timu"><answer-timu :isactive="curr === i" :timu="timu"/></div>
           </static-swipe-item>
         </static-swipe>
       </div>
     </div>
     <div class="answer-bottom">
       <button :class="{btn: true, disable: curr <= 0}" @click="toprev">上一题</button>
-      <button class="btn" @click="tonext">{{isfinish ? '提交' : (islast ? '完成' : '下一题')}}</button>
+      <button :class="{btn: true, disable: isfinishquestion && islast}" @click="tonext">{{rightBtnText}}</button>
     </div>
   </div>
 </template>
@@ -40,8 +43,9 @@
   import StaticSwipe from "../../components/content/static-swipe/StaticSwipe";
   import StaticSwipeItem from "../../components/content/static-swipe/StaticSwipeItem";
   import AnswerTimu from "./AnswerTimu";
-  import { parseFormat } from '../../util/util';
+  import { parseFormat, parsetimeData, parseSecondTime } from '../../util/util';
   import { mapActions, mapGetters } from 'vuex';
+  import Dialog from "@/components/dialog";
   export default {
     name: "AnswerBox",
     components: {
@@ -63,6 +67,10 @@
         shortanswers: [],
         len: 0,
         curr: 0,
+        finishtimedata: {},
+        isready: false,
+        time: 0,
+        isfinishquestion: false, // 是否全部题目都刷完了
       }
     },
     computed: {
@@ -84,11 +92,27 @@
         if (num < 0 || !this.list.length) return false;
         return this.list[this.len-1].finished;
       },
+      rightBtnText() {
+        if (this.islast) {
+          return this.isfinish ? '提交' : '完成';
+        } else {
+          return '下一步'
+        }
+      },
     },
     methods: {
-      ...mapActions(['queryAllTimus']),
+      ...mapActions(['queryAllTimus', 'queryQuestOpt', 'setQuestOpt']),
       toclose() {
-        this.model.toclose();
+        Dialog.confirm({
+          message: '是否保存后再退出？',
+          confirmButtonText: '是',
+          cancelButtonText: '否'
+        }).then(() => {
+          this.onsubmit(false);
+          this.model.toclose();
+        }, () => {
+          this.model.toclose();
+        })
       },
       toprev() {
         if (this.curr <= 0) return;
@@ -97,14 +121,37 @@
       tonext() {
         if (!this.list[this.curr].finished) {
           this.list[this.curr].finished = true;
+          this.$refs.countTimer.pause();
         } else if (!this.islast) {
+          let next = this.list[this.curr+1] || {};
+          if (!next.finished) {
+            this.$refs.countTimer.start();
+          }
           this.$refs.swipe.next();
-        } else {
-          console.log('提交');
+        } else if (!this.isfinishquestion) {
+          this.onsubmit();
         }
       },
       formatTime(time) {
         return parseFormat('HH:mm:ss', time);
+      },
+      currtime(remain) {
+        this.finishtimedata = parsetimeData(remain);
+      },
+      onsubmit(flag = true) {
+        console.log('提交');
+        let obj = {
+          singles: this.singles,
+          multis: this.multis,
+          shortanswers: this.shortanswers
+        };
+        obj.currtime = (this.time / 1000) || parseSecondTime(this.finishtimedata);
+        let work_json = JSON.stringify(obj);
+        let info = {quesid: this.quesid, work_json, iswork: 1};
+        if (this.isfinish) {
+          info.finishtime = obj.currtime;
+        }
+        this.asyncSetQuestOpt(info, flag);
       },
       async asyncQueryAllTimus(quesid) {
         let res = await this.queryAllTimus(quesid);
@@ -114,15 +161,52 @@
             let arr = res.data.types[key];
             this[key] = arr.map(tm => {
               tm.finished = false;
+              tm.youres = [];
               return tm;
             });
           })
+        }
+      },
+      async asyncQueryQuestInfo(quesid) {
+        let { status, data: res } = await this.queryQuestOpt(quesid);
+        if (status === 200) {
+          let { iswork, work_json, finishtime } = res;
+          if (iswork) {
+            this.isfinishquestion = Boolean(finishtime);
+            // 有数据，则说明曾经答题过，需要回到之前答题的记录上去
+            let { singles, multis, shortanswers, currtime } = JSON.parse(work_json);
+            this.asyncQueryAllTimus(quesid).then(() => {
+              this.singles = singles;
+              this.multis = multis;
+              this.shortanswers = shortanswers;
+              this.$nextTick(() => {
+                setTimeout(() => {
+                  this.isready = true;
+                  this.time = currtime * 1000;
+                }, 500)
+              })
+            })
+          } else {
+            await this.asyncQueryAllTimus(quesid);
+            this.$nextTick(() => {
+              setTimeout(() => {
+                this.isready = true;
+                this.$refs.countTimer.start();
+              }, 500)
+            })
+          }
+        }
+      },
+      async asyncSetQuestOpt(info, flag) {
+        let res = await this.setQuestOpt(info);
+        if (res.status === 200 && flag) {
+          console.log('即将跳转到其他页面');
         }
       }
     },
     mounted() {
       if (typeof this.quesid === 'number') {
-        this.asyncQueryAllTimus(this.quesid);
+        this.asyncQueryQuestInfo(this.quesid);
       }
     },
   }
@@ -140,6 +224,19 @@
       height: 40px;
       border: none;
       box-shadow: none;
+    }
+    .ready {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      z-index: 1000;
+      background-color: #fff;
+      &.ready-enter, &.ready-leave-to {
+        opacity: 0;
+      }
+      &.ready-leave-to {
+        transition: all .3s;
+      }
     }
     .answer-top {
       height: 100%;

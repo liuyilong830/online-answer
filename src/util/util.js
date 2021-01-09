@@ -78,6 +78,16 @@ const parseFormat = function (format = 'DD:HH:mm', timeData) {
   return format;
 }
 
+const parseSecondTime = function (timeData) {
+  let { days, hours, minutes, seconds } = timeData;
+  let s = 0;
+  s += parseInt(seconds);
+  s += parseInt(60 * minutes);
+  s += parseInt(3600 * hours);
+  s += parseInt(24 * 3600 * days);
+  return s;
+}
+
 const padZero = function (num) {
   let str = '' + num;
   if (str.length < 2) {
@@ -92,4 +102,5 @@ export {
   formatTime,
   parsetimeData,
   parseFormat,
+  parseSecondTime,
 }

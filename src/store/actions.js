@@ -105,6 +105,22 @@ const actions = {
   async queryAllTimus(ctx, quesid) {
     return await questions.queryAllTimus(quesid);
   },
+  async queryTimuOperations(ctx, tid) {
+    return await questions.queryTimuOperations(tid);
+  },
+  async setTimuOperations(ctx, info) {
+    if (!info.tid) return;
+    return await questions.setTimuOperations(info);
+  },
+  async queryQuestOpt(ctx, quesid) {
+    if (!quesid) return;
+    return await questions.queryQuestOpt(quesid);
+  },
+  async setQuestOpt(ctx, info) {
+    if (!info.quesid) return;
+    return await questions.setQuestOpt(info);
+  },
+
 }
 
 export default actions;

@@ -30,7 +30,7 @@
       autoplay: {
         type: Boolean,
         default: true
-      }
+      },
     },
     computed: {
       timeData() {
@@ -50,12 +50,12 @@
       start() {
         if (this.counting) return;
         this.counting = true;
-        this.endTime = Date.now() + this.remain;
+        this.endTime = this.mode === 'down' ? (Date.now() + this.remain) : (Date.now() - this.remain);
         this.run();
       },
       reset() {
         this.pause();
-        this.remain = this.mode === 'down' ? this.time : 0;
+        this.remain = this.time;
         if (this.autoplay) {
           this.start();
         }
@@ -71,8 +71,7 @@
           if (
             parseInt(remain / 1000) !== parseInt(this.remain / 1000) ||
             (remain === 0 && this.mode === 'down') ||
-            (remain === this.time && this.mode === 'up') ||
-            this.time === 0
+            (this.mode === 'up')
           ) {
             this.setRemain(remain);
           }
@@ -83,11 +82,8 @@
       },
       setRemain(remain) {
         this.remain = remain;
-        if (
-          this.time !== 0 &&
-          (remain === 0 && this.mode === 'down') ||
-          (remain === this.time && this.mode === 'up')
-        ) {
+        this.$emit('currtime', remain);
+        if (remain === 0 && this.mode === 'down') {
           this.pause();
           this.$emit('finish');
         }
@@ -96,7 +92,7 @@
         if (this.mode === 'down') {
           return Math.max(this.endTime - Date.now(), 0);
         } else {
-          return Math.min(Date.now() - this.endTime, this.time || Number.MAX_SAFE_INTEGER);
+          return Math.min(Date.now() - this.endTime, Number.MAX_SAFE_INTEGER);
         }
       }
     },

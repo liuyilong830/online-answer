@@ -12,5 +12,9 @@ export default {
   updateTimu: (timu) => Request.patch('/questions/timus/update', timu, true),
   deleteTimu: (tid, quesid) => Request.delete('/questions/timus/delete', {tid, quesid}, true),
   queryAllTimus: (quesid) => Request.get('/questions/timus/all', {quesid}, true),
+  queryTimuOperations: (tid) => Request.get('/questions/timu/operations', {tid}, true),
+  setTimuOperations: (info) => Request.post('/questions/timu/set/operations', info, true),
+  queryQuestOpt: (quesid) => Request.get('/questions/operations', {quesid}, true),
+  setQuestOpt: (info) => Request.post('/questions/set/operations', info, true),
 
 }

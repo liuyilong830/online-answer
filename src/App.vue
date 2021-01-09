@@ -5,9 +5,11 @@
     </keep-alive>
     <main-tab-bar class="main-tab-bar" v-if="$route.meta.isShowTab" @otherEvent="otherEvent"/>
     <release v-model="isShow"/>
-    <model-box1 v-model="isanswer" ref="box1">
-      <answer-box/>
-    </model-box1>
+    <div v-if="isanswer">
+      <model-box1 v-model="isanswer" ref="box1">
+        <answer-box/>
+      </model-box1>
+    </div>
   </div>
 </template>
 
@@ -46,16 +48,13 @@
         this.isanswer = value;
       })
     },
-    mounted() {
-      this.$refs.box1.updateZIndex(100);
-    }
   }
 </script>
 
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_98bkaqvdk7m.css');
+    @import url('http://at.alicdn.com/t/font_2194746_nimq7s4q3.css');
     width: 100vw;
     height: 100vh;
     display: flex;

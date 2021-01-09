@@ -7,10 +7,10 @@
         <span class="name-title">{{timu.tname}}</span>
       </div>
     </div>
-    <div class="public" v-if="timu.options.length">
+    <div class="public" v-if="!isshort">
       <p class="title">选项:</p>
       <ul class="options-list">
-        <li :class="{option: true, active: res.includes(opt)}" v-for="(opt, i) in timu.options" :key="i" @click="setResult(opt)">
+        <li :class="{option: true, active: timu.youres.includes(opt)}" v-for="(opt, i) in timu.options" :key="i" @click="setResult(opt)">
           <div class="round">{{formatNum(i)}}</div>
           <div class="text">{{opt}}</div>
         </li>
@@ -18,33 +18,51 @@
     </div>
     <div class="public" v-else>
       <p class="title">作答:</p>
-      <textarea placeholder="请输入您的答案" v-model="texts"></textarea>
+      <textarea placeholder="请输入您的答案" v-model="texts" :disabled="timu.finished"></textarea>
     </div>
-    <div class="public" v-if="timu.finished">
-      <p class="title">答案</p>
-      <div class="results">
-        <div class="result_icon" v-if="!isshort">
-          <i :class="['iconfont', isright ? 'icon-V' : 'icon-V1']"></i>
+    <transition-group name="finish">
+      <div v-if="timu.finished" key="aaa">
+        <div class="public">
+          <p class="title">答案</p>
+          <div class="results">
+            <div class="result_icon" v-if="!isshort">
+              <i :class="['iconfont', isright ? 'icon-V' : 'icon-V1']"></i>
+            </div>
+            <span class="res">{{getResTag(timu.res)}}</span>
+          </div>
         </div>
-        <span class="res">{{getResTag(timu.res)}}</span>
+        <div class="public">
+          <p class="title">解析</p>
+          <div :class="['desc', isright ? 'active' : 'normal']" v-if="timu.description">{{timu.description}}</div>
+          <div class="desc normal" v-else>创建者没有给这道题出解析</div>
+        </div>
+        <ul class="tomore">
+          <li class="round" @click="tocomments">
+            <i class="iconfont icon-tubiaozhizuo-"></i>
+          </li>
+          <li class="round" @click="tocollection">
+            <i :class="[iscollection ? 'collection':'', 'iconfont', 'icon-shoucang1']"></i>
+          </li>
+        </ul>
       </div>
-    </div>
-    <div class="public" v-if="timu.finished">
-      <p class="title">解析</p>
-      <div :class="['desc', isright ? 'active' : 'normal']" v-if="timu.description">{{timu.description}}</div>
-      <div class="desc normal" v-else>创建者没有给这道题出解析</div>
-    </div>
+    </transition-group>
   </div>
 </template>
 
 <script>
+  import { mapActions } from 'vuex';
+  import { deepClone } from '../../util/util';
   export default {
     name: "AnswerTimu",
     data() {
       return {
         texts: '',
-        res: [],
         restext: '',
+        opts: {
+          iszan: 0,
+          iscomment: 0,
+          iscollection: 0,
+        },
       }
     },
     props: {
@@ -54,6 +72,7 @@
           return {}
         }
       },
+      isactive: Boolean,
     },
     computed: {
       isshort() {
@@ -68,7 +87,7 @@
       },
       isright() {
         if (!this.isshort) {
-          let arr = this.res.map(res => {
+          let arr = this.timu.youres.map(res => {
             let index = this.timu.options.findIndex(opt => opt === res);
             return this.formatNum(index);
           })
@@ -77,17 +96,40 @@
           return true;
         }
       },
+      iscollection() {
+        return this.opts.iscollection;
+      },
     },
     watch: {
+      timu: {
+        handler(tm) {
+          if (this.isshort) {
+            let res = tm.youres;
+            this.texts = res.length ? res[0] : '';
+          }
+        },
+        immediate: true,
+      },
       'timu.finished': {
-        handler(val) {
-          if (val) {
-
+        handler() {
+          if (this.isshort) {
+            this.timu.youres.push(this.texts);
           }
         }
+      },
+      isactive: {
+        handler(val) {
+          if (val && !this.timu.finished) {
+            // 发送请求
+            let tid = this.timu.tid;
+            this.asyncQueryTimuOpt(tid);
+          }
+        },
+        immediate: true,
       }
     },
     methods: {
+      ...mapActions(['queryTimuOperations', 'setTimuOperations']),
       formatNum(num) {
         return String.fromCharCode(65 + num);
       },
@@ -104,22 +146,47 @@
       },
       setResult(opt) {
         if (this.timu.finished) return;
-        if (this.issingle) {
-          this.res = [];
-        } else {
-          let index = this.res.findIndex(option => opt === option);
+        if (!this.issingle) {
+          let index = this.timu.youres.findIndex(option => opt === option);
           if (index > -1) {
-            return this.res.splice(index, 1);
+            return this.timu.youres.splice(index, 1);
+          }
+        } else {
+          this.timu.youres = [];
+        }
+        this.timu.youres.push(opt);
+      },
+      tocomments() {},
+      tocollection() {
+        let num = this.opts.iscollection ^ 1;
+        let tid = this.timu.tid;
+        let info = {...this.opts, iscollection: num, tid};
+        this.asyncSetTimuOpt(info, () => {
+          this.opts.iscollection = num;
+          this.$toast(num ? '收藏成功' : '取消收藏');
+        });
+      },
+      async asyncQueryTimuOpt(tid) {
+        let res = await this.queryTimuOperations(tid);
+        if (Object.keys(res.data).length) {
+          this.opts = res.data;
+        }
+      },
+      async asyncSetTimuOpt(info, cb) {
+        let res = await this.setTimuOperations(info);
+        if (res.status === 200) {
+          if (cb && typeof cb === 'function') {
+            cb();
           }
         }
-        this.res.push(opt);
-      }
+      },
     },
   }
 </script>
 
 <style scoped lang="scss">
   .answer-timu {
+    position: relative;
     height: 100%;
     overflow: auto;
     .public {
@@ -212,6 +279,37 @@
       box-sizing: border-box;
       padding: 5px 10px;
       background-color: #f2f3f5;
+    }
+    .tomore {
+      position: absolute;
+      z-index: 2;
+      left: 0px;
+      bottom: 10px;
+      width: 50px;
+      .round {
+        box-sizing: border-box;
+        padding: 5px;
+        height: 50px;
+        .iconfont {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #5754fd;
+          border-radius: 50%;
+          color: #fff;
+          font-size: 20px;
+          &.collection {
+            color: yellow;
+          }
+        }
+      }
+    }
+    .finish-enter, .finish-leave-to {
+      opacity: 0;
+    }
+    .finish-enter-active, .finish-leave-active {
+      transition: all .3s;
     }
     &::-webkit-scrollbar {
       width: 0 !important;
