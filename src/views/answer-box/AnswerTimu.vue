@@ -20,7 +20,7 @@
       <p class="title">作答:</p>
       <textarea placeholder="请输入您的答案" v-model="texts" :disabled="timu.finished"></textarea>
     </div>
-    <transition-group name="finish">
+    <transition-group name="finish" tag="div">
       <div v-if="timu.finished" key="aaa">
         <div class="public">
           <p class="title">答案</p>
@@ -73,6 +73,10 @@
         }
       },
       isactive: Boolean,
+      isinteractive: {
+        type: Boolean,
+        default: true
+      },
     },
     computed: {
       isshort() {
@@ -112,14 +116,16 @@
       },
       'timu.finished': {
         handler() {
+          if (!this.isinteractive) return;
           if (this.isshort) {
             this.timu.youres.push(this.texts);
           }
+          this.$emit('onefinished', this.timu);
         }
       },
       isactive: {
         handler(val) {
-          if (val && !this.timu.finished) {
+          if (val) {
             // 发送请求
             let tid = this.timu.tid;
             this.asyncQueryTimuOpt(tid);

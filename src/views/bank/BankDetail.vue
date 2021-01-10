@@ -41,11 +41,25 @@
               </div>
               <div class="equal" v-else>空</div>
             </div>
+            <div class="public" ref="rankRef">
+              <p class="title">4.排名</p>
+              <ul class="rank-list" v-if="ranklist.length">
+                <li class="rank-item-info" :class="{myself: isfinishedTest}" v-for="(user,i) in ranklist" :key="user.uid">
+                  <span class="number">
+                    <span v-if="i>2">{{i+1}}</span>
+                    <img v-else :src="require(`../../assets/images/${i==0?'guanjun':(i==1?'yajun':'jijun')}.png`)" alt="">
+                  </span>
+                  <div class="username"><p>{{user.nickname}}</p></div>
+                  <span class="use-time">{{parseTime(user.finishtime)}}</span>
+                </li>
+              </ul>
+              <div class="equal" v-else>快来霸榜呀</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <answers-action v-if="operation" :operation.sync="operation" @check="checkOpera" @totest="totest"/>
+    <answers-action ref="actionRef" v-if="operation" :operation.sync="operation" @check="checkOpera" @totest="totest"/>
     <popup :is-show.sync="isinfo" position="bottom" round closeable ref="popup">
       <div class="timuinfo" v-if="Object.keys(timuinfo).length">
         <div class="public">
@@ -93,7 +107,7 @@
   import ModelBox1 from "../../components/content/model-box/ModelBox1";
   import TimuForm from "../../components/content/form/TimuForm";
   import UpdateTimu from "../../components/content/update-info/UpdateTimu";
-  import { formatTime } from '../../util/util';
+  import { parseFormat, formatTime, parsetimeData } from '../../util/util';
   import {root} from '../../util/mixins/root';
   import { mapActions, mapMutations } from 'vuex';
   import Dialog from "../../components/dialog";
@@ -120,7 +134,7 @@
     inject: ['box1'],
     data() {
       return {
-        tablist: ['单选', '多选', '简答', '汇总'],
+        tablist: ['单选', '多选', '简答', '排名'],
         currtab: 0,
         iscopyed: false,
         navbarheight: 40,
@@ -138,6 +152,7 @@
         iscreate: false,
         createtype: null,
         isupdate: false,
+        ranklist: [],
       }
     },
     props: {
@@ -188,10 +203,23 @@
         let type = this.getType;
         return this.timus[type][type];
       },
+      isfinishedTest() {
+        return this.ranklist.findIndex(user => user.uid === this.getUid) > -1;
+      },
     },
     methods: {
       ...mapMutations([totestQuest]),
-      ...mapActions(['queryTimus', 'querySingles', 'queryMultis', 'queryShortAnswers', 'queryAboutuser', 'createTimus', 'deleteTimu']),
+      ...mapActions([
+        'queryTimus',
+        'querySingles',
+        'queryMultis',
+        'queryShortAnswers',
+        'queryAboutuser',
+        'createTimus',
+        'deleteTimu',
+        'getRankListUser',
+        'setQuestOpt',
+      ]),
       toclose() {
         this.box1.toclose();
       },
@@ -208,13 +236,17 @@
         let {height} = this.tabsRef;
         let navbarheight = this.navbarheight;
         let titlesRect = this.$refs.titleRefs.map(ref => ref.getBoundingClientRect());
+        let rankRect = this.$refs.rankRef.getBoundingClientRect();
         this.scrollTops = titlesRect.map(rect => {
           return this.top + rect.top - (height + navbarheight);
         });
+        this.scrollTops.push(this.top + rankRect.top - (height + navbarheight));
       },
       onscroll() {
         this.contentRect = this.$refs.contentRef.getBoundingClientRect();
+        let actionRect = this.$refs.actionRef.$el.getBoundingClientRect();
         this.top = Math.abs(this.contentRect.top);
+        this.maxTop = Math.max(this.contentRect.height + actionRect.height - document.body.clientHeight, 0);
         if (this.top >= this.height) {
           this.iscopyed = true;
         } else {
@@ -262,14 +294,18 @@
         }, () => {})
       },
       checkOpera(key, val) {
-        console.log(key, val);
+        let qid = this.detail.qid;
+        let info = { quesid: qid, [key]: val};
+        this.asyncUpdateQuestOpt(info);
       },
       checkTab(index) {
-        if (index < this.types.length) {
-          this.$refs.contentRef.parentNode.scrollTop = this.scrollTops[index];
-        } else {
-          console.log(index);
-        }
+        this.$nextTick(() => {
+          let dom = this.$refs.contentRef;
+          if (dom && dom.parentNode) {
+            this.currtab = index;
+            dom.parentNode.scrollTop = this.scrollTops[index];
+          }
+        })
       },
       tocreated(key) {
         this.createtype = key;
@@ -289,8 +325,12 @@
           message: '您确定开始刷题吗？'
         }).then(() => {
           this[totestQuest](this.detail);
-          this.$bus.$emit('openAnswers', true);
+          this.$bus.$emit('openAnswers', true); // 进入到刷题页面
         }, () => {});
+      },
+      parseTime(time) {
+        time = parsetimeData(time * 1000);
+        return parseFormat('HH:mm:ss', time);
       },
       onsuccess(list, onclose) {
         let type = this.createtype;
@@ -395,12 +435,27 @@
           }
         }
       },
+      async asyncQueryRanklist(quesid, cb) {
+        let res = await this.getRankListUser(quesid);
+        let { status, data: arr } = res;
+        if (status === 200) {
+          this.ranklist = arr.sort((a,b) => a.finishtime - b.finishtime);
+          if (typeof cb === 'function') cb();
+        }
+      },
+      async asyncUpdateQuestOpt(info) {
+        let res = await this.setQuestOpt(info);
+        if (res.status === 200) {
+          this.$toast('更新成功');
+        }
+      },
     },
     watch: {
       top(val) {
         let index = this.currtab;
         let prev = this.scrollTops[index];
         let next = this.scrollTops[index + 1];
+        if (this.maxTop === val) return;
         if (val > next) {
           this.currtab += 1;
         } else if (val + 1 < prev && this.currtab >= 1) {
@@ -418,6 +473,12 @@
       let qid = this.detail.qid;
       this.asyncQueryTimus(qid, 0, 3);
       this.asyncQueryAboutuser(qid);
+      this.asyncQueryRanklist(qid);
+      this.$bus.$on('finishedTest', () => {
+        this.asyncQueryRanklist(qid, () => {
+          this.checkTab(this.tablist.length-1);
+        });
+      })
     },
   }
 </script>
@@ -622,6 +683,44 @@
           &.delete {
             background-color: #d84848;
           }
+        }
+      }
+    }
+    .rank-list {
+      .rank-item-info {
+        margin-bottom: 5px;
+        border-radius: 5px;
+        background-color: #f2f3f5;
+        display: flex;
+        &.myself {
+          background-color: #82abff;
+          color: #fff;
+        }
+        .number {
+          width: 40px;
+          padding-right: 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          img {
+            width: 30px;
+            height: 30px;
+          }
+        }
+        .username {
+          flex: 1;
+          line-height: 35px;
+          padding: 3px 0;
+          p {
+            @include toEllipse(1);
+          }
+        }
+        .use-time {
+          padding-left: 5px;
+          width: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       }
     }

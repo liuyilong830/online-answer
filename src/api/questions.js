@@ -16,5 +16,6 @@ export default {
   setTimuOperations: (info) => Request.post('/questions/timu/set/operations', info, true),
   queryQuestOpt: (quesid) => Request.get('/questions/operations', {quesid}, true),
   setQuestOpt: (info) => Request.post('/questions/set/operations', info, true),
+  getRankListUser: (quesid) => Request.get('/questions/ranklist/user', {quesid}, true),
 
 }

@@ -49,21 +49,21 @@
       move(i) {
         this.offset +=  (i * this.size);
       },
-      next() {
-        if (this.index + 1 >= this.len) {
-          this.index = 0;
+      next(num = 1) {
+        if (this.index + num >= this.len) {
+          this.index = this.index + num - this.len;
         } else {
-          this.index += 1;
+          this.index += num;
         }
-        this.move(-1);
+        this.move(-1 * num);
       },
-      prev() {
-        if (this.index - 1 < 0) {
-          this.index = this.len - 1;
+      prev(num = 1) {
+        if (this.index - num < 0) {
+          this.index = this.len + (this.index - num);
         } else {
-          this.index -= 1;
+          this.index -= num;
         }
-        this.move(1);
+        this.move(num);
       },
     },
     watch: {

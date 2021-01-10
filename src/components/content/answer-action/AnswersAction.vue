@@ -55,6 +55,7 @@
 
 <style scoped lang="scss">
   .answers-action {
+    box-sizing: border-box;
     height: 50px;
     background-color: #fff;
     display: flex;

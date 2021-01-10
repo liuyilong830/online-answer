@@ -120,6 +120,10 @@ const actions = {
     if (!info.quesid) return;
     return await questions.setQuestOpt(info);
   },
+  async getRankListUser(ctx, quesid) {
+    if (!quesid) return;
+    return await questions.getRankListUser(quesid);
+  },
 
 }
 

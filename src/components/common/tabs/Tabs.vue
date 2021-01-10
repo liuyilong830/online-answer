@@ -61,7 +61,6 @@
           this.$emit('input', index);
           this.istrans = true;
           this.$emit('check', index);
-          this.move();
         }
       },
       init() {

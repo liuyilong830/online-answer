@@ -191,6 +191,8 @@
       }
       .pt-dlg-center {
         flex: 1;
+        box-sizing: border-box;
+        padding: 0 10px;
         p {
           font-size: 16px;
           height: 100%;
