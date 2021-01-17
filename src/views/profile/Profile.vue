@@ -1,6 +1,6 @@
 <template>
-  <div class="pfl">
-    <redirect-dialog ref="scrollRef" @scroll.native="onscroll" @isrender="onrender">
+  <div class="pfl" @scroll="onscroll">
+    <div ref="scrollRef">
       <nav-bar class="pfl-navbar" ref="navbar">
         <template #left>
           <i class="iconfont icon-liebiao" @click.stop="toMore"></i>
@@ -15,15 +15,17 @@
         <profile-nav-bar v-model="current" :list="list" @changeIndex="changeIndex"/>
       </div>
       <profile-info ref="pflInfoRef"/>
-      <profile-content>
-        <profile-nav-bar ref="profilenavbar" v-model="current" :list="list" @changeIndex="changeIndex"/>
-        <div class="scroll-content" :style="scrollContentStyle">
-          <keep-alive :exclude="['ClassDetail']">
-            <router-view/>
-          </keep-alive>
+      <div class="pfl-ctn">
+        <div class="pfl-ctn-box" ref="pflctnboxRef" :style="scrollContentStyle">
+          <profile-nav-bar ref="profilenavbar" v-model="current" :list="list" @changeIndex="changeIndex"/>
+          <div class="scroll-content">
+            <keep-alive :exclude="['ClassDetail']">
+              <router-view/>
+            </keep-alive>
+          </div>
         </div>
-      </profile-content>
-    </redirect-dialog>
+      </div>
+    </div>
     <popup :is-show.sync="ispopup" position="left" :box-style="{width: '60%'}">
       <more-list @change="changeOpt"/>
     </popup>
@@ -32,10 +34,8 @@
 </template>
 
 <script>
-  import RedirectDialog from "../../components/content/redirectj-dialog/RedirectDialog";
   import NavBar from "../../components/nav-bar/NavBar";
   import ProfileInfo from "./child/ProfileInfo";
-  import ProfileContent from "./child/ProfileContent";
   import ProfileNavBar from "./child/ProfileNavBar";
   import Popup from "../../components/popup/Popup";
   import MoreList from "./MoreList";
@@ -43,10 +43,8 @@
   export default {
     name: "Profile",
     components: {
-      RedirectDialog,
       NavBar,
       ProfileInfo,
-      ProfileContent,
       ProfileNavBar,
       Popup,
       MoreList,
@@ -68,7 +66,6 @@
         ],
         ispopup: false,
         isbank: false,
-        navbarHeigth: 0,
         elRect: {},
       }
     },
@@ -90,36 +87,28 @@
       },
       scrollContentStyle() {
         let navbarH = this.navbarRect ? this.navbarRect.height : 50;
-        let profilenavbarH = this.profilenavbarRect ? this.profilenavbarRect.height : 45;
-        let marginBottom = this.profilenavbarMarginBottom || 10;
         return {
-          minHeight: `${this.elRect.height - navbarH - profilenavbarH - marginBottom}px`
+          minHeight: `${this.elRect.height - navbarH + this.offsertY}px`
         }
       }
     },
     methods: {
       init() {
-        if (!this.isrender) return;
         this.$nextTick(() => {
           this.navbarRect = this.$refs.navbar.$el.getBoundingClientRect();
           this.infoRect = this.$refs.pflInfoRef.$el.getBoundingClientRect();
           this.elRect = this.$el.getBoundingClientRect();
-          this.profilenavbarRect = this.$refs.profilenavbar.$el.getBoundingClientRect();
-          this.profilenavbarMarginBottom = parseFloat(window.getComputedStyle(this.$refs.profilenavbar.$el).marginBottom);
-          this.positionY = this.infoRect.height - this.navbarRect.height - 11;
+          this.offsertY = parseFloat(window.getComputedStyle(this.$refs.pflctnboxRef).top || -10);
+          this.positionY = this.infoRect.height - this.navbarRect.height + this.offsertY;
         })
       },
       onscroll() {
-        const rect = this.$refs.scrollRef.$el.children[0].getBoundingClientRect();
-        this.top = rect.top;
-        if (Math.abs(rect.top) >= this.positionY) {
+        this.top = this.$refs.scrollRef.getBoundingClientRect().top;
+        if (Math.abs(this.top) >= this.positionY) {
           this.isShow = true;
         } else if (this.isShow) {
           this.isShow = false;
         }
-      },
-      onrender(flag) {
-        this.isrender = flag;
       },
       changeIndex(index) {
         this.$router.replace(this.list[index].path);
@@ -150,7 +139,11 @@
 <style scoped lang="scss">
   .pfl {
     position: relative;
-    height: calc(100% - 50px);
+    height: 100%;
+    overflow: auto;
+    &::-webkit-scrollbar {
+      width: 0 !important;
+    }
     .pfl-navbar {
       position: fixed;
       left: 0;
@@ -184,7 +177,7 @@
       }
     }
     .copy {
-      position: absolute;
+      position: fixed;
       top: 50px;
       width: 100%;
       height: 40px;
@@ -200,8 +193,21 @@
         background-color: rgba(0,0,0, .58);
       }
     }
+    .pfl-ctn {
+      .pfl-ctn-box {
+        position: relative;
+        top: -10px;
+        width: 100%;
+        background-color: #fff;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        overflow: auto;
+        &::-webkit-scrollbar {
+          width: 0 !important;
+        }
+      }
+    }
     .scroll-content {
-      min-height: 512px;
       padding: 0 10px;
     }
   }

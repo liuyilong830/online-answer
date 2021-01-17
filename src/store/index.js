@@ -8,8 +8,8 @@ import getters from "./getters";
 Vue.use(Vuex);
 
 const state = {
-  user: {}, // 登录用户的信息
-  clsDetail: {}, // 班级详情页信息
+  user: null, // 登录用户的信息
+  clsDetail: null, // 班级详情页信息
   ques: null, // 当前正在测试的题库id
 }
 

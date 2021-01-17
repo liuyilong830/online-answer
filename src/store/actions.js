@@ -2,6 +2,7 @@ import login  from '../api/login';
 import home from '../api/home';
 import profile from '../api/profile';
 import questions from "../api/questions";
+import comments from "@/api/comments";
 
 import {
   initUserInfo,
@@ -123,6 +124,14 @@ const actions = {
   async getRankListUser(ctx, quesid) {
     if (!quesid) return;
     return await questions.getRankListUser(quesid);
+  },
+  async getQuesCommentList(ctx, { quesid, start = 0, limit = 10 }) {
+    if (!quesid) return;
+    return await comments.getQuesCommentList(quesid, start, limit)
+  },
+  async getQuesAllReply(ctx, { cid, start = 0, limit = 10 }) {
+    if (!cid) return;
+    return await comments.getQuesAllReply(cid, start, limit);
   },
 
 }

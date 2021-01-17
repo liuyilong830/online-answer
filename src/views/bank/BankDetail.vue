@@ -59,7 +59,7 @@
         </div>
       </div>
     </div>
-    <answers-action ref="actionRef" v-if="operation" :operation.sync="operation" @check="checkOpera" @totest="totest"/>
+    <answers-action ref="actionRef" v-if="operation" :operation.sync="operation" @check="checkOpera" @totest="totest" @toComments="toComments"/>
     <popup :is-show.sync="isinfo" position="bottom" round closeable ref="popup">
       <div class="timuinfo" v-if="Object.keys(timuinfo).length">
         <div class="public">
@@ -96,6 +96,9 @@
     <model-box1 v-model="isupdate">
       <update-timu v-model="timuinfo" @closed="updateClosed"/>
     </model-box1>
+    <model-box1 v-model="iscomments">
+      <ques-comment-list :ques-detail="detail"/>
+    </model-box1>
   </div>
 </template>
 
@@ -107,8 +110,10 @@
   import ModelBox1 from "../../components/content/model-box/ModelBox1";
   import TimuForm from "../../components/content/form/TimuForm";
   import UpdateTimu from "../../components/content/update-info/UpdateTimu";
+  import QuesCommentList from "../../views/comments/QuesCommentList";
   import { parseFormat, formatTime, parsetimeData } from '../../util/util';
   import {root} from '../../util/mixins/root';
+  import islogin from '../../util/mixins/islogin'
   import { mapActions, mapMutations } from 'vuex';
   import Dialog from "../../components/dialog";
   import {totestQuest} from "../../store/mutation-types";
@@ -129,8 +134,9 @@
       ModelBox1,
       TimuForm,
       UpdateTimu,
+      QuesCommentList,
     },
-    mixins: [root],
+    mixins: [root, islogin],
     inject: ['box1'],
     data() {
       return {
@@ -148,11 +154,12 @@
         types: ['singles', 'multis', 'shortanswers'],
         isinfo: false,
         timuinfo: {},
-        operation: null,
+        operation: {},
         iscreate: false,
         createtype: null,
         isupdate: false,
         ranklist: [],
+        iscomments: false,
       }
     },
     props: {
@@ -266,7 +273,11 @@
         this.timuinfo = info;
       },
       toeqit() {
-        this.isupdate = true;
+        this.vaildator(() => {
+          this.isupdate = true;
+        }, {
+          reject: () => {}
+        })
       },
       updateClosed(timuinfo) {
         let arr = this.getArr;
@@ -279,19 +290,23 @@
         }
       },
       todelete() {
-        Dialog.confirm({
-          message: '您确定删除该题目吗?'
-        }).then(() => {
-          let { tid, quesid } = this.timuinfo;
-          this.asyncDeleteTimu(tid, quesid, () => {
-            if (!this.getArr.length && !this.timus[this.getType].finished) {
-              return this.tomore(this.getType);
-            }
-            this.$nextTick(() => {
-              this.getTitlesRect();
-            })
-          });
-        }, () => {})
+        this.vaildator(() => {
+          Dialog.confirm({
+            message: '您确定删除该题目吗?'
+          }).then(() => {
+            let { tid, quesid } = this.timuinfo;
+            this.asyncDeleteTimu(tid, quesid, () => {
+              if (!this.getArr.length && !this.timus[this.getType].finished) {
+                return this.tomore(this.getType);
+              }
+              this.$nextTick(() => {
+                this.getTitlesRect();
+              })
+            });
+          }, () => {})
+        }, {
+          reject: () => {}
+        })
       },
       checkOpera(key, val) {
         let qid = this.detail.qid;
@@ -319,6 +334,9 @@
             this.getTitlesRect()
           })
         });
+      },
+      toComments() {
+        this.iscomments = true;
       },
       totest() {
         Dialog.confirm({

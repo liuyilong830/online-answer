@@ -29,7 +29,7 @@
       AnswerBox,
       ModelBox1,
     },
-    mixins: [islogin()],
+    mixins: [islogin],
     data() {
       return {
         isShow: false,
@@ -38,9 +38,9 @@
     },
     methods: {
       otherEvent() {
-        this.valdation(function () {
+        this.vaildator(() => {
           this.isShow = true;
-        })
+        });
       },
     },
     created() {
@@ -54,7 +54,7 @@
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_bio1vodsb76.css');
+    @import url('http://at.alicdn.com/t/font_2194746_lnshzb1uxcf.css');
     width: 100vw;
     height: 100vh;
     display: flex;

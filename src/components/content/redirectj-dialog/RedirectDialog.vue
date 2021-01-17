@@ -1,7 +1,6 @@
 <template>
   <div class="rict-dlg">
-    <div class="rict-dlg-normal" v-if="isShow"></div>
-    <div class="rict-dlg-content" v-else>
+    <div class="rict-dlg-content" v-if="isShow">
       <slot></slot>
     </div>
   </div>
@@ -9,10 +8,6 @@
 
 <script>
   import islogin from '../../../util/mixins/islogin';
-  let m1 = islogin(function () {
-    this.isShow = true;
-    this.$emit('isrender', false);
-  })
   export default {
     name: "RedirectDialog",
     data() {
@@ -20,14 +15,16 @@
         isShow: false,
       }
     },
-    mixins: [m1],
+    mixins: [islogin],
     provide() {
       return {
         scroller: this
       }
     },
     created() {
-      this.valdation();
+      this.vaildator(() => {
+        this.isShow = true;
+      })
     }
   }
 </script>
@@ -36,12 +33,11 @@
   .rict-dlg {
     height: 100%;
     overflow: auto;
+    .rict-dlg-content {
+      height: 100%;
+    }
     &::-webkit-scrollbar {
       width: 0 !important;
-    }
-    .rict-dlg-normal {
-      background-color: #fff;
-      height: 100%;
     }
   }
 </style>

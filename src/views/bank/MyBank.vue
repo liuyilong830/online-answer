@@ -37,7 +37,6 @@
       PullRefresh,
       NavBar,
       QuestionsList,
-      PullRefresh,
       List,
       BankDetail,
       ModelBox1,

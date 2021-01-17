@@ -1,7 +1,7 @@
 <template>
   <div class="answers-action">
     <div class="item">
-      <i class="iconfont icon-pinglun1"></i>
+      <i class="iconfont icon-pinglun1" @click="toComments"></i>
       <span>评论</span>
     </div>
     <div class="item">
@@ -19,8 +19,10 @@
 </template>
 
 <script>
+  import islogin from "@/util/mixins/islogin";
   export default {
     name: "AnswersAction",
+    mixins: [islogin],
     data() {
       return {}
     },
@@ -41,13 +43,27 @@
     },
     methods: {
       check(type) {
+        this.vaildator(() => {
+          this.tofetch(type);
+        }, {
+          reject: () => {}
+        })
+      },
+      tofetch(type) {
         let num = this.operation[type] ^ 1;
         let obj = {...this.operation, [type]: num};
         this.$emit('update:operation', obj);
         this.$emit('check', type, num);
       },
       totestQuestions() {
-        this.$emit('totest');
+        this.vaildator(() => {
+          this.$emit('totest');
+        }, {
+          reject: () => {}
+        })
+      },
+      toComments() {
+        this.$emit('toComments');
       },
     },
   }
