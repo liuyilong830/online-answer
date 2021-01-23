@@ -133,7 +133,10 @@ const actions = {
     if (!cid) return;
     return await comments.getQuesAllReply(cid, start, limit);
   },
-
+  async createComment(ctx, info) {
+    if (!info.questionid && !info.timuid) return;
+    return await comments.createComment(info);
+  },
 }
 
 export default actions;

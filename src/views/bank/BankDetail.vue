@@ -116,7 +116,7 @@
   import islogin from '../../util/mixins/islogin'
   import { mapActions, mapMutations } from 'vuex';
   import Dialog from "../../components/dialog";
-  import {totestQuest} from "../../store/mutation-types";
+  import { totestQuest, quesDetailInfo } from "../../store/mutation-types";
   const Template = function (type, res = [], start = 0, limit = 10, finished = false) {
     this[type] = res;
     this.start = start;
@@ -215,7 +215,7 @@
       },
     },
     methods: {
-      ...mapMutations([totestQuest]),
+      ...mapMutations([totestQuest, quesDetailInfo]),
       ...mapActions([
         'queryTimus',
         'querySingles',
@@ -488,6 +488,7 @@
     },
     mounted() {
       this.init();
+      this.quesDetailInfo(this.detail);
       let qid = this.detail.qid;
       this.asyncQueryTimus(qid, 0, 3);
       this.asyncQueryAboutuser(qid);

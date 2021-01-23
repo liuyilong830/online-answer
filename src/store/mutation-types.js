@@ -5,3 +5,4 @@ export const signOutUser = 'signOutUser';
 export const changeUserInfo = 'changeUserInfo';
 export const resetDetailInfo = 'resetDetailInfo';
 export const totestQuest = 'totestQuest';
+export const quesDetailInfo = 'quesDetailInfo';

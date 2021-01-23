@@ -2,15 +2,19 @@
   <div class="game">
     <button @click.stop="onclick">切换</button>
     <cropper-box v-model="isShow"/>
+
+    <chat-input/>
   </div>
 </template>
 
 <script>
   import CropperBox from "../../components/content/cropper-box/CropperBox";
+  import ChatInput from "@/components/common/chat-input/ChatInput";
   export default {
     name: "Game",
     components: {
       CropperBox,
+      ChatInput,
     },
     data() {
       return {

@@ -8,6 +8,9 @@ const getters = {
   getTestQues(state) {
     return state.ques;
   },
+  getQuesDetail(state) {
+    return state.quesDetail;
+  },
 }
 
 export default getters;

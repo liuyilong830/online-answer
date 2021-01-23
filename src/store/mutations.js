@@ -6,6 +6,7 @@ import {
   changeUserInfo,
   resetDetailInfo,
   totestQuest,
+  quesDetailInfo,
 } from './mutation-types';
 
 const mutations = {
@@ -39,6 +40,9 @@ const mutations = {
   },
   [totestQuest](state, ques) {
     state.ques = ques;
+  },
+  [quesDetailInfo](state, quesDetail) {
+    state.quesDetail = quesDetail;
   },
 }
 

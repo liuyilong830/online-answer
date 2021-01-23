@@ -4,7 +4,11 @@
       <img :src="comment.avatar" alt="">
     </div>
     <div class="base-info" :style="rightStyle">
-      <p class="comment-nickname">{{comment.nickname}}</p>
+      <p class="comment-nickname">
+        <span>{{comment.nickname}}</span>
+        <span class="creater" v-if="createid === comment.uid">作者</span>
+        <span class="yourself" v-if="comment.uid === getUid">自己</span>
+      </p>
       <p class="release-time">{{releaseTime}}</p>
       <div class="content">{{comment.content}}</div>
       <slot></slot>
@@ -14,13 +18,19 @@
 
 <script>
   import { formatTime } from '../../util/util'
+  import { root } from '@/util/mixins/root'
+  import { mapGetters } from 'vuex'
   export default {
     name: "Comment",
-    components: {},
+    mixins: [root],
     data() {
       return {}
     },
     computed: {
+      ...mapGetters(['getQuesDetail']),
+      createid() {
+        return this.getQuesDetail.uid;
+      },
       releaseTime() {
         let time = this.comment.createtime;
         if (time) {
@@ -66,6 +76,20 @@
       .comment-nickname {
         font-size: 12px;
         margin-bottom: 1px;
+        .creater {
+          padding: 1px 3px;
+          border-radius: 3px;
+          background-color: #f53636;
+          color: #fff;
+          margin-left: 5px;
+        }
+        .yourself {
+          padding: 1px 3px;
+          border-radius: 3px;
+          background-color: #1989fa;
+          color: #fff;
+          margin-left: 5px;
+        }
       }
       .release-time {
         font-size: 10px;

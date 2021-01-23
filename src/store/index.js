@@ -11,6 +11,7 @@ const state = {
   user: null, // 登录用户的信息
   clsDetail: null, // 班级详情页信息
   ques: null, // 当前正在测试的题库id
+  quesDetail: null, // 题库详情页信息
 }
 
 export default new Vuex.Store({
