@@ -5,6 +5,8 @@
       v-for="comment in list"
       :key="comment.cid"
       @click="toComment(comment)"
+      @touchstart="touchStart"
+      @touchend="touchEnd(comment)"
     >
       <comment :comment="comment">
         <p class="reply-count" v-if="comment.count">
@@ -31,8 +33,8 @@
                 v-for="comment in allReply"
                 :key="comment.cid"
                 @click="replyComment(comment)"
-                @touchStart="touchStart"
-                @touchEnd="touchEnd(comment)"
+                @touchstart="touchStart"
+                @touchend="touchEnd(comment)"
               >
                 <comment :comment="comment">
                   <div class="reference-info" v-if="comment.targetInfo.cid !== currCmt.cid">
@@ -52,6 +54,11 @@
         <chat-input ref="chatInput" v-model="content" :placeholder="inputPlaceholder" @send="onsend"/>
       </div>
     </popup>
+    <popup :is-show.sync="isdel" round position="bottom">
+      <div class="btns">
+        <div class="delete-btn" @click="delComment">删除评论</div>
+      </div>
+    </popup>
   </ul>
 </template>
 
@@ -63,6 +70,7 @@
   import ChatInput from "@/components/common/chat-input/ChatInput";
   import List from "@/components/common/list/List";
   import { root } from '@/util/mixins/root'
+  import islogin from "@/util/mixins/islogin";
   export default {
     name: "CommentList",
     components: {
@@ -72,7 +80,7 @@
       ChatInput,
       List,
     },
-    mixins: [root],
+    mixins: [root, islogin],
     data() {
       return {
         ismore: false,
@@ -84,6 +92,8 @@
         isfinished: false,
         content: '',
         target: null,
+        focusCmt: null,
+        isdel: false,
       }
     },
     props: {
@@ -102,7 +112,7 @@
       },
     },
     methods: {
-      ...mapActions(['getQuesAllReply']),
+      ...mapActions(['getQuesAllReply', 'deleteComment']),
       tomoreComment(comment) {
         this.ismore = true;
         this.currCmt = comment;
@@ -111,14 +121,47 @@
         this.$refs.popup.closePopup();
       },
       touchStart() {
-        console.log(111)
-        this.start = Date.now();
+        this.startTime = Date.now();
       },
       touchEnd(comment) {
-        console.log(comment);
-        this.end = Date.now();
-        if (this.end - this.start >= 1000 && this.getUid === comment.uid) {
-          console.log('可以进行删除');
+        if (Date.now() - this.startTime >= 1000 && this.getUid === comment.uid) {
+          this.isdel = true;
+          this.delCmt = comment;
+        }
+      },
+      delComment() {
+        let { cid } = this.delCmt;
+        this.asyncDeleteComment(cid).then(res => {
+          if (res.status === 200) {
+            if (this.ismore) {
+              this.currCmt.count -= res.count;
+              this.dfsAboutDel(cid, this.allReply);
+              // let index = this.allReply.findIndex(cmt => cmt.cid === cid);
+              // this.allReply.splice(index, 1);
+            } else {
+              let index = this.list.findIndex(cmt => cmt.cid === cid);
+              this.list.splice(index, 1);
+            }
+            this.$toast('删除成功');
+          }
+        }).finally(() => {
+          this.isdel = false;
+        })
+      },
+      dfsAboutDel(cid, arr = []) {
+        let stack = [{ cid, child: [] }];
+        while (stack.length) {
+          let cmt = stack.pop();
+          cmt.child = arr.filter(item => item.targetid === cmt.cid).map(cmt => cmt.cid);
+          if (cmt.child.length) {
+            stack.push(cmt);
+            cmt.child.forEach(cid => {
+              stack.push({ cid, child: [] })
+            })
+          } else {
+            let index = arr.findIndex(item => item.cid === cmt.cid);
+            arr.splice(index, 1);
+          }
         }
       },
       closeAllReply() {
@@ -151,20 +194,24 @@
         return info;
       },
       onsend() {
-        let info = this.createParams();
-        this.$emit('replyComment', info, (res) => {
-          if (this.target) {
-            let index = this.allReply.findIndex(comment => comment.cid === this.target.cid);
-            this.allReply.splice(index+1, 0, res.data);
-            this.target = null;
-          } else {
-            this.allReply.unshift(res.data);
-          }
-          this.currCmt.count++;
-          this.content = '';
-          this.$toast('评论成功');
-          this.focus = false;
-        });
+        this.vaildator(() => {
+          let info = this.createParams();
+          this.$emit('replyComment', info, (res) => {
+            if (this.target) {
+              let index = this.allReply.findIndex(comment => comment.cid === this.target.cid);
+              this.allReply.splice(index+1, 0, res.data);
+              this.target = null;
+            } else {
+              this.allReply.unshift(res.data);
+            }
+            this.currCmt.count++;
+            this.content = '';
+            this.$toast('评论成功');
+            this.focus = false;
+          });
+        }, {
+          reject: () => {}
+        })
       },
       onlistload() {
         let cid = this.currCmt.cid;
@@ -188,6 +235,9 @@
           this.islistload = false;
           this.start += len;
         }
+      },
+      asyncDeleteComment(cid) {
+        return this.deleteComment(cid);
       },
     },
   }
@@ -268,6 +318,21 @@
             }
           }
         }
+      }
+    }
+    .btns {
+      box-sizing: border-box;
+      padding: 10px;
+      .delete-btn {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: #e83939;
+        border-radius: 5px;
+        color: #fff;
       }
     }
   }

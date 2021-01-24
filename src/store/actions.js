@@ -137,6 +137,10 @@ const actions = {
     if (!info.questionid && !info.timuid) return;
     return await comments.createComment(info);
   },
+  async deleteComment(ctx, cid) {
+    if (!cid) return;
+    return await comments.deleteComment(cid);
+  }
 }
 
 export default actions;

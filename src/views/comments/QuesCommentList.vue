@@ -33,6 +33,7 @@
   import List from "@/components/common/list/List";
   import CommentList from "@/views/comments/CommentList";
   import ChatInput from "@/components/common/chat-input/ChatInput";
+  import islogin from "@/util/mixins/islogin";
   export default {
     name: "QuesCommentList",
     components: {
@@ -47,6 +48,7 @@
         from: 'box1'
       }
     },
+    mixins: [islogin],
     data() {
       return {
         start: 0,
@@ -79,21 +81,25 @@
         this.model1.toclose();
       },
       sendComment() {
-        let info = this.createParams();
-        this.asyncCreateComment(info).then(res => {
-          if (res.status === 200) {
-            this.$toast('评论成功');
-            if (this.target) {
-              this.target.count++;
-              this.target = null;
-            } else {
-              this.list.unshift(res.data);
+        this.vaildator(() => {
+          let info = this.createParams();
+          this.asyncCreateComment(info).then(res => {
+            if (res.status === 200) {
+              this.$toast('评论成功');
+              if (this.target) {
+                this.target.count++;
+                this.target = null;
+              } else {
+                this.list.unshift(res.data);
+              }
+              this.content = '';
+              this.focus = false;
             }
-            this.content = '';
-            this.focus = false;
-          }
-        }).catch(err => {
-          this.$toast.fail(`${err}`);
+          }).catch(err => {
+            this.$toast.fail(`${err}`);
+          })
+        }, {
+          reject: () => {}
         })
       },
       createParams() {

@@ -16,6 +16,9 @@ const onlyZIndex = {
     updateZIndex(i = 0) {
       this.zIndex = index += 1 + i;
     },
+    currIndex() {
+      return index;
+    },
   }
 }
 
