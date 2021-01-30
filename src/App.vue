@@ -54,7 +54,7 @@
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_lnshzb1uxcf.css');
+    @import url('http://at.alicdn.com/t/font_2194746_55is0xv1p04.css');
     width: 100vw;
     height: 100vh;
     display: flex;

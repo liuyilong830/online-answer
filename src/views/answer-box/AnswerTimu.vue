@@ -115,8 +115,8 @@
         immediate: true,
       },
       'timu.finished': {
-        handler() {
-          if (!this.isinteractive) return;
+        handler(val) {
+          if (!this.isinteractive || !val) return;
           if (this.isshort) {
             this.timu.youres.push(this.texts);
           }

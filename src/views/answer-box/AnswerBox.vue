@@ -84,6 +84,7 @@
   import { parseFormat, parsetimeData, parseSecondTime } from '../../util/util';
   import { mapActions, mapGetters } from 'vuex';
   import Dialog from "@/components/dialog";
+  import { root } from '../../util/mixins/root'
   export default {
     name: "AnswerBox",
     components: {
@@ -96,6 +97,7 @@
       ModelBox1,
       AllTimuSummary,
     },
+    mixins: [root],
     inject: {
       'model': {
         from: 'box1'
@@ -157,7 +159,7 @@
       },
     },
     methods: {
-      ...mapActions(['queryAllTimus', 'queryQuestOpt', 'setQuestOpt']),
+      ...mapActions(['queryAllTimus', 'queryQuestOpt', 'setQuestOpt', 'insertWrongTimu']),
       exittest() {
         this.model.toclose();
       },
@@ -220,9 +222,31 @@
       currtime(remain) {
         this.finishtimedata = parsetimeData(remain);
       },
-      onefinished() {
+      validationTimu(arr = []) {
+        let fails = [];
+        arr.forEach(timu => {
+          let { youres, res, options, finished } = timu;
+          if (options.length && finished) {
+            let flag = youres.every(text => res.includes(text));
+            let obj = {
+              tid: timu.tid,
+              fails: timu.youres.slice().sort(),
+              res: timu.res,
+            }
+            if (!flag) fails.push(obj);
+          }
+        })
+        return fails;
+      },
+      onefinished(timu) {
         if (this.isagaintest || this.testmode === 2) return;
         // 只要有一道题的 finished 设置为 true，则会发送一次请求将做题的结果保存起来
+        let fails = this.validationTimu([timu]);
+        if (fails.length) {
+          this.asyncInsertWrongTimus(fails).catch(() => {
+            this.$toast('系统出现异常，请稍后再试');
+          })
+        }
         this.onsubmit();
       },
       onsubmit() {
@@ -272,6 +296,8 @@
         this.onexit();
       },
       tosummaryPage() {
+        let fails = this.validationTimu(this.list);
+        this.asyncInsertWrongTimus(fails);
         this.onsubmit().then(() => {
           this.issummary = true;
         })
@@ -328,7 +354,10 @@
       },
       async asyncSetQuestOpt(info) {
         return await this.setQuestOpt(info);
-      }
+      },
+      asyncInsertWrongTimus(list = []) {
+        return this.insertWrongTimu(list);
+      },
     },
     mounted() {
       if (typeof this.quesid === 'number') {

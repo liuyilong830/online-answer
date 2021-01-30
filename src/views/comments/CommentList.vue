@@ -136,8 +136,6 @@
             if (this.ismore) {
               this.currCmt.count -= res.count;
               this.dfsAboutDel(cid, this.allReply);
-              // let index = this.allReply.findIndex(cmt => cmt.cid === cid);
-              // this.allReply.splice(index, 1);
             } else {
               let index = this.list.findIndex(cmt => cmt.cid === cid);
               this.list.splice(index, 1);

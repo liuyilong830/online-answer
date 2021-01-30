@@ -6,7 +6,7 @@
       <template #right><i class="iconfont icon-19"></i></template>
     </nav-bar>
     <div class="ques-comment-content">
-      <div class="ques-info" @click="toclose">
+      <div class="ques-info" @click="toQuestion">
         <div class="ques-img">
           <img :src="quesDetail.icon" alt="">
         </div>
@@ -23,6 +23,10 @@
     <div class="ques-comment-input">
       <chat-input ref="chatInput" v-model="content" :placeholder="inputPlaceholder" @send="sendComment"/>
     </div>
+
+    <model-box1 v-model="isdetaled" @enterd="isenter = true" @closed="isenter = false">
+      <bank-detail :detail="quesDetail" :isenter="isenter"/>
+    </model-box1>
   </div>
 </template>
 
@@ -34,6 +38,8 @@
   import CommentList from "@/views/comments/CommentList";
   import ChatInput from "@/components/common/chat-input/ChatInput";
   import islogin from "@/util/mixins/islogin";
+  import ModelBox1 from "@/components/content/model-box/ModelBox1";
+  import BankDetail from '../../views/bank/BankDetail';
   export default {
     name: "QuesCommentList",
     components: {
@@ -42,6 +48,8 @@
       List,
       CommentList,
       ChatInput,
+      ModelBox1,
+      BankDetail,
     },
     inject: {
       model1: {
@@ -58,6 +66,8 @@
         isfinished: false,
         target: null,
         content: '',
+        isdetaled: false,
+        isenter: false,
       }
     },
     props: {
@@ -79,6 +89,9 @@
       ...mapActions(['getQuesCommentList', 'createComment']),
       toclose() {
         this.model1.toclose();
+      },
+      toQuestion() {
+        this.isdetaled = true;
       },
       sendComment() {
         this.vaildator(() => {

@@ -6,8 +6,8 @@
     <div class="base-info" :style="rightStyle">
       <p class="comment-nickname">
         <span>{{comment.nickname}}</span>
-        <span class="creater" v-if="createid === comment.uid">作者</span>
-        <span class="yourself" v-if="comment.uid === getUid">自己</span>
+        <span class="creater" v-if="isauthor">作者</span>
+        <span class="yourself" v-if="ismyself">自己</span>
       </p>
       <p class="release-time">{{releaseTime}}</p>
       <div class="content">{{comment.content}}</div>
@@ -28,8 +28,14 @@
     },
     computed: {
       ...mapGetters(['getQuesDetail']),
-      createid() {
-        return this.getQuesDetail.uid;
+      commentUid() {
+        return this.comment.uid || this.comment.usid;
+      },
+      isauthor() {
+        return this.getQuesDetail?.uid === this.commentUid;
+      },
+      ismyself() {
+        return this.getUid === this.commentUid;
       },
       releaseTime() {
         let time = this.comment.createtime;

@@ -140,7 +140,18 @@ const actions = {
   async deleteComment(ctx, cid) {
     if (!cid) return;
     return await comments.deleteComment(cid);
-  }
+  },
+  async queryMyComment(ctx, { start = 0, limit = 10 }) {
+    return await comments.queryMyComment(start, limit);
+  },
+  async queryQuestByQid(ctx, qid) {
+    if (!qid) return;
+    return await questions.queryQuestByQid(qid);
+  },
+  async insertWrongTimu(ctx, list) {
+    if (!Array.isArray(list)) return;
+    return await questions.insertWrongTimu(list);
+  },
 }
 
 export default actions;

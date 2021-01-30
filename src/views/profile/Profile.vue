@@ -30,6 +30,9 @@
       <more-list @change="changeOpt"/>
     </popup>
     <my-bank v-model="isbank"/>
+    <model-box1 v-model="iscomment">
+      <my-comment/>
+    </model-box1>
   </div>
 </template>
 
@@ -40,6 +43,8 @@
   import Popup from "../../components/popup/Popup";
   import MoreList from "./MoreList";
   import MyBank from "../bank/MyBank";
+  import ModelBox1 from "@/components/content/model-box/ModelBox1";
+  import MyComment from "@/views/comments/MyComment";
   export default {
     name: "Profile",
     components: {
@@ -49,6 +54,8 @@
       Popup,
       MoreList,
       MyBank,
+      ModelBox1,
+      MyComment,
     },
     data() {
       return {
@@ -66,6 +73,9 @@
         ],
         ispopup: false,
         isbank: false,
+        iscomment: false,
+        ishistory: false,
+        iswrongtopic: false,
         elRect: {},
       }
     },
@@ -119,6 +129,12 @@
       changeOpt(info) {
         if (info.title === '我的题库') {
           this.isbank = true;
+        } else if (info.title === '我的评论') {
+          this.iscomment = true;
+        } else if (info.title === '错题记录') {
+          this.iswrongtopic = true;
+        } else if (info.title === '历史记录') {
+          this.ishistory = true;
         }
       },
     },

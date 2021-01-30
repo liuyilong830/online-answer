@@ -17,5 +17,6 @@ export default {
   queryQuestOpt: (quesid) => Request.get('/questions/operations', {quesid}, true),
   setQuestOpt: (info) => Request.post('/questions/set/operations', info, true),
   getRankListUser: (quesid) => Request.get('/questions/ranklist/user', {quesid}, true),
-
+  queryQuestByQid: (qid) => Request.get('/questions/qid', {qid}),
+  insertWrongTimu: (list) => Request.post('/questions/wrongtimu/insert', {list}, true),
 }
