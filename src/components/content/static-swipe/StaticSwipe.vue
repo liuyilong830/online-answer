@@ -14,8 +14,6 @@
         children: [],
         rect: null,
         computeWidth: 0,
-        offset: 0,
-        index: 0,
       }
     },
     props: {
@@ -36,7 +34,7 @@
       contentStyle() {
         return {
           width: `${this.size * this.len}px`,
-          transform: `translate3d(${this.offset}px, 0, 0)`,
+          transform: `translate3d(-${this.value * this.size}px, 0, 0)`,
           transition: 'all 0.4s'
         }
       },
@@ -46,32 +44,27 @@
         this.rect = this.$refs.swipe.getBoundingClientRect();
         this.computeWidth = this.rect.width;
       },
-      move(i) {
-        this.offset +=  (i * this.size);
-      },
       next(num = 1) {
-        if (this.index + num >= this.len) {
-          this.index = this.index + num - this.len;
+        if (this.value + num >= this.len) {
+          this.setIndex(this.value + num - this.len);
         } else {
-          this.index += num;
+          this.setIndex(this.value + num);
         }
-        this.move(-1 * num);
       },
       prev(num = 1) {
-        if (this.index - num < 0) {
-          this.index = this.len + (this.index - num);
+        if (this.value - num < 0) {
+          this.setIndex(this.len + (this.value - num))
         } else {
-          this.index -= num;
+          this.setIndex(this.value - num);
         }
-        this.move(num);
+      },
+      setIndex(val) {
+        this.$emit('input', val);
       },
     },
     watch: {
       children() {
         this.init();
-      },
-      index(val) {
-        this.$emit('input', val);
       },
     }
   }

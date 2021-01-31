@@ -152,6 +152,9 @@ const actions = {
     if (!Array.isArray(list)) return;
     return await questions.insertWrongTimu(list);
   },
+  queryWrongTimus() {
+    return questions.queryWrongTimus();
+  },
 }
 
 export default actions;

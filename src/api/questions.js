@@ -19,4 +19,5 @@ export default {
   getRankListUser: (quesid) => Request.get('/questions/ranklist/user', {quesid}, true),
   queryQuestByQid: (qid) => Request.get('/questions/qid', {qid}),
   insertWrongTimu: (list) => Request.post('/questions/wrongtimu/insert', {list}, true),
+  queryWrongTimus: () => Request.get('/questions/wrongtimu', {}, true),
 }

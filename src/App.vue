@@ -5,11 +5,6 @@
     </keep-alive>
     <main-tab-bar class="main-tab-bar" v-if="$route.meta.isShowTab" @otherEvent="otherEvent"/>
     <release v-model="isShow"/>
-    <div v-if="isanswer">
-      <model-box1 v-model="isanswer" ref="box1">
-        <answer-box/>
-      </model-box1>
-    </div>
   </div>
 </template>
 
@@ -17,8 +12,6 @@
   import Login from "./views/login/Login";
   import MainTabBar from "./components/tab-bar/MainTabBar";
   import Release from "./views/release/Release";
-  import AnswerBox from "./views/answer-box/AnswerBox";
-  import ModelBox1 from "./components/content/model-box/ModelBox1";
   import islogin from './util/mixins/islogin';
   export default {
     name: 'App',
@@ -26,8 +19,6 @@
       Login,
       MainTabBar,
       Release,
-      AnswerBox,
-      ModelBox1,
     },
     mixins: [islogin],
     data() {
@@ -42,11 +33,6 @@
           this.isShow = true;
         });
       },
-    },
-    created() {
-      this.$bus.$on('openAnswers', (value) => {
-        this.isanswer = value;
-      })
     },
   }
 </script>

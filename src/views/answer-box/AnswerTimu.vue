@@ -21,7 +21,7 @@
       <textarea placeholder="请输入您的答案" v-model="texts" :disabled="timu.finished"></textarea>
     </div>
     <transition-group name="finish" tag="div">
-      <div v-if="timu.finished" key="aaa">
+      <div v-if="timu.finished && showParsing" key="aaa">
         <div class="public">
           <p class="title">答案</p>
           <div class="results">
@@ -77,6 +77,10 @@
         type: Boolean,
         default: true
       },
+      showParsing: {
+        type: Boolean,
+        default: true,
+      }
     },
     computed: {
       isshort() {

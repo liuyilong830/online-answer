@@ -33,6 +33,9 @@
     <model-box1 v-model="iscomment">
       <my-comment/>
     </model-box1>
+    <model-box1 v-model="iswrongtopic">
+      <my-wrong-timus/>
+    </model-box1>
   </div>
 </template>
 
@@ -45,6 +48,7 @@
   import MyBank from "../bank/MyBank";
   import ModelBox1 from "@/components/content/model-box/ModelBox1";
   import MyComment from "@/views/comments/MyComment";
+  import MyWrongTimus from "@/views/answer-box/MyWrongTimus";
   export default {
     name: "Profile",
     components: {
@@ -56,6 +60,7 @@
       MyBank,
       ModelBox1,
       MyComment,
+      MyWrongTimus,
     },
     data() {
       return {

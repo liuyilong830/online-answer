@@ -44,7 +44,7 @@
             <div class="public" ref="rankRef">
               <p class="title">4.排名</p>
               <ul class="rank-list" v-if="ranklist.length">
-                <li class="rank-item-info" :class="{myself: isfinishedTest}" v-for="(user,i) in ranklist" :key="user.uid">
+                <li class="rank-item-info" :class="{myself: user.uid === getUid}" v-for="(user,i) in ranklist" :key="user.uid">
                   <span class="number">
                     <span v-if="i>2">{{i+1}}</span>
                     <img v-else :src="require(`../../assets/images/${i==0?'guanjun':(i==1?'yajun':'jijun')}.png`)" alt="">
@@ -99,6 +99,9 @@
     <model-box1 v-model="iscomments">
       <ques-comment-list :ques-detail="detail"/>
     </model-box1>
+    <model-box1 v-model="isanswer">
+      <deal-with-answer @submit="toRank"/>
+    </model-box1>
   </div>
 </template>
 
@@ -111,6 +114,7 @@
   import TimuForm from "../../components/content/form/TimuForm";
   import UpdateTimu from "../../components/content/update-info/UpdateTimu";
   import QuesCommentList from "../../views/comments/QuesCommentList";
+  import DealWithAnswer from "@/views/bank/DealWithAnswer";
   import { parseFormat, formatTime, parsetimeData } from '../../util/util';
   import {root} from '../../util/mixins/root';
   import islogin from '../../util/mixins/islogin'
@@ -135,6 +139,7 @@
       TimuForm,
       UpdateTimu,
       QuesCommentList,
+      DealWithAnswer,
     },
     mixins: [root, islogin],
     inject: ['box1'],
@@ -160,6 +165,7 @@
         isupdate: false,
         ranklist: [],
         iscomments: false,
+        isanswer: false,
       }
     },
     props: {
@@ -209,9 +215,6 @@
       getArr() {
         let type = this.getType;
         return this.timus[type][type];
-      },
-      isfinishedTest() {
-        return this.ranklist.findIndex(user => user.uid === this.getUid) > -1;
       },
     },
     methods: {
@@ -343,8 +346,16 @@
           message: '您确定开始刷题吗？'
         }).then(() => {
           this[totestQuest](this.detail);
-          this.$bus.$emit('openAnswers', true); // 进入到刷题页面
+          this.isanswer = true;
+          // this.$bus.$emit('openAnswers', true); // 进入到刷题页面
         }, () => {});
+      },
+      toRank() {
+        this.isanswer = false;
+        let qid = this.detail.qid;
+        this.asyncQueryRanklist(qid, () => {
+          this.checkTab(this.tablist.length-1);
+        });
       },
       parseTime(time) {
         time = parsetimeData(time * 1000);
@@ -493,11 +504,6 @@
       this.asyncQueryTimus(qid, 0, 3);
       this.asyncQueryAboutuser(qid);
       this.asyncQueryRanklist(qid);
-      this.$bus.$on('finishedTest', () => {
-        this.asyncQueryRanklist(qid, () => {
-          this.checkTab(this.tablist.length-1);
-        });
-      })
     },
   }
 </script>
