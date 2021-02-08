@@ -9,7 +9,7 @@
     :submit-fetch="asyncSetQuestOpt"
     :fail-timu-fetch="asyncInsertWrongTimus"
     :test-mode="testmode"
-    v-on="$listeners"
+    @submit="handleFinishTest"
   />
 </template>
 
@@ -53,6 +53,13 @@
     },
     methods: {
       ...mapActions(['queryAllTimus', 'queryQuestOpt', 'setQuestOpt', 'insertWrongTimu']),
+      handleFinishTest() {
+        if (this.isagain) {
+          this.modal.toclose();
+        } else {
+          this.$emit('submit');
+        }
+      },
       async asyncQueryAllTimus(quesid) {
         let res = await this.queryAllTimus(quesid);
         let list = [];
@@ -92,8 +99,28 @@
           }
         }
       },
-      async asyncSetQuestOpt(info) {
+      async asyncSetQuestOpt({ list, currtime, isfinish }) {
         if (this.isagain) return;
+        let obj = {
+          singles: [],
+          multis: [],
+          shortanswers: [],
+          currtime,
+        }
+        list.forEach(tm => {
+          if (!tm.options.length) {
+            obj.shortanswers.push(tm);
+          } else if (tm.res.length < 2) {
+            obj.singles.push(tm);
+          } else {
+            obj.multis.push(tm);
+          }
+        })
+        let work_json = JSON.stringify(obj);
+        let info = {quesid: this.quesid, work_json, iswork: 1};
+        if (isfinish) {
+          info.finishtime = currtime;
+        }
         return await this.setQuestOpt(info);
       },
       async asyncInsertWrongTimus(list = []) {

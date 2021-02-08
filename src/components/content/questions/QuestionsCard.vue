@@ -20,7 +20,7 @@
           </p>
         </div>
       </template>
-      <div class="score">评分: {{bank.score}}</div>
+      <div class="score">评分: {{getScore}}</div>
     </card>
   </div>
 </template>
@@ -49,7 +49,14 @@
       getZanCount() {
         let count = this.bank.zancount;
         return this.islike ? count + 1 : count;
-      }
+      },
+      getScore() {
+        if (this.bank.workcount === 0) {
+          return 0;
+        } else {
+          return this.bank.score / this.bank.workcount;
+        }
+      },
     },
     methods: {
       clickZan() {

@@ -21,12 +21,16 @@
         </div>
       </li>
     </ul>
+    <model-box1 v-model="doWrongTest">
+      <deal-with-wrong-answer :wrong-list="currTimus" @submit="handleFinished" @succDelete="succDelete" />
+    </model-box1>
   </div>
 </template>
 
 <script>
   import NavBar from "@/components/nav-bar/NavBar";
   import ModelBox1 from "@/components/content/model-box/ModelBox1";
+  import DealWithWrongAnswer from "@/views/answer-box/DealWithWrongAnswer";
   import { TemplateTimu } from '@/util/common'
   import { mapActions } from 'vuex';
   export default {
@@ -34,6 +38,7 @@
     components: {
       NavBar,
       ModelBox1,
+      DealWithWrongAnswer,
     },
     inject: {
       modal: {
@@ -44,6 +49,7 @@
       return {
         list: [],
         currTimus: [],
+        doWrongTest: false,
       }
     },
     methods: {
@@ -53,15 +59,27 @@
       },
       handleDoWrongTimu(timus) /* 将 timus处理为答题组件能够识别的结构进行刷题 */ {
         this.currTimus = timus.map(tm => {
-          let { description, options, quesid, fail_res, suc_res, tid, tname, tnum } = tm;
-          return new TemplateTimu(description, options, suc_res, fail_res, tid, false, quesid, tname, tnum);
+          let { description, options, quesid, suc_res, tid, tname, tnum } = tm;
+          return new TemplateTimu(description, options, suc_res, [], tid, false, quesid, tname, tnum);
         })
-        console.log(this.currTimus);
+        this.doWrongTest = true;
+      },
+      handleFinished() {
+        this.doWrongTest = false;
+      },
+      succDelete({ quesid, tid }) {
+        let index = this.list.findIndex(item => item[0].quesid === quesid);
+        if (index > -1) {
+          let cur = this.list[index].findIndex(item => item.tid === tid);
+          this.list[index].splice(cur, 1);
+          if (!this.list[index].length) {
+            this.list.splice(index, 1);
+          }
+        }
       },
     },
     created() {
       this.queryWrongTimus().then(res => {
-        console.log(res);
         this.list = res.data;
       }).catch(() => {
         this.$toast('系统出现异常，请稍后再试');

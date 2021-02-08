@@ -87,7 +87,7 @@
   import AnswerTimu from "@/views/answer-box/AnswerTimu";
   import { parseFormat, parsetimeData, parseSecondTime } from '../../util/util';
   import { types } from './enum'
-  import { mapActions, mapGetters } from 'vuex';
+  import { mapActions } from 'vuex';
   import Dialog from "@/components/dialog";
   export default {
     name: "AnswerWrapper",
@@ -117,6 +117,8 @@
         multis: [], // 多选题的数组对象
         shortanswers: [], // 简答题的数组对象,
         finishtimedata: {}, // 保存答题当前答题的时间
+        failsList: [], // 保存答错的题目
+        succList: [], // 保存答对的题目
       }
     },
     props: {
@@ -163,13 +165,13 @@
       failTimuFetch: /* 题目做错时需要处理的函数 */ {
         type: Function,
         default: () => Promise.resolve(),
+      },
+      succTimuFetch: /* 当题目正确时会调用该函数 */ {
+        type: Function,
+        default: () => Promise.resolve(),
       }
     },
     computed: {
-      ...mapGetters(['getTestQues']),
-      quesid() /* 获取题库的id */ {
-        return this.getTestQues.qid || 0;
-      },
       len() /* 总的题目数量 */ {
         return this.answerList.length;
       },
@@ -255,7 +257,7 @@
           message: this.isfinish ? '你确定要退出吗？' : '你还有题目没有作答，确定要退出吗？'
         }).then(() => {
           this.closeWrapper();
-          this.onsubmit();
+          this.onsubmit(this.answerList);
         }, () => {})
       },
       handleAnswerCard() /* 控制答题卡的展示 */ {
@@ -274,11 +276,20 @@
         })
       },
       async handleFinishTimu(timu) /* 当一个题目完成时触发 */ {
-        if (this.againTest || this.isTwoMode) return;
         // 只要有一道题的 finished 设置为 true，则会发送一次请求将做题的结果保存起来
         let fails = this.validationTimu([timu])
-        await this.failTimuFetch(fails);
-        await this.onsubmit();
+        if (fails.length) {
+          this.failsList.push(...fails);
+        } else {
+          this.succList.push(timu);
+        }
+        if (this.againTest || this.isTwoMode) return;
+        if (fails.length) {
+          await this.failTimuFetch(fails);
+        } else {
+          await this.succTimuFetch([timu])
+        }
+        await this.onsubmit([timu]);
       },
       validationTimu(arr = []) /* 找出数组中所有做错的题目 */ {
         let fails = [];
@@ -361,9 +372,13 @@
             this.issummary = true;
           } else {
             try {
-              let fails = this.validationTimu(this.answerList);
-              await this.failTimuFetch(fails);
-              await this.onsubmit();
+              if (this.failsList.length) {
+                await this.failTimuFetch(this.failsList);
+              }
+              if (this.succList.length) {
+                await this.succTimuFetch(this.succList);
+              }
+              await this.onsubmit(this.answerList);
               this.issummary = true;
             } catch (e) {
               this.$toast('系统出现异常，请稍后再试');
@@ -373,19 +388,13 @@
           this.toNextPage();
         }
       },
-      onsubmit() /* 将题目对象转换为 json字符串保存在后台，用于下次直接获取 */ {
+      onsubmit(list) /* 将题目对象转换为 json字符串保存在后台，用于下次直接获取 */ {
         if (this.againTest) return;
-        let obj = {
-          singles: this.singles,
-          multis: this.multis,
-          shortanswers: this.shortanswers
+        let info = {
+          list,
+          currtime: parseSecondTime(this.finishtimedata) || (this.cptTimerProps.time / 1000),
+          isfinish: this.isfinish,
         };
-        obj.currtime = parseSecondTime(this.finishtimedata) || (this.time / 1000);
-        let work_json = JSON.stringify(obj);
-        let info = {quesid: this.quesid, work_json, iswork: 1};
-        if (this.isfinish) {
-          info.finishtime = obj.currtime;
-        }
         return this.submitFetch(info);
       },
       toNextPage() /* 即将跳转到下一个列表位置 */ {

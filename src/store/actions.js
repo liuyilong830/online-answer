@@ -155,6 +155,13 @@ const actions = {
   queryWrongTimus() {
     return questions.queryWrongTimus();
   },
+  deleteWrongTimus(ctx, tid) {
+    return questions.deleteWrongTimus(tid);
+  },
+  updateQuestion(ctx, { qid, info }) {
+    if (!qid) return;
+    return questions.updateQuestion(qid, info);
+  },
 }
 
 export default actions;

@@ -20,4 +20,6 @@ export default {
   queryQuestByQid: (qid) => Request.get('/questions/qid', {qid}),
   insertWrongTimu: (list) => Request.post('/questions/wrongtimu/insert', {list}, true),
   queryWrongTimus: () => Request.get('/questions/wrongtimu', {}, true),
+  deleteWrongTimus: (tid) => Request.delete('/questions/wrongtimu/del', {tid}, true),
+  updateQuestion: (qid, info) => Request.patch('/questions/update', {qid, info}, true),
 }

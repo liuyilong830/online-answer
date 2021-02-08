@@ -100,7 +100,10 @@
       <ques-comment-list :ques-detail="detail"/>
     </model-box1>
     <model-box1 v-model="isanswer">
-      <deal-with-answer @submit="toRank"/>
+      <deal-with-answer @submit="toEval"/>
+    </model-box1>
+    <model-box1 v-model="iseval">
+      <evaluation-star :ques-detail="detail" @finished="finishedEval"/>
     </model-box1>
   </div>
 </template>
@@ -115,6 +118,7 @@
   import UpdateTimu from "../../components/content/update-info/UpdateTimu";
   import QuesCommentList from "../../views/comments/QuesCommentList";
   import DealWithAnswer from "@/views/bank/DealWithAnswer";
+  import EvaluationStar from "@/views/bank/EvaluationStar";
   import { parseFormat, formatTime, parsetimeData } from '../../util/util';
   import {root} from '../../util/mixins/root';
   import islogin from '../../util/mixins/islogin'
@@ -140,6 +144,7 @@
       UpdateTimu,
       QuesCommentList,
       DealWithAnswer,
+      EvaluationStar,
     },
     mixins: [root, islogin],
     inject: ['box1'],
@@ -166,6 +171,7 @@
         ranklist: [],
         iscomments: false,
         isanswer: false,
+        iseval: false,
       }
     },
     props: {
@@ -347,11 +353,14 @@
         }).then(() => {
           this[totestQuest](this.detail);
           this.isanswer = true;
-          // this.$bus.$emit('openAnswers', true); // 进入到刷题页面
         }, () => {});
       },
-      toRank() {
+      toEval() {
+        this.iseval = true;
+      },
+      finishedEval() {
         this.isanswer = false;
+        this.iseval = false;
         let qid = this.detail.qid;
         this.asyncQueryRanklist(qid, () => {
           this.checkTab(this.tablist.length-1);
