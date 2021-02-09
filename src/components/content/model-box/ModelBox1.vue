@@ -21,6 +21,7 @@
     },
     props: {
       value: Boolean,
+      append: [Function, HTMLElement],
     },
     methods: {
       enterd() {
@@ -33,6 +34,15 @@
         this.$emit('input', false);
       },
     },
+    mounted() {
+      if (this.append) {
+        let dom = this.append;
+        if (typeof this.append === 'function') {
+          dom = this.append();
+        }
+        dom.appendChild(this.$el);
+      }
+    }
   }
 </script>
 

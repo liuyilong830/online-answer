@@ -129,7 +129,7 @@ const actions = {
     if (!quesid) return;
     return await comments.getQuesCommentList(quesid, start, limit)
   },
-  async getQuesAllReply(ctx, { cid, start = 0, limit = 10 }) {
+  async getAllReply(ctx, { cid, start = 0, limit = 10 }) {
     if (!cid) return;
     return await comments.getQuesAllReply(cid, start, limit);
   },
@@ -141,8 +141,8 @@ const actions = {
     if (!cid) return;
     return await comments.deleteComment(cid);
   },
-  async queryMyComment(ctx, { start = 0, limit = 10 }) {
-    return await comments.queryMyComment(start, limit);
+  async queryMyComment(ctx, { start = 0, limit = 10, istimu }) {
+    return await comments.queryMyComment(start, limit, istimu);
   },
   async queryQuestByQid(ctx, qid) {
     if (!qid) return;
@@ -162,6 +162,10 @@ const actions = {
     if (!qid) return;
     return questions.updateQuestion(qid, info);
   },
+  getTimuCommentList(ctx, { tid, start, limit }) {
+    if (!tid) return;
+    return comments.getTimuCommentList(tid, start, limit);
+  }
 }
 
 export default actions;

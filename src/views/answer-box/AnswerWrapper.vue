@@ -43,7 +43,13 @@
         <static-swipe ref="swipe" v-model="curr">
           <static-swipe-item v-for="(timu, i) in answerList" :key="timu.tid">
             <div class="timu">
-              <answer-timu :isactive="curr === i" :show-parsing="!isTwoMode" :timu="timu" @onefinished="handleFinishTimu"/>
+              <answer-timu
+                :isactive="curr === i"
+                :show-parsing="!isTwoMode"
+                :timu="timu"
+                @onefinished="handleFinishTimu"
+                @toComment="toComment"
+              />
             </div>
           </static-swipe-item>
         </static-swipe>
@@ -73,6 +79,9 @@
     <model-box1 v-model="issummary">
       <all-timu-summary :all-timus="answerList" @exit="toNextPage"/>
     </model-box1>
+    <model-box1 v-model="showtimuComment">
+      <timu-comment-list :timu-info="answerList[curr]"/>
+    </model-box1>
   </div>
 </template>
 
@@ -85,6 +94,7 @@
   import AllTimuSummary from "@/views/answer-box/AllTimuSummary";
   import ModelBox1 from "@/components/content/model-box/ModelBox1";
   import AnswerTimu from "@/views/answer-box/AnswerTimu";
+  import TimuCommentList from "@/views/comments/TimuCommentList";
   import { parseFormat, parsetimeData, parseSecondTime } from '../../util/util';
   import { types } from './enum'
   import { mapActions } from 'vuex';
@@ -100,6 +110,7 @@
       AllTimuSummary,
       ModelBox1,
       AnswerTimu,
+      TimuCommentList,
     },
     inheritAttrs: false,
     inject: {
@@ -119,6 +130,7 @@
         finishtimedata: {}, // 保存答题当前答题的时间
         failsList: [], // 保存答错的题目
         succList: [], // 保存答对的题目
+        showtimuComment: false, // 控制题目评论区的显示和隐藏
       }
     },
     props: {
@@ -240,6 +252,9 @@
     },
     methods: {
       ...mapActions(['setQuestOpt', 'insertWrongTimu']),
+      toComment() /* 打开题目的评论区 */ {
+        this.showtimuComment = true;
+      },
       resetAnswerData() /* 重置数据 */ {
         types.forEach(type => {
           this[type] = [];

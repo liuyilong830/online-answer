@@ -112,7 +112,7 @@
       },
     },
     methods: {
-      ...mapActions(['getQuesAllReply', 'deleteComment']),
+      ...mapActions(['getAllReply', 'deleteComment']),
       tomoreComment(comment) {
         this.ismore = true;
         this.currCmt = comment;
@@ -221,7 +221,7 @@
         this.$emit('toComment', comment);
       },
       async asyncGetQuesAllReply(cid, start = 0, limit = 10) {
-        let res = await this.getQuesAllReply({cid, start, limit})
+        let res = await this.getAllReply({cid, start, limit})
         if (res.status === 200) {
           let len = res.data.length;
           this.allReply.push(...res.data);

@@ -51,7 +51,6 @@
 
 <script>
   import { mapActions } from 'vuex';
-  import { deepClone } from '../../util/util';
   export default {
     name: "AnswerTimu",
     data() {
@@ -166,7 +165,9 @@
         }
         this.timu.youres.push(opt);
       },
-      tocomments() {},
+      tocomments() {
+        this.$emit('toComment', this.timu);
+      },
       tocollection() {
         let num = this.opts.iscollection ^ 1;
         let tid = this.timu.tid;
