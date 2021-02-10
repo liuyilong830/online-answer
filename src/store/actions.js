@@ -165,7 +165,10 @@ const actions = {
   getTimuCommentList(ctx, { tid, start, limit }) {
     if (!tid) return;
     return comments.getTimuCommentList(tid, start, limit);
-  }
+  },
+  queryCollections(ctx, istimu) {
+    return questions.queryCollections(istimu);
+  },
 }
 
 export default actions;

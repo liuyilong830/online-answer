@@ -51,8 +51,9 @@
   }
   .qsbk-list-two {
     .qsbk-item {
-      padding-bottom: 5px;
-      border-bottom: 1px solid #adadad54;
+      box-sizing: border-box;
+      padding: 5px;
+      margin-bottom: 5px;
     }
   }
 </style>

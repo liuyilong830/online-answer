@@ -22,4 +22,5 @@ export default {
   queryWrongTimus: () => Request.get('/questions/wrongtimu', {}, true),
   deleteWrongTimus: (tid) => Request.delete('/questions/wrongtimu/del', {tid}, true),
   updateQuestion: (qid, info) => Request.patch('/questions/update', {qid, info}, true),
+  queryCollections: (istimu) => Request.get('/questions/collections', {istimu}, true),
 }

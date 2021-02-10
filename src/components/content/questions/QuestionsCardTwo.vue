@@ -61,6 +61,9 @@
   @import "../../../assets/css/base";
   .questions-card-two {
     position: relative;
+    padding: 5px;
+    box-shadow: 0px 0px 4px 2px #e6e6e6;
+    border-radius: 4px;
     .iconfont.icon-suo {
       position: absolute;
       display: flex;

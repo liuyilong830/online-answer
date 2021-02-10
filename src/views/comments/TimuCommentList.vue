@@ -114,7 +114,9 @@
               callback(res);
             }
           })
-        }, () => {})
+        }, {
+          reject: () => {}
+        })
       },
       sendReplyComment(info, callback) {
         info.timuid = this.tid;
@@ -123,7 +125,9 @@
             this.$toast('评论成功');
             callback(res);
           })
-        }, () => {})
+        }, {
+          reject: () => {}
+        })
       },
       currComment(comment) {
         this.currCmt = comment;
