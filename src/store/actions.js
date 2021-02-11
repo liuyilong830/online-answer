@@ -3,9 +3,11 @@ import home from '../api/home';
 import profile from '../api/profile';
 import questions from "../api/questions";
 import comments from "@/api/comments";
+import game from "@/api/game";
 
 import {
   initUserInfo,
+  initDanList,
 } from './mutation-types';
 const actions = {
   async isExistPhone(ctx, phone) {
@@ -169,6 +171,23 @@ const actions = {
   queryCollections(ctx, istimu) {
     return questions.queryCollections(istimu);
   },
+  async getDanList({ commit }) {
+    try {
+      let res = await game.getDanList();
+      return Promise.resolve(commit(initDanList, res.data));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  },
+  getUserRank() {
+    return game.getUserRank();
+  },
+  getRankTop3() {
+    return game.getRankTop3();
+  },
+  getRankList(ctx, {start = 0, limit = 10}) {
+    return game.getRankList(start, limit);
+  }
 }
 
 export default actions;

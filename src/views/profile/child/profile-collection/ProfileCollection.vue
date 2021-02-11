@@ -82,6 +82,7 @@
         this.vaildator(() => {
           this.isshow = true;
           this.istimu = false;
+          this.list = [];
           this.queryCollections(false).then(res => {
             if (res.status === 200) {
               this.list = res.data;
@@ -95,6 +96,7 @@
         this.vaildator(() => {
           this.isshow = true;
           this.istimu = true;
+          this.list = [];
           this.queryCollections(true).then(res => {
             if (res.status === 200) {
               this.list = res.data;

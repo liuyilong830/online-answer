@@ -7,6 +7,7 @@ import {
   resetDetailInfo,
   totestQuest,
   quesDetailInfo,
+  initDanList,
 } from './mutation-types';
 
 const mutations = {
@@ -44,6 +45,9 @@ const mutations = {
   [quesDetailInfo](state, quesDetail) {
     state.quesDetail = quesDetail;
   },
+  [initDanList](state, list) {
+    return state.danlist = list;
+  }
 }
 
 export default mutations;

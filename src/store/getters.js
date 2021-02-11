@@ -11,6 +11,9 @@ const getters = {
   getQuesDetail(state) {
     return state.quesDetail;
   },
+  danList(state) {
+    return state.danlist || [];
+  },
 }
 
 export default getters;
