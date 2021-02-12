@@ -16,6 +16,9 @@
       </div>
     </div>
     <p class="participate-count">
+      用户总积分：{{userinfo.all_integral || 0}}
+    </p>
+    <p class="participate-count">
       参与挑战赛次数：{{userinfo.rankcount || 0}}
     </p>
     <div class="progress-bar">
@@ -129,7 +132,7 @@
     background-color: #f2f3f5;
     border-radius: 4px;
     box-sizing: border-box;
-    padding: 5px;
+    padding: 10px 5px;
     min-width: 140px;
     max-width: 170px;
     .base-info {

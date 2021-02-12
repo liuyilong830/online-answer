@@ -40,7 +40,7 @@
 <style lang="scss">
   #app {
     @import url('./assets/css/base.css');
-    @import url('http://at.alicdn.com/t/font_2194746_unc6eoq1jk.css');
+    @import url('http://at.alicdn.com/t/font_2194746_xck84erov2.css');
     width: 100vw;
     height: 100vh;
     display: flex;

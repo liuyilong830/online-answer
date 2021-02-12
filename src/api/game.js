@@ -5,4 +5,5 @@ export default {
   getUserRank: () => Request.get('/game/user/rank', {}, true),
   getRankTop3: () => Request.get('/game/ranklist/top3'),
   getRankList: (start, limit) => Request.get('/game/ranklist/all', {start, limit}),
+  getAppointment: (start, limit) => Request.get('/game/appointment', {start, limit}, true),
 }

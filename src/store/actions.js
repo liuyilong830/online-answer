@@ -187,6 +187,9 @@ const actions = {
   },
   getRankList(ctx, {start = 0, limit = 10}) {
     return game.getRankList(start, limit);
+  },
+  getAppointment(ctx, {start = 0, limit = 10}) {
+    return game.getAppointment(start, limit);
   }
 }
 

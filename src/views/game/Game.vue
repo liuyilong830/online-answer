@@ -9,18 +9,21 @@
         <rank-base-list/>
       </div>
     </div>
+    <appointment-info/>
   </div>
 </template>
 
 <script>
   import MyRankInfo from "@/views/game/MyRankInfo";
   import RankBaseList from "@/views/game/RankBaseList";
+  import AppointmentInfo from "@/views/game/AppointmentInfo";
   import islogin from "@/util/mixins/islogin";
   export default {
     name: "Game",
     components: {
       MyRankInfo,
       RankBaseList,
+      AppointmentInfo,
     },
     mixins: [islogin],
     data() {
@@ -42,11 +45,14 @@
   .game {
     height: calc(100% - 50px);
     background-color: #fff;
-    overflow: hidden;
+    overflow: auto;
+    box-sizing: border-box;
+    padding: 10px 15px 0;
+    &::-webkit-scrollbar {
+      width: 0 !important;
+    }
     .base-info {
       display: flex;
-      box-sizing: border-box;
-      padding: 10px 15px 0;
       .left {
         padding-right: 5px;
         display: flex;
