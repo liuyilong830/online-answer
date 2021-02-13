@@ -7,7 +7,14 @@
         <i class="iconfont icon-jiantouzuo-copy"></i>
       </span>
     </p>
-    <appointment-list v-if="appointmentList.length" :appointment-list="appointmentList" :infos="infos"/>
+    <appointment-list
+      v-if="renderList.length"
+      :appointment-list="renderList"
+      :infos="infos"
+      @toTest="toTest"
+      @toExitAppoint="toExitAppoint"
+      @canTestGame="canTestGame"
+    />
     <div class="no-login" v-else>
       完成登录后，便可查询到具体信息哟~
     </div>
@@ -24,7 +31,13 @@
             finished-text="加载完成"
             error-text="加载出错了"
           >
-            <appointment-list :appointment-list="moreList" :infos="moreInfos"/>
+            <appointment-list
+              :appointment-list="moreList"
+              :infos="moreInfos"
+              @toTest="toTest"
+              @toExitAppoint="toExitAppoint"
+              @canTestGame="canTestGame"
+            />
           </list>
         </div>
       </div>
@@ -41,8 +54,8 @@
   import {parsetimeData} from '@/util/util'
   import islogin from "@/util/mixins/islogin";
 
-  const STATUS = { 1: '进行中', 2: '已预约', 3: '已提交', 4: '已结束', 5: '已迟到'};
-  const STATUSCLASS = { 1: 'doing', 2: 'appoint', 3: 'submit', 4: 'endding', 5: 'lateing' };
+  const STATUS = { 1: '进行中', 2: '已预约', 3: '已迟到', 4: '已提交', 5: '已结束' };
+  const STATUSCLASS = { 1: 'doing', 2: 'appoint', 3: 'lateing', 4: 'submit', 5: 'endding' };
   export default {
     name: "AppointmentInfo",
     components: {
@@ -70,9 +83,12 @@
       hasmore() {
         return this.appointmentList.length >= 3;
       },
+      renderList() {
+        return this.appointmentList.filter((item, i) => i < 2);
+      },
     },
     methods: {
-      ...mapActions(['getAppointment']),
+      ...mapActions(['getAppointment', 'setGameAppointment']),
       fullZero(num) {
         num = num.toString();
         if (num.length < 2) {
@@ -93,7 +109,7 @@
         return STATUS[status];
       },
       getDoTime(s) {
-        let timeData = parsetimeData(s * 1000);
+        let timeData = parsetimeData(s);
         let { hours, minutes, seconds } = timeData;
         let str = '';
         str += hours === 0 ? '' : `${hours}小时`;
@@ -113,6 +129,19 @@
       tomoreAppoint() {
         this.ismore = true;
       },
+      setInfos(list) {
+        this.infos = list.map(item => {
+          let time = this.toStartTime(item.starttime);
+          if (time < 0) {
+            time = this.toStartTime(item.latetime);
+          }
+          let doingtime = this.getDoTime(new Date(item.endtime).getTime() - new Date(item.starttime));
+          let createtime = this.formatCreateTime(item.createtime);
+          let statusText = this.getAppointmentStatus(item.status);
+          let statusCls = this.getStatusCls(item.status);
+          return {time, doingtime, createtime, statusText, statusCls};
+        })
+      },
       onlistload() {
         this.getAppointment({
           start: this.start,
@@ -127,14 +156,8 @@
           }
           this.islistload = false;
           this.moreList.push(...data);
-          this.moreInfos.push(...(data.map(item => {
-            let time = this.toStartTime(item.starttime);
-            let doingtime = this.getDoTime(item.doingtime);
-            let createtime = this.formatCreateTime(item.createtime);
-            let statusText = this.getAppointmentStatus(item.status);
-            let statusCls = this.getStatusCls(item.status);
-            return {time, doingtime, createtime, statusText, statusCls};
-          })))
+          this.setInfos(data);
+          this.moreInfos.push(...data)
           this.start += len;
         }).catch(err => {
           this.iserror = true;
@@ -147,23 +170,40 @@
         this.moreInfos = [];
         this.moreList = [];
         this.start = 0;
-      }
+      },
+      toTest(info, index) {
+        console.log(info, index);
+      },
+      toExitAppoint(info) {
+        let { rankid } = info;
+        this.setGameAppointment({
+          rankid,
+          num: -1,
+        }).then(() => {
+          this.$toast('取消预约成功');
+          this.asyncGetSomeAppointment();
+        }).catch(err => {
+          this.$toast(err.message || '哎，系统好像出现了异常~');
+        })
+      },
+      asyncGetSomeAppointment() {
+        this.getAppointment({
+          start: 0,
+          limit: 3
+        }).then(res => {
+          if (!Array.isArray(res.data)) throw new Error('登录已过期');
+          this.appointmentList = res.data;
+          this.setInfos(this.appointmentList);
+        }).catch(err => {
+          this.$toast(err.message || '哎，系统好像出现了一些异常~');
+        })
+      },
+      canTestGame() {
+        this.asyncGetSomeAppointment();
+      },
     },
     created() {
-      this.getAppointment(0, 3).then(res => {
-        if (!Array.isArray(res.data)) throw new Error('登录已过期');
-        this.appointmentList = res.data;
-        this.infos = this.appointmentList.map(item => {
-          let time = this.toStartTime(item.starttime);
-          let doingtime = this.getDoTime(item.doingtime);
-          let createtime = this.formatCreateTime(item.createtime);
-          let statusText = this.getAppointmentStatus(item.status);
-          let statusCls = this.getStatusCls(item.status);
-          return {time, doingtime, createtime, statusText, statusCls};
-        });
-      }).catch(err => {
-        this.$toast(err.message || '哎，系统好像出现了一些异常~');
-      })
+      this.asyncGetSomeAppointment();
     }
   }
 </script>

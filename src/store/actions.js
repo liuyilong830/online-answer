@@ -190,7 +190,20 @@ const actions = {
   },
   getAppointment(ctx, {start = 0, limit = 10}) {
     return game.getAppointment(start, limit);
-  }
+  },
+  getAllGames(ctx, {start = 0, limit = 10}) {
+    return game.getAllGames(start, limit);
+  },
+  setGameAppointment(ctx, {rankid, num}) {
+    if (!rankid) return;
+    return game.setGameAppointment(rankid, num);
+  },
+  getDoingGames() {
+    return game.getDoingGames();
+  },
+  setChallengeRecord(ctx, info) {
+    return game.setChallengeRecord(info);
+  },
 }
 
 export default actions;
