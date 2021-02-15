@@ -204,6 +204,26 @@ const actions = {
   setChallengeRecord(ctx, info) {
     return game.setChallengeRecord(info);
   },
+  isDoingGame(ctx, challengeid) {
+    if (!challengeid) return;
+    return game.isDoingGame(challengeid);
+  },
+  getGameById(ctx, rankid) {
+    if (!rankid) return;
+    return game.getGameById(rankid);
+  },
+  updateVisibleCount(ctx, challengeid) {
+    if (!challengeid) return;
+    return game.updateVisibleCount(challengeid);
+  },
+  getGameTimusList(ctx, rankid) {
+    if (!rankid) return;
+    return game.getGameTimusList(rankid);
+  },
+  isTimuRight(ctx, {tag, id, result}) {
+    if (!tag || !id || !Array.isArray(result)) return;
+    return game.isTimuRight(tag, id, result);
+  },
 }
 
 export default actions;

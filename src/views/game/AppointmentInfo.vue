@@ -42,6 +42,11 @@
         </div>
       </div>
     </popup>
+    <model-box1 v-model="istest">
+      <game-preparation-stage
+        :curr-game="currGame"
+      />
+    </model-box1>
   </div>
 </template>
 
@@ -50,6 +55,8 @@
   import Popup from "@/components/popup/Popup";
   import AppointmentList from "@/views/game/AppointmentList";
   import List from "@/components/common/list/List";
+  import GamePreparationStage from "@/views/challenge-game-box/GamePreparationStage";
+  import ModelBox1 from "@/components/content/model-box/ModelBox1";
   import {mapActions} from 'vuex';
   import {parsetimeData} from '@/util/util'
   import islogin from "@/util/mixins/islogin";
@@ -63,6 +70,8 @@
       Popup,
       AppointmentList,
       List,
+      GamePreparationStage,
+      ModelBox1,
     },
     mixins: [islogin],
     data() {
@@ -77,6 +86,8 @@
         iserror: false,
         moreList: [],
         moreInfos: [],
+        istest: false,
+        currGame: null,
       }
     },
     computed: {
@@ -88,7 +99,7 @@
       },
     },
     methods: {
-      ...mapActions(['getAppointment', 'setGameAppointment']),
+      ...mapActions(['getAppointment', 'setGameAppointment', 'isDoingGame']),
       fullZero(num) {
         num = num.toString();
         if (num.length < 2) {
@@ -171,8 +182,25 @@
         this.moreList = [];
         this.start = 0;
       },
-      toTest(info, index) {
-        console.log(info, index);
+      toTest(info) {
+        let t = this.$toast.loading({
+          message: '加载中...',
+          forbidClick: true,
+          duration: 0,
+        })
+        this.isDoingGame(info.challengeid).then(res => {
+          if (res.data) {
+            console.log('发送请求，获取该挑战赛中所有的题，并进入答题模块');
+            this.istest = true;
+            this.currGame = info;
+          } else {
+            this.$toast('当前答题还没有开始，请稍后再试');
+          }
+        }).catch(() => {
+          this.$toast('哎，系统好像出现了一些问题~');
+        }).finally(() => {
+          t.clear();
+        })
       },
       toExitAppoint(info) {
         let { rankid } = info;

@@ -10,4 +10,9 @@ export default {
   setGameAppointment: (rankid, num) => Request.patch('/game/set/appointment', {rankid, num}, true),
   getDoingGames: () => Request.get('/game/doinglist', {}, true),
   setChallengeRecord: (info) => Request.patch('/game/set/challenge_record', info, true),
+  isDoingGame: (challengeid) => Request.get('/game/isdoing', {challengeid}, true),
+  getGameById: (rankid) => Request.get('/game/byid', {rankid}, true),
+  updateVisibleCount: (challengeid) => Request.patch('/game/set/visible_count', {challengeid}, true),
+  getGameTimusList: (rankid) => Request.get('/game/timulist', {rankid}),
+  isTimuRight: (tag, id, result) => Request.post('/game/isright/timu', {tag, id, result}, true),
 }

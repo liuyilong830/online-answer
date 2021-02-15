@@ -37,29 +37,44 @@ const defaultOptions = {
   },
 };
 const DialogConstructor = Vue.extend(dialog);
-let instance = null;
+// let instance = null;
+const stack = [];
 
 const Dialog = function (options) {
   if (typeof options !== 'object') {
     return console.warn('请输入一个对象类型的配置对象');
   }
 
+  let i = stack.length;
+  while (--i >= 0) {
+    if (stack[i].isShow) {
+      stack[i].onclose();
+    }
+  }
+
+  let instance = new DialogConstructor({
+    props: defaultOptions,
+  });
+
+  stack.push(instance);
+
   return new Promise((resolve, reject) => {
-    instance = new DialogConstructor({
-      data() {
-        return {
-          onsuccess: resolve,
-          oncancel: reject
-        }
-      },
-      props: defaultOptions,
-    });
     instance.useFunc = true;
+    instance.onsuccess = () => resolve(instance);
+    instance.oncancel = reject;
     Object.keys(defaultOptions).forEach(key => {
       if (options[key]) {
         instance[key] = options[key];
       }
     })
+    instance.onclose = function () {
+      instance.isShow = false;
+      let index = stack.findIndex(item => item === instance);
+      if (index > -1) {
+        stack.splice(index, 1);
+      }
+      return true;
+    }
     instance.$mount();
     document.body.appendChild(instance.$el);
     instance.isShow = true;
