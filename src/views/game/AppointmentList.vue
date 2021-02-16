@@ -22,7 +22,7 @@
         <p
           class="appointment-operation"
           :class="infos[index].statusCls"
-          @click.stop="handleToStatus(item, index)"
+          @click.stop="handleToStatus(item, infos[index].status)"
         >
           {{infos[index].statusText}}
         </p>
@@ -73,14 +73,13 @@
         }
         return num;
       },
-      handleToStatus(appoint, index) {
-        let { status } = appoint;
+      handleToStatus(appoint, status) {
         switch (status) {
           case 1:
-            this.$emit('toTest', appoint, index);
+            this.$emit('toTest', appoint);
             break;
           case 2:
-            this.$emit('toExitAppoint', appoint, index);
+            this.$emit('toExitAppoint', appoint);
             break;
           case 3:
             this.$toast('非常遗憾，由于您没有在指定的时间内进入挑战赛，本次机会被作废~');

@@ -15,4 +15,5 @@ export default {
   updateVisibleCount: (challengeid) => Request.patch('/game/set/visible_count', {challengeid}, true),
   getGameTimusList: (rankid) => Request.get('/game/timulist', {rankid}),
   isTimuRight: (tag, id, result) => Request.post('/game/isright/timu', {tag, id, result}, true),
+  setUserAboutGame: (info) => Request.patch('/game/user/aboutgame', info, true),
 }

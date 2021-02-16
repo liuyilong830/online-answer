@@ -12,7 +12,7 @@
     </div>
     <p class="title">选项</p>
     <div class="fill-input" v-for="(item,i) in fill.res_count" :key="item">
-      <input type="text" :placeholder="`请输入第${item}空的答案`" v-model="texts[i]">
+      <input type="text" :disabled="item.isfinished" :placeholder="`请输入第${item}空的答案`" v-model="fill.youres[i]">
       <div class="num">{{item}}</div>
       <div class="result_icon" v-if="fill.isfinished">
         <i :class="['iconfont', isrights[i] ? 'icon-V' : 'icon-V1']"></i>
@@ -40,7 +40,6 @@
     data() {
       return {
         isrights: new Array(this.fill.res_count).fill(false),
-        texts: new Array(this.fill.res_count).fill(null),
       }
     },
     props: {
@@ -65,7 +64,6 @@
     },
     methods: {
       submitTimu() {
-        this.fill.youres = this.texts;
         let toast = this.$toast.loading({
           message: '提交中',
           forbidClick: true,

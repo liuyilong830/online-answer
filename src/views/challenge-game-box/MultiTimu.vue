@@ -95,7 +95,7 @@
         this.validateTimuFn(this.multi).then(({score}) => {
           this.multi.isfinished = true;
           this.isright = score;
-          this.finishedFn(this.multi, score ? this.single.score: 0);
+          this.finishedFn(this.multi, score ? this.multi.score: 0);
         }).catch(err => {
           this.$toast(err.message || '哎，系统好像出现了一些异常~');
         }).finally(() => {

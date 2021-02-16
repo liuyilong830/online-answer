@@ -45,6 +45,7 @@
     <model-box1 v-model="istest">
       <game-preparation-stage
         :curr-game="currGame"
+        @finished="finishedAnswer"
       />
     </model-box1>
   </div>
@@ -116,14 +117,26 @@
         let minutes = time.getMinutes();
         return `${year}-${month}-${date}, ${this.fullZero(hours)}:${this.fullZero(minutes)}`
       },
+      getStatus(item) {
+        let { status, isjoin, finishtime } = item;
+        if (status === 1 && finishtime) {
+          return 4;
+        } else if (status === 3 && finishtime) {
+          return 4;
+        } else if (status === 3 && isjoin === 1) {
+          return 1;
+        } else {
+          return status;
+        }
+      },
       getAppointmentStatus(status) {
         return STATUS[status];
       },
       getDoTime(s) {
         let timeData = parsetimeData(s);
-        let { hours, minutes, seconds } = timeData;
+        let { days, hours, minutes, seconds } = timeData;
         let str = '';
-        str += hours === 0 ? '' : `${hours}小时`;
+        str += (hours === 0 && days === 0) ? '' : `${hours + days * 24}小时`;
         str += minutes === 0 ? '' : `${minutes}分钟`;
         str += seconds === 0 ? '' : `${seconds}秒`;
         return str.length ? str : '暂无信息';
@@ -141,16 +154,17 @@
         this.ismore = true;
       },
       setInfos(list) {
-        this.infos = list.map(item => {
+        return list.map(item => {
           let time = this.toStartTime(item.starttime);
           if (time < 0) {
             time = this.toStartTime(item.latetime);
           }
+          let status = this.getStatus(item);
           let doingtime = this.getDoTime(new Date(item.endtime).getTime() - new Date(item.starttime));
           let createtime = this.formatCreateTime(item.createtime);
-          let statusText = this.getAppointmentStatus(item.status);
-          let statusCls = this.getStatusCls(item.status);
-          return {time, doingtime, createtime, statusText, statusCls};
+          let statusText = this.getAppointmentStatus(status);
+          let statusCls = this.getStatusCls(status);
+          return {time, doingtime, createtime, statusText, statusCls, status};
         })
       },
       onlistload() {
@@ -167,8 +181,7 @@
           }
           this.islistload = false;
           this.moreList.push(...data);
-          this.setInfos(data);
-          this.moreInfos.push(...data)
+          this.moreInfos.push(...this.setInfos(data))
           this.start += len;
         }).catch(err => {
           this.iserror = true;
@@ -189,17 +202,18 @@
           duration: 0,
         })
         this.isDoingGame(info.challengeid).then(res => {
+          t.clear();
           if (res.data) {
             console.log('发送请求，获取该挑战赛中所有的题，并进入答题模块');
             this.istest = true;
             this.currGame = info;
           } else {
+            t.clear();
             this.$toast('当前答题还没有开始，请稍后再试');
           }
         }).catch(() => {
-          this.$toast('哎，系统好像出现了一些问题~');
-        }).finally(() => {
           t.clear();
+          this.$toast('哎，系统好像出现了一些问题~');
         })
       },
       toExitAppoint(info) {
@@ -221,12 +235,16 @@
         }).then(res => {
           if (!Array.isArray(res.data)) throw new Error('登录已过期');
           this.appointmentList = res.data;
-          this.setInfos(this.appointmentList);
+          this.infos = [...this.setInfos(this.appointmentList)];
         }).catch(err => {
           this.$toast(err.message || '哎，系统好像出现了一些异常~');
         })
       },
       canTestGame() {
+        this.asyncGetSomeAppointment();
+      },
+      finishedAnswer() {
+        this.istest = false;
         this.asyncGetSomeAppointment();
       },
     },

@@ -224,6 +224,9 @@ const actions = {
     if (!tag || !id || !Array.isArray(result)) return;
     return game.isTimuRight(tag, id, result);
   },
+  setUserAboutGame(ctx, info) {
+    return game.setUserAboutGame(info);
+  },
 }
 
 export default actions;

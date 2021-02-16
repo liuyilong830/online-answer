@@ -1,13 +1,13 @@
 <template>
-  <div class="challenge-game-box">
+  <div class="answer-wrapper">
     <nav-bar class="navbar-answer">
-      <template #left><i class="iconfont icon-fanhui1" @click="maybeClose"></i></template>
+      <template #left><i class="iconfont icon-fanhui1" @click="exitAnswer"></i></template>
       <div class="answer-top">
-        <div class="answer-title">{{title}}</div>
+        <div class="answer-title">{{answerTitle}}</div>
         <div class="answer-operations">
-          <i class="iconfont icon-guanliyuan" v-if="isStrict" @click="contactAdmin"></i>
-          <i class="iconfont icon-datiqia" @click="handleAnswerCard"></i>
-          <count-timer ref="countTimer" v-bind="timerProps" class="answer-timer" @currtime="handleCurrTime">
+          <i class="iconfont icon-guanliyuan"></i>
+          <i class="iconfont icon-datiqia" @click="showTimuCard"></i>
+          <count-timer ref="countTimer" v-bind="timerProps" class="answer-timer" @currtime="getUseTime">
             <template #default="time">
               <slot name="time" :time="time">
                 <i class="iconfont icon-jishiqi"></i>
@@ -18,7 +18,7 @@
         </div>
       </div>
     </nav-bar>
-    <div class="game-box-content">
+    <div class="answer-content">
       <div class="curr-count">
         <span>当前题目序号：{{curr+1}}/{{len}}</span>
       </div>
@@ -26,42 +26,42 @@
         <static-swipe ref="swipe" v-model="curr">
           <static-swipe-item v-for="timu in singles" :key="timu.name || timu.img">
             <div class="timu">
-              <single-timu :single="timu" :mode="mode" :validate-timu-fn="validateSingleFn" :finished-fn="finishedFn"/>
+              <single-timu :single="timu" :mode="testMode" :validate-timu-fn="validateSingleFn" :finished-fn="finishedFn"/>
             </div>
           </static-swipe-item>
           <static-swipe-item v-for="timu in multis" :key="timu.name || timu.img">
             <div class="timu">
-              <multi-timu :multi="timu" :mode="mode" :validate-timu-fn="validateMultiFn" :finished-fn="finishedFn"/>
+              <multi-timu :multi="timu" :mode="testMode" :validate-timu-fn="validateMultiFn" :finished-fn="finishedFn"/>
             </div>
           </static-swipe-item>
           <static-swipe-item v-for="timu in fills" :key="timu.name || timu.img">
             <div class="timu">
-              <fill-timu :fill="timu":mode="mode" :validate-timu-fn="validateFillFn" :finished-fn="finishedFn"/>
+              <fill-timu :fill="timu":mode="testMode" :validate-timu-fn="validateFillFn" :finished-fn="finishedFn"/>
             </div>
           </static-swipe-item>
         </static-swipe>
       </div>
-      <div class="answer-bottom">
-        <button :class="{btn: true, disable: curr <= 0}" @click="toprevTimu">上一题</button>
-        <button :class="{btn: true}" @click="tonextTimu">{{islast ? '提交' : '下一题'}}</button>
-      </div>
     </div>
-    <popup ref="popup" round position="bottom" v-model="isshowCard">
+    <div class="answer-bottom">
+      <button :class="{btn: true, disable: curr <= 0}" @click="toprevTimu">上一题</button>
+      <button :class="{btn: true}" @click="tonextTimu">{{islastTimu ? '提交' : '下一题'}}</button>
+    </div>
+    <popup ref="popup" round position="bottom" v-model="isshowcard">
       <div class="types" v-for="(type,i) in [singles, multis, fills]" :key="i">
         <p class="title">{{type === singles ? '单选题' : (type === multis ? '多选题' : '填空题')}}</p>
         <ul class="answer-card">
           <li class="timu-index" v-for="(tm,index) in type" :key="tm.id">
             <div
               class="round"
-              :class="{finished: tm.isfinished, currtm: tm === list[curr]}"
-              @click="toRedirectTimu(tm)"
+              :class="{finished: tm.isfinished, currtm: tm === timuList[curr]}"
+              @click="toRedrectTimu(tm)"
             >
               {{index+1}}
             </div>
           </li>
         </ul>
       </div>
-      <div class="submit-btn" @click="handleStopAnswer">{{isfinish ? '提交' : '停止作答，进入提交'}}</div>
+      <div class="submit-btn" @click="submitAnswer">{{isAllFinished ? '提交' : '停止作答，进入提交'}}</div>
     </popup>
   </div>
 </template>
@@ -78,81 +78,38 @@
   import { parseFormat, deepClone } from '@/util/util';
   import Dialog from "@/components/dialog";
   export default {
-    name: "ChallengeGameBox",
+    name: "AnswerWrapper",
     components: {
-      NavBar,
       CountTimer,
-      StaticSwipe,
+      NavBar,
       StaticSwipeItem,
+      StaticSwipe,
       SingleTimu,
       MultiTimu,
       FillTimu,
       Popup,
     },
     inject: {
-      modal: {
+      modal1: {
         from: 'box1',
       }
     },
     data() {
       return {
         curr: 0,
-        score: 0,
-        isshowCard: false,
+        isshowcard: false,
+        usetime: 0, // 答题已使用的时间(毫秒)
+        score: 0, // 当天的得分数
+        resCount: 0,
+        failCount: 0,
       }
     },
     props: {
-      title: {
-        type: String,
-        default: '答题组件',
-      },
-      isStrict: /* 是否开启严格模式 */ {
-        type: Boolean,
-        default: false,
-      },
-      startTime: /* 用户开始答题的时间 */ {
-        type: Number,
-        default: 0,
-      },
-      singles: /* 单选题 */ {
-        type: Array,
-        default() {
-          return [];
-        },
-      },
-      multis: /* 多选题 */ {
-        type: Array,
-        default() {
-          return [];
-        },
-      },
-      fills: /* 填空题 */ {
-        type: Array,
-        default() {
-          return [];
-        },
-      },
-      timerProps: /* 用于透传给顶部计时组件的props */ {
+      options: {
         type: Object,
         default() {
           return {}
         }
-      },
-      mode: /* 答题的模式，如果是1，则做一题就会显示一题的解析等，如果是2，则直接进入下一题，到最后提交完所有题目之后方可查看各题的解析 */ {
-        type: Number,
-        default: 1
-      },
-      isagain: /* 是否之前全部提交过一次 */ {
-        type: Boolean,
-        default: false,
-      },
-      isdosome: /* 是否做了一部分，但还没全部完成 */ {
-        type: Boolean,
-        default: false,
-      },
-      isTimuRightFn: /* 检测题目是否正确 */ {
-        type: Function,
-        default: () => Promise.resolve(),
       },
       submitFn: {
         type: Function,
@@ -160,124 +117,84 @@
       },
       visibleChangeFn: {
         type: Function,
-        default: () => Promise.resolve()
+        default: () => Promise.resolve(),
       },
       handleFraudFn: {
         type: Function,
         default: () => Promise.resolve(),
-      }
+      },
+      isTimuRightFn: {
+        type: Function,
+        default: () => Promise.resolve(),
+      },
     },
     computed: {
+      answerTitle() {
+        return this.options.title || '答题组件';
+      },
+      timerProps() {
+        let { timeMode, endTime } = this.options;
+        let doingtime = endTime - Date.now();
+        return {
+          mode: timeMode || 'down',
+          time: doingtime,
+        }
+      },
+      singles() {
+        return this.options.timus.singles;
+      },
+      multis() {
+        return this.options.timus.multis;
+      },
+      fills() {
+        return this.options.timus.fills;
+      },
       len() {
-        return this.singles.length + this.multis.length + this.fills.length;
+        let { singles, multis, fills } = this.options.timus;
+        return singles.length + multis.length + fills.length;
       },
-      list() {
-        return [...this.singles, ...this.multis, ...this.fills];
+      timuList() {
+        let { singles, multis, fills } = this.options.timus;
+        return [...singles, ...multis, ...fills];
       },
-      islast() {
-        return this.curr === this.len - 1;
+      isAllFinished() {
+        return this.timuList.every(item => item.isfinished);
       },
-      isfinish() {
-        return this.list.every(item => item.isfinished);
+      islastTimu() {
+        return this.curr === this.len-1;
       },
+      testMode() {
+        return this.options.testMode || 1;
+      },
+      isagain() {
+        return !!this.options.isagain
+      },
+      isdosome() {
+        return !!this.options.isdosome;
+      },
+      isStrict() {
+        return !!this.options.isStrict;
+      }
     },
     methods: {
-      maybeClose() {
-        Dialog.confirm({
-          message: this.isfinish ? '你确定要退出吗？' : '你的题目还没有全部做完，确定提交吗？'
-        }).then(() => {
-          // 发送请求
-          this.submitFn().then(() => {
-            this.modal.toclose();
-          })
-        }, () => {})
-      },
-      handleAnswerCard() {
-        this.isshowCard = true;
-      },
-      handleCurrTime(remain) {
-        console.log(remain);
-      },
       formatTime(format, timeData) {
         return parseFormat(format, timeData);
       },
-      onvisibilitychange() {
-        if (document.visibilityState === 'visible') {
-          // 页面进入
-        } else {
-          // 发送请求
-          this.visibleChangeFn().then(count => {
-            if (count < 0) {
-              // 达到了作为舞弊的处理要求
-              let info = this.getAnswerInfo();
-              this.handleFraudFn(info);
-              this.modal.toclose();
-            }
-            // 页面进入后台，触发警告机制
-            Dialog({
-              message: `由于您切出了页面，您还剩${count}次机会，否则作为舞弊处理`,
-            })
-          })
-        }
+      exitAnswer() /* 左上角按钮点击触发 */ {
+        Dialog.confirm({
+          message: this.isAllFinished ? '您确定要提交并退出吗？' : '您还有题目未提交，您确定退出吗？'
+        }).then(() => {
+          this.submitAnswer();
+        }, () => {})
       },
-      getAnswerInfo() {
-        let obj = {};
-        obj.singles = this.singles.filter(item => item.isfinished);
-        obj.multis = this.multis.filter(item => item.isfinished);
-        obj.fills = this.fills.filter(item => item.isfinished);
-        obj = deepClone(obj);
-        let res_count = obj.singles.length + obj.multis.length + obj.fills.length;
-        return {
-          json: obj,
-          score: this.score,
-          res_count,
-          fail_count: this.list.length - res_count,
-        }
+      getUseTime(remain) /* 获取当前使用的时间 */ {
+        this.usetime = this.timerProps.time - remain;
       },
-      contactAdmin() /* 联系管理员 */ {},
-      toprevTimu() /* 返回上一题 */ {
-        if (this.curr <= 0) return;
-        this.$refs.swipe.prev();
+      showTimuCard() /* 打开答题卡 */ {
+        this.isshowcard = true;
       },
-      tonextTimu() /* 进入下一题 */ {
-        let timu = this.list[this.curr];
-        if (this.islast) {
-          Dialog.confirm({
-            message: '你确定要提交全部题目吗?'
-          }).then(() => {
-            console.log('提交');
-            this.submitFn();
-          }, () => {})
-        }else if (timu.isfinished) {
-          this.$refs.swipe.next();
-        } else {
-          Dialog.confirm({
-            message: '该题目你还没作答，确定跳过该题吗，如果跳过，则可以通过在上方的答题卡中回到该题再次进行作答'
-          }).then(() => {
-            this.$refs.swipe.next();
-          }, () => {})
-        }
-      },
-      validateSingleFn(timu) /* 验证单选题是否正确 */ {
-        return this.validateTimuFn(timu, 'single');
-      },
-      validateMultiFn(timu) /* 验证多选题是否正确 */ {
-        return this.validateTimuFn(timu, 'multi');
-      },
-      validateFillFn(timu) /* 验证填空是否正确 */ {
-        return this.validateTimuFn(timu, 'fill');
-      },
-      async validateTimuFn(timu, tag) {
-        timu = deepClone(timu);
-        return await this.isTimuRightFn(timu, tag);
-      },
-      finishedFn(timu, score) {
-        if (this.isagain) return;
-        this.score += score;
-        console.log(timu, score);
-      },
-      toRedirectTimu(tm) {
-        let index = this.list.findIndex(timu => timu === tm);
+      toRedrectTimu(tm) /* 答题卡重定向方法 */ {
+        let index = this.timuList.findIndex(timu => timu === tm);
         if (index > -1) {
           let num = index - this.curr;
           if (num > 0) {
@@ -288,7 +205,133 @@
           this.$refs.popup.closePopup();
         }
       },
-      handleStopAnswer() {},
+      getTestInfo() /* 获取该用户答题的一些数据，为发送请求提供数据 */ {
+        // 获取所有已完成的题目信息;
+        let singles = this.singles.filter(item => item.isfinished);
+        let multis = this.multis.filter(item => item.isfinished);
+        let fills = this.fills.filter(item => item.isfinished);
+        let usetime = this.usetime;
+        let resCount = this.resCount;
+        let failCount = this.failCount;
+
+        return deepClone({
+          singles,
+          multis,
+          fills,
+          usetime,
+          resCount,
+          failCount,
+          score: this.score,
+          testMode: this.testMode,
+          len: this.len,
+        })
+      },
+      submitAnswer() {
+        this.$refs.countTimer.pause();
+        if (this.isagain) {
+          let info = this.getTestInfo();
+          this.$emit('againFinished', info);
+          this.modal1.toclose();
+        } else {
+          this.submitOtherTimu().then(() => {
+            let info = this.getTestInfo();
+            info.failCount = info.len - info.resCount;
+            this.submitFn(info, true).then(() => {
+              this.modal1.toclose();
+              this.$emit('finished', info);
+            })
+          })
+        }
+      },
+      async submitOtherTimu() /* 提交所有未点击提交按钮，但是输入了值的题目 */ {
+        let keys = ['singles', 'multis', 'fills'];
+        for (let i = 0; i < keys.length; i++) {
+          let arr = this[keys[i]];
+          for (let j = 0; j < arr.length; j++) {
+            let timu = arr[j];
+            if (!timu.isfinished && timu.youres.length > 0) {
+              await this.validateTimuFn(timu, keys[i].slice(0, keys[i].length-1));
+              timu.isfinished = true;
+            }
+          }
+        }
+      },
+      toprevTimu() {
+        if (this.curr <= 0) return;
+        this.$refs.swipe.prev();
+      },
+      tonextTimu() {
+        let timu = this.timuList[this.curr];
+        if (this.islastTimu) {
+          Dialog.confirm({
+            message: '你确定要提交全部题目吗?'
+          }).then(() => {
+            this.submitAnswer();
+          }, () => {})
+        } else if (!timu.isfinished) {
+          Dialog.confirm({
+            message: '该题目你还没作答，确定跳过该题吗，如果跳过，则可以通过在上方的答题卡中回到该题再次进行作答'
+          }).then(() => {
+            this.$refs.swipe.next();
+          }, () => {})
+        } else {
+          this.$refs.swipe.next();
+        }
+      },
+      onvisibilitychange() {
+        if (document.visibilityState === 'visible') {
+
+        } else {
+          this.visibleChangeFn().then(count => {
+            if (count < 0) {
+              // 达到了作为舞弊的处理要求
+              this.$refs.countTimer.pause();
+              let info = this.getTestInfo();
+              if (!this.isagain) {
+                this.handleFraudFn(info);
+              }
+              this.modal1.toclose();
+            }
+            // 页面进入后台，触发警告机制
+            Dialog({
+              message: `由于您切出了页面，您还剩${count}次机会，否则作为舞弊处理`,
+            })
+          })
+        }
+      },
+      validateSingleFn(timu) {
+        return this.validateTimuFn(timu, 'single');
+      },
+      validateMultiFn(timu) {
+        return this.validateTimuFn(timu, 'multi');
+      },
+      validateFillFn(timu) {
+        return this.validateTimuFn(timu, 'fill');
+      },
+      async validateTimuFn(timu, tag) {
+        timu = deepClone(timu);
+        let { score } = await this.isTimuRightFn(timu, tag);
+        let num = 0;
+        if (tag === 'fill') {
+          num = score.reduce((prev, curr) => {
+            return prev + (curr ? timu.score : 0);
+          }, 0);
+        } else {
+          num = score ? timu.score : 0;
+        }
+        if (num > 0) {
+          this.resCount += 1;
+        } else {
+          this.failCount += 1;
+        }
+        this.score += num;
+        return { score };
+      },
+      finishedFn(timu) {
+        if (this.isagain) return;
+        let info = this.getTestInfo();
+        this.submitFn(info, false, timu)
+      },
     },
     created() {
       if (this.isStrict) {
@@ -300,7 +343,7 @@
 
 <style lang="scss" scoped>
   @import "../../assets/css/base";
-  .challenge-game-box {
+  .answer-wrapper {
     background-color: #fff;
     position: fixed;
     top: 0;
@@ -344,7 +387,7 @@
         }
       }
     }
-    .game-box-content {
+    .answer-content {
       flex: 1;
       overflow: hidden;
       display: flex;
