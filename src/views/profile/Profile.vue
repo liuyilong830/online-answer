@@ -36,6 +36,9 @@
     <model-box1 v-model="iswrongtopic">
       <my-wrong-timus/>
     </model-box1>
+    <model-box1 v-model="isreward">
+      <my-rewards/>
+    </model-box1>
   </div>
 </template>
 
@@ -49,6 +52,7 @@
   import ModelBox1 from "@/components/content/model-box/ModelBox1";
   import MyComment from "@/views/comments/MyComment";
   import MyWrongTimus from "@/views/answer-box/MyWrongTimus";
+  import MyRewards from "@/views/game/MyRewards";
   export default {
     name: "Profile",
     components: {
@@ -61,6 +65,7 @@
       ModelBox1,
       MyComment,
       MyWrongTimus,
+      MyRewards,
     },
     data() {
       return {
@@ -82,6 +87,7 @@
         ishistory: false,
         iswrongtopic: false,
         elRect: {},
+        isreward: false,
       }
     },
     computed: {
@@ -140,6 +146,8 @@
           this.iswrongtopic = true;
         } else if (info.title === '历史记录') {
           this.ishistory = true;
+        } else if (info.title === '积分领取') {
+          this.isreward = true;
         }
       },
     },
@@ -222,7 +230,6 @@
         background-color: #fff;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
-        overflow: auto;
         &::-webkit-scrollbar {
           width: 0 !important;
         }

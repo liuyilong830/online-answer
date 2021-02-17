@@ -23,6 +23,9 @@
             { title: '错题记录', icon: 'icon-cuoti' },
             { title: '历史记录', icon: 'icon-lishijilu' },
             { title: '我的题库', icon: 'icon-tiku2' },
+          ],
+          [
+            { title: '积分领取', icon: 'icon-jifen' },
           ]
         ]
       }

@@ -16,4 +16,6 @@ export default {
   getGameTimusList: (rankid) => Request.get('/game/timulist', {rankid}),
   isTimuRight: (tag, id, result) => Request.post('/game/isright/timu', {tag, id, result}, true),
   setUserAboutGame: (info) => Request.patch('/game/user/aboutgame', info, true),
+  getMyRewards: () => Request.get('/game/myrewards', {}, true),
+  receiveIntegral: (id, num) => Request.post('/game/receive/integral', {id, num}, true),
 }

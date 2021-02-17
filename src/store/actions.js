@@ -227,6 +227,13 @@ const actions = {
   setUserAboutGame(ctx, info) {
     return game.setUserAboutGame(info);
   },
+  getMyRewards() {
+    return game.getMyRewards();
+  },
+  receiveIntegral(ctx, {id, num}) {
+    if (!id) return;
+    return game.receiveIntegral(id, num);
+  },
 }
 
 export default actions;

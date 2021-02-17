@@ -40,7 +40,6 @@
       SearchClass,
     },
     mixins: [root],
-    inject: ['scroller'],
     data() {
       return {
         isShow: true,
@@ -105,13 +104,24 @@
           this.$toast('学生用户不能切换哟');
         }
       },
+      getScroller() {
+        let el = this.$el;
+        console.log(el);
+        while (el && el.tagName !== 'HTML' && el.tagName !== 'BODY' && el.nodeType === 1 && el !== window) {
+          const { overflowY } = window.getComputedStyle(el);
+          if (/scroll|auto/i.test(overflowY)) {
+            return el;
+          }
+          el = el.parentNode;
+        }
+      },
       /* 滑动过程中给按钮增添特效逻辑 */
       bindEvent() {
         if (this.scroller) {
-          this.scroller.$el.addEventListener('scroll', (event) => {
+          this.scroller.addEventListener('scroll', (event) => {
             this.isShow = false;
           })
-          this.scroller.$el.addEventListener('scroll', this.debunce(() => { this.isShow = true }, 500))
+          this.scroller.addEventListener('scroll', this.debunce(() => { this.isShow = true }, 500))
         }
       },
       debunce(func, delay) {
@@ -146,6 +156,7 @@
       }
     },
     mounted() {
+      this.scroller = this.getScroller();
       this.bindEvent();
       if (!this.isTea) {
         this.text = '参与';
