@@ -3,7 +3,7 @@
     <p class="game-title">{{gameInfo.rname}}</p>
     <div class="info-content">
       <h2 class="welcome-to-game">欢迎来到{{gameInfo.rname}}</h2>
-      <p class="game-desc">{{gameInfo.desc}}</p>
+      <p class="game-desc">{{gameInfo.description}}</p>
       <p class="reservation-num">参与本场挑战赛的人数：{{gameInfo.reservation_num}}人</p>
       <p class="reward-name">【本场奖励】</p>
       <ul class="rewards">

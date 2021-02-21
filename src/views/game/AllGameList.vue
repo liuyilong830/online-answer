@@ -7,7 +7,7 @@
             <span class="name">{{item.rname}}</span>
             <span class="create-time">{{formatCreateTime(item.starttime)}}</span>
           </p>
-          <p class="desc">简介：{{item.desc}}</p>
+          <p class="desc">简介：{{item.description}}</p>
           <div class="icons">
             <div class="icon-list">
               <span class="appointment-count"><i class="iconfont icon-weibiaoti-_huabanfuben"></i>{{item.reservation_num}}</span>
