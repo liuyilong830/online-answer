@@ -1,58 +1,59 @@
 <template>
-  <transition name="release">
-    <div class="release" v-if="value" :style="zindexStyle">
-      <nav-bar :style="navbarStyle">
-        <template #left><i class="iconfont icon-cha" @click.stop="toclose"></i></template>
-        <div class="release-title">{{title}}</div>
-        <template #right><i></i></template>
-      </nav-bar>
-      <div class="content">
-        <static-swipe ref="swipe" v-model="curr">
-          <static-swipe-item><questions-create @tonext="tonext"/></static-swipe-item>
-          <static-swipe-item>
-            <operation @toprev="toprev" @tonext="tonext"><single-question :created="multis"/></operation>
-          </static-swipe-item>
-          <static-swipe-item>
-            <operation @toprev="toprev" @tonext="tonext"><short-answer-question :created="shortanswers"/></operation>
-          </static-swipe-item>
-          <static-swipe-item><finish-question @toprev="toprev"/></static-swipe-item>
-        </static-swipe>
-      </div>
+  <div class="release" :style="zindexStyle">
+    <nav-bar :style="navbarStyle">
+      <template #left><i class="iconfont icon-cha" @click.stop="toclose"></i></template>
+      <div class="release-title">{{title}}</div>
+      <template #right><i></i></template>
+    </nav-bar>
+    <div class="content">
+      <static-swipe ref="swipe" v-model="curr">
+        <static-swipe-item><questions-create @tonext="tonext"/></static-swipe-item>
+        <static-swipe-item>
+          <operation @tonext="tonext"><single-question/></operation>
+        </static-swipe-item>
+        <static-swipe-item>
+          <operation @tonext="tonext"><single-question ismultis/></operation>
+        </static-swipe-item>
+        <static-swipe-item>
+          <fills-create/>
+        </static-swipe-item>
+        <static-swipe-item><finish-question/></static-swipe-item>
+      </static-swipe>
     </div>
-  </transition>
+  </div>
 </template>
 
 <script>
   import NavBar from "../../components/nav-bar/NavBar";
   import QuestionsCreate from "./child/QuestionsCreate";
   import SingleQuestion from "./child/SingleQuestion";
-  import ShortAnswerQuestion from "./child/ShortAnswerQuestion";
-  import FinishQuestion from "./child/FinishQuestion";
+  import FillsCreate from "@/views/release/child/FillsCreate";
   import StaticSwipe from "../../components/content/static-swipe/StaticSwipe";
   import StaticSwipeItem from "../../components/content/static-swipe/StaticSwipeItem";
   import Operation from "./child/Operation";
   import onlyZIndex from '../../util/mixins/zindex';
-  import Dialog from "../../components/dialog";
-  const titles = ['创建题库', '创建选择题', '创建简答题', '发布题库'];
+  const titles = ['创建题库', '创建单选题', '创建多选题', '创建填空题'];
   export default {
     name: "Release",
     components: {
       NavBar,
       QuestionsCreate,
       SingleQuestion,
-      ShortAnswerQuestion,
-      FinishQuestion,
       StaticSwipe,
       StaticSwipeItem,
       Operation,
+      FillsCreate,
     },
     mixins: [onlyZIndex],
+    inject: {
+      modal: {
+        from: 'box1',
+      }
+    },
     data() {
       return {
         curr: 0,
         title: titles[0],
-        multis: [],
-        shortanswers: [],
       }
     },
     props: {
@@ -74,45 +75,10 @@
     },
     methods: {
       toclose() {
-        this.$emit('input', false);
+        this.modal.toclose();
       },
       tonext() {
-        if (this.curr === 1) {
-          return this.validationMultiple();
-        } else if (this.curr === 2) {
-          return this.validationShortanswers();
-        } else {
-          return this.$refs.swipe.next();
-        }
-      },
-      validationMultiple() {
-        if (!this.multis.length) {
-          Dialog.confirm({
-            message: '如果跳过，则没有选择题',
-          }).then(() => {
-            this.$bus.$emit('createMultiple', this.multis);
-            this.$refs.swipe.next();
-          }, () => {})
-        } else {
-          this.$bus.$emit('createMultiple', this.multis);
-          this.$refs.swipe.next();
-        }
-      },
-      validationShortanswers() {
-        if (!this.shortanswers.length) {
-          Dialog.confirm({
-            message: '如果跳过，则没有简答题',
-          }).then(() => {
-            this.$bus.$emit('createShortAnswer', this.shortanswers);
-            this.$refs.swipe.next();
-          }, () => {})
-        } else {
-          this.$bus.$emit('createShortAnswer', this.shortanswers);
-          this.$refs.swipe.next();
-        }
-      },
-      toprev() {
-        this.$refs.swipe.prev();
+        this.$refs.swipe.next();
       },
     },
     watch: {
@@ -141,13 +107,6 @@
     .content {
       height: calc(100% - 49px);
       overflow: hidden;
-    }
-    &.release-enter, &.release-leave-to {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-    &.release-enter-active, &.release-leave-active {
-      transition: all .7s ease;
     }
   }
 </style>

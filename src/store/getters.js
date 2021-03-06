@@ -14,6 +14,9 @@ const getters = {
   danList(state) {
     return state.danlist || [];
   },
+  createdQuesId(state) {
+    return state.createdQuesId;
+  }
 }
 
 export default getters;

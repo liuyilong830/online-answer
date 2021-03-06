@@ -37,6 +37,7 @@ instance.interceptors.response.use(res => {
   return data;
 }, error => {
   console.log('响应拦截器中发生错误:', error);
+  return Promise.reject(error)
 });
 
 const Request = {};

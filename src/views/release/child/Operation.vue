@@ -4,7 +4,6 @@
       <slot></slot>
     </div>
     <div class="opeartion">
-      <button class="prev-btn" @click="toprev">上一步</button>
       <button class="next-btn" @click="tonext">下一步</button>
     </div>
   </div>
@@ -17,9 +16,6 @@
       return {}
     },
     methods: {
-      toprev() {
-        this.$emit('toprev');
-      },
       tonext() {
         this.$emit('tonext');
       },

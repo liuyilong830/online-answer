@@ -8,6 +8,7 @@ import {
   totestQuest,
   quesDetailInfo,
   initDanList,
+  setCreatedQuesId,
 } from './mutation-types';
 
 const mutations = {
@@ -47,6 +48,9 @@ const mutations = {
   },
   [initDanList](state, list) {
     return state.danlist = list;
+  },
+  [setCreatedQuesId](state, qid) {
+    state.createdQuesId = qid;
   }
 }
 

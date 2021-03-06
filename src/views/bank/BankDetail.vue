@@ -32,7 +32,7 @@
                 <ul class="timus">
                   <li class="timu" v-for="(item, i) in timus[key][key]" :key="item.tid">
                     <div class="number">{{i + 1}}</div>
-                    <div class="tname">{{item.tname}}</div>
+                    <div class="tname">{{item.name}}</div>
                     <div class="opeations" @click="checkTimu(item)"><i class="iconfont icon-gengduo3"></i></div>
                   </li>
                 </ul>
@@ -64,9 +64,9 @@
       <div class="timuinfo" v-if="Object.keys(timuinfo).length">
         <div class="public">
           <p class="title">题目名</p>
-          <div class="text">{{timuinfo.tname}}</div>
+          <div class="text">{{timuinfo.name}}</div>
         </div>
-        <div class="public" v-if="timuinfo.options.length">
+        <div class="public" v-if="timuinfo.options">
           <p class="title">题目选项</p>
           <ul class="options">
             <li class="option" v-for="(opt,i) in timuinfo.options" :key="i">
@@ -74,10 +74,14 @@
             </li>
           </ul>
         </div>
-        <div class="public" v-if="timuinfo.tnum === 0">
+        <div class="public" v-if="timuinfo.res_json">
           <p class="title">题目答案</p>
-          <div class="textarea" v-if="timuinfo.res.length">{{timuinfo.res[0]}}</div>
-          <div class="equal" v-else>空</div>
+          <ul class="result">
+            <li class="item" v-for="(res,i) in timuinfo.res_json" :key="i">
+              <span>第{{i+1}}空的答案：</span>
+              <span>{{res.join('、')}}</span>
+            </li>
+          </ul>
         </div>
         <div class="public">
           <p class="title">题目解析</p>
@@ -159,9 +163,9 @@
         timus: {
           singles: new Template('singles'),
           multis: new Template('multis'),
-          shortanswers: new Template('shortanswers'),
+          fills: new Template('fills'),
         },
-        types: ['singles', 'multis', 'shortanswers'],
+        types: ['singles', 'multis', 'fills'],
         isinfo: false,
         timuinfo: {},
         operation: {},
@@ -216,7 +220,7 @@
         let { options, res } = this.timuinfo;
         return options.length ? (
           res.length < 2 ? 'singles' : 'multis'
-        ) : 'shortanswers';
+        ) : 'fills';
       },
       getArr() {
         let type = this.getType;
@@ -226,7 +230,7 @@
     methods: {
       ...mapMutations([totestQuest, quesDetailInfo]),
       ...mapActions([
-        'queryTimus',
+        'queryQuesTimus',
         'querySingles',
         'queryMultis',
         'queryShortAnswers',
@@ -271,7 +275,7 @@
       },
       formatTitle(key) {
         return key === 'singles' ? '单选题' : (
-          key === 'multis' ? '多选题' : '简单题'
+          key === 'multis' ? '多选题' : '填空题'
         );
       },
       formatTnum(num) {
@@ -392,7 +396,8 @@
         });
       },
       async asyncQueryTimus(qid, start = 0, limit = 10) {
-        let res = await this.queryTimus({qid, start, limit});
+
+        let res = await this.queryQuesTimus({qid, start, limit});
         if (res.status === 200 && res.data) {
           this.types.forEach(type => {
             let arr = res.data[type];
@@ -401,6 +406,42 @@
           this.$nextTick(() => {
             this.getTitlesRect()
           })
+        }
+      },
+      async asyncQuerySingles(qid, start = 0, limit = 10) {
+        try {
+          let res = await this.queryQuesTimus({ type: 'single', qid, start, limit});
+          if (res.data.length < limit) {
+            this.timus.singles.finished = true;
+          }
+          this.timus.singles.singles.push(...res.data);
+          this.timus.singles.start += res.data.length;
+        } catch (e) {
+          this.$toast('系统出现异常，请稍后再试')
+        }
+      },
+      async asyncQueryMultis(qid, start = 0, limit = 10) {
+        try {
+          let res = await this.queryQuesTimus({ type: 'multi', qid, start, limit});
+          if (res.data.length < limit) {
+            this.timus.multis.finished = true;
+          }
+          this.timus.multis.multis.push(...res.data);
+          this.timus.multis.start += res.data.length;
+        } catch (e) {
+          this.$toast('系统出现异常，请稍后再试')
+        }
+      },
+      async asyncQueryFills(qid, start = 0, limit = 10) {
+        try {
+          let res = await this.queryQuesTimus({ type: 'fill', qid, start, limit});
+          if (res.data.length < limit) {
+            this.timus.fills.finished = true;
+          }
+          this.timus.fills.fills.push(...res.data);
+          this.timus.fills.start += res.data.length;
+        } catch (e) {
+          this.$toast('系统出现异常，请稍后再试')
         }
       },
       async asyncQueryAboutuser(qid) {
@@ -510,9 +551,14 @@
       this.init();
       this.quesDetailInfo(this.detail);
       let qid = this.detail.qid;
-      this.asyncQueryTimus(qid, 0, 3);
+      // this.asyncQueryTimus(qid, 0, 3);
       this.asyncQueryAboutuser(qid);
       this.asyncQueryRanklist(qid);
+
+      // 获取指定类型的题目
+      this.asyncQuerySingles(qid, this.timus.singles.start, this.timus.singles.limit);
+      this.asyncQueryMultis(qid, this.timus.multis.start, this.timus.multis.limit);
+      this.asyncQueryFills(qid, this.timus.fills.start, this.timus.fills.limit);
     },
   }
 </script>
@@ -718,6 +764,11 @@
             background-color: #d84848;
           }
         }
+      }
+      .result .item {
+        min-height: 30px;
+        display: flex;
+        align-items: center;
       }
     }
     .rank-list {

@@ -142,18 +142,6 @@
           }, () => {});
         });
       },
-      init() {
-        this.$bus.$on('createQues', (bank, iconname) => {
-          this.bank = bank;
-          this.iconname = iconname;
-        })
-        this.$bus.$on('createMultiple', (multiples) => {
-          this.multiples = multiples;
-        })
-        this.$bus.$on('createShortAnswer', (shortanswer) => {
-          this.shortanswer = shortanswer;
-        })
-      },
       showMultipleInfo(index) {
         this.isshow = true;
         this.ismult = true;
@@ -202,9 +190,6 @@
         }
       },
     },
-    mounted() {
-      this.init();
-    }
   }
 </script>
 

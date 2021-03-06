@@ -4,7 +4,9 @@
       <router-view></router-view>
     </keep-alive>
     <main-tab-bar class="main-tab-bar" v-if="$route.meta.isShowTab" @otherEvent="otherEvent"/>
-    <release v-model="isShow"/>
+    <model-box1 v-model="isShow">
+      <release/>
+    </model-box1>
   </div>
 </template>
 
@@ -12,6 +14,7 @@
   import Login from "./views/login/Login";
   import MainTabBar from "./components/tab-bar/MainTabBar";
   import Release from "./views/release/Release";
+  import ModelBox1 from "@/components/content/model-box/ModelBox1";
   import islogin from './util/mixins/islogin';
   export default {
     name: 'App',
@@ -19,6 +22,7 @@
       Login,
       MainTabBar,
       Release,
+      ModelBox1,
     },
     mixins: [islogin],
     data() {

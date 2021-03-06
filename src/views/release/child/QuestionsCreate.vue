@@ -62,6 +62,7 @@
 <script>
   import { root } from '../../../util/mixins/root';
   import { mapActions } from 'vuex';
+  import { deepClone } from '@/util/util'
   export default {
     name: "QuestionsCreate",
     data() {
@@ -84,7 +85,7 @@
       },
     },
     methods: {
-      ...mapActions(['getCreatedCls', 'uploadImg', 'deleteImg']),
+      ...mapActions(['getCreatedCls', 'uploadImg', 'deleteImg', 'createQuesBank']),
       changeHidden() {
         this.form.ishidden = this.form.ishidden ? 0 : 1;
       },
@@ -119,8 +120,27 @@
       },
       tonext() {
         if (!this.validation()) return;
-        this.$bus.$emit('createQues', this.form, this.filename);
-        this.$emit('tonext');
+        let toast = this.$toast.loading({
+          message: '创建题库中',
+          forbidClick: true,
+          duration: 0,
+        })
+        let ques = deepClone(this.form);
+        ques.icon = this.filename;
+        this.createQuesBank(ques).then(res => {
+          console.log(res)
+          toast.clear()
+          this.$toast.success({
+            message: '创建成功',
+            duration: 1,
+            onClose: () => {
+              this.$emit('tonext');
+            }
+          })
+        }).catch(() => {
+          toast.clear()
+          this.$toast('系统好像出现了一些异常，请稍后再试~');
+        })
       },
       async changeToCls(flag) {
         if (!this.isTea) return;

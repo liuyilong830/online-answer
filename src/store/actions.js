@@ -8,6 +8,7 @@ import game from "@/api/game";
 import {
   initUserInfo,
   initDanList,
+  setCreatedQuesId,
 } from './mutation-types';
 const actions = {
   async isExistPhone(ctx, phone) {
@@ -75,8 +76,10 @@ const actions = {
   async getCreatedCls() {
     return await profile.getCreatedCls();
   },
-  async createQuesBank(ctx, info) {
-    return await questions.createQuesBank(info);
+  async createQuesBank({commit}, info) {
+    let res = await questions.createQuesBank(info);
+    commit(setCreatedQuesId, res.data.qid);
+    return res;
   },
   async createTimus(ctx, {quesid, list}) {
     return await questions.createTimus(quesid, list);
@@ -233,6 +236,23 @@ const actions = {
   receiveIntegral(ctx, {id, num}) {
     if (!id) return;
     return game.receiveIntegral(id, num);
+  },
+  insertTypeTimu(ctx, {type, timu}) {
+    if (!type || !timu) return;
+    return game.insertTypeTimu(type, timu);
+  },
+  collectQuesAndTimu(ctx, {type, qid, timuid}) {
+    if (!type || !qid || !timuid) return;
+    return game.collectQuesAndTimu(type, qid, timuid);
+  },
+  updateTypeTimu(ctx, info) {
+    return game.updateTypeTimu(info);
+  },
+  deleteTypeTimu(ctx, {type, id}) {
+    return game.deleteTypeTimu(type, id);
+  },
+  queryQuesTimus(ctx, payload) {
+    return game.queryQuesTimus(payload);
   },
 }
 

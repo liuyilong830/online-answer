@@ -18,4 +18,10 @@ export default {
   setUserAboutGame: (info) => Request.patch('/game/user/aboutgame', info, true),
   getMyRewards: () => Request.get('/game/myrewards', {}, true),
   receiveIntegral: (id, num) => Request.post('/game/receive/integral', {id, num}, true),
+  insertTypeTimu: (type, timu) => Request.put('/game/insert/typetimu', { type, timu}, true),
+  collectQuesAndTimu: (type, qid, timuid) => Request.put('/game/collect/quesandtimu', {type, qid, timuid}, true),
+  updateTypeTimu: (info) => Request.patch('/game/update/typetimu', info, true),
+  deleteTypeTimu: (type, id) => Request.delete('/game/delete/typetimu', {type, id}, true),
+  queryQuesTimus: (paylaod) => Request.get('/game/ques_typetimu', paylaod),
+
 }

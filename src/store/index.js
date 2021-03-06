@@ -13,6 +13,7 @@ const state = {
   ques: null, // 当前正在测试的题库id
   quesDetail: null, // 题库详情页信息
   danlist: [], // 段位列表
+  createdQuesId: null, // 当前正在创建的题库id
 }
 
 export default new Vuex.Store({

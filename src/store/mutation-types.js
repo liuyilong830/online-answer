@@ -7,3 +7,4 @@ export const resetDetailInfo = 'resetDetailInfo';
 export const totestQuest = 'totestQuest';
 export const quesDetailInfo = 'quesDetailInfo';
 export const initDanList = 'initDanList';
+export const setCreatedQuesId = 'setCreatedQuesId';
