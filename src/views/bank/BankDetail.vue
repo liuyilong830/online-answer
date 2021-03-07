@@ -94,7 +94,7 @@
         </div>
       </div>
     </popup>
-    <model-box1 v-model="iscreate">
+    <model-box1 @closed="beforeCloseCreate" v-model="iscreate">
       <timu-form :type="createtype" @success="onsuccess"/>
     </model-box1>
     <model-box1 v-model="isupdate">
@@ -217,10 +217,10 @@
         return this.getUid === this.detail.uid;
       },
       getType() {
-        let { options, res } = this.timuinfo;
-        return options.length ? (
-          res.length < 2 ? 'singles' : 'multis'
-        ) : 'fills';
+        let { res_count, res_json } = this.timuinfo;
+        return res_json ? 'fills' : (
+            res_count ? 'multis' : 'singles'
+        )
       },
       getArr() {
         let type = this.getType;
@@ -239,6 +239,7 @@
         'deleteTimu',
         'getRankListUser',
         'setQuestOpt',
+        'deleteTypeTimu',
       ]),
       toclose() {
         this.box1.toclose();
@@ -301,21 +302,46 @@
             this.getTitlesRect();
           })
         }
+        this.isinfo = false;
+        this.timuinfo = {};
       },
       todelete() {
         this.vaildator(() => {
           Dialog.confirm({
             message: '您确定删除该题目吗?'
           }).then(() => {
-            let { tid, quesid } = this.timuinfo;
-            this.asyncDeleteTimu(tid, quesid, () => {
+            let type = this.getType.slice(0, this.getType.length-1);
+            let { tid } = this.timuinfo;
+            this.deleteTypeTimu({
+              type,
+              id: tid,
+            }).then(() => {
+              let arr = this.getArr;
+              let index = arr.findIndex(tm => tm.tid === tid);
+              if (index > -1) {
+                this.$toast.success({
+                  message: '删除成功',
+                  duration: 500,
+                  onClose: () => this.$refs.popup.closePopup()
+                })
+                arr.splice(index, 1);
+              }
               if (!this.getArr.length && !this.timus[this.getType].finished) {
-                return this.tomore(this.getType);
+                let qid = this.detail.qid;
+                let { start, limit } = this.timus[this.getType];
+                if (type === 'single') {
+                  this.asyncQuerySingles(qid, start, limit)
+                } else if (type === 'multi') {
+                  this.asyncQueryMultis(qid, start, limit)
+                } else if (type === 'fill') {
+                  this.asyncQueryFills(qid, start, limit)
+                }
+                return;
               }
               this.$nextTick(() => {
                 this.getTitlesRect();
               })
-            });
+            })
           }, () => {})
         }, {
           reject: () => {}
@@ -395,18 +421,14 @@
           duration: 0
         });
       },
-      async asyncQueryTimus(qid, start = 0, limit = 10) {
-
-        let res = await this.queryQuesTimus({qid, start, limit});
-        if (res.status === 200 && res.data) {
-          this.types.forEach(type => {
-            let arr = res.data[type];
-            this.timus[type] = new Template(type, arr, arr.length, limit, arr.length < limit);
-          })
-          this.$nextTick(() => {
-            this.getTitlesRect()
-          })
-        }
+      beforeCloseCreate() {
+        this.timus.singles.finished = false;
+        this.timus.multis.finished = false;
+        this.timus.fills.finished = false;
+        let qid = this.detail.qid;
+        this.asyncQuerySingles(qid, this.timus.singles.start, this.timus.singles.limit);
+        this.asyncQueryMultis(qid, this.timus.multis.start, this.timus.multis.limit);
+        this.asyncQueryFills(qid, this.timus.fills.start, this.timus.fills.limit);
       },
       async asyncQuerySingles(qid, start = 0, limit = 10) {
         try {
@@ -416,6 +438,9 @@
           }
           this.timus.singles.singles.push(...res.data);
           this.timus.singles.start += res.data.length;
+          this.$nextTick(() => {
+            this.getTitlesRect()
+          })
         } catch (e) {
           this.$toast('系统出现异常，请稍后再试')
         }
@@ -428,6 +453,9 @@
           }
           this.timus.multis.multis.push(...res.data);
           this.timus.multis.start += res.data.length;
+          this.$nextTick(() => {
+            this.getTitlesRect()
+          })
         } catch (e) {
           this.$toast('系统出现异常，请稍后再试')
         }
@@ -440,6 +468,9 @@
           }
           this.timus.fills.fills.push(...res.data);
           this.timus.fills.start += res.data.length;
+          this.$nextTick(() => {
+            this.getTitlesRect()
+          })
         } catch (e) {
           this.$toast('系统出现异常，请稍后再试')
         }
@@ -498,22 +529,6 @@
           if (func && typeof func === 'function') func();
         }
       },
-      async asyncDeleteTimu(tid, quesid, func) {
-        let res = await this.deleteTimu({tid, quesid});
-        if (res.status === 200) {
-          let arr = this.getArr;
-          let index = arr.findIndex(tm => tm.tid === tid);
-          if (index > -1) {
-            this.$toast.success({
-              message: '创建成功',
-              duration: 500,
-              onClose: () => this.$refs.popup.closePopup()
-            })
-            arr.splice(index, 1);
-            if (func && typeof func === 'function') func();
-          }
-        }
-      },
       async asyncQueryRanklist(quesid, cb) {
         let res = await this.getRankListUser(quesid);
         let { status, data: arr } = res;
@@ -551,7 +566,6 @@
       this.init();
       this.quesDetailInfo(this.detail);
       let qid = this.detail.qid;
-      // this.asyncQueryTimus(qid, 0, 3);
       this.asyncQueryAboutuser(qid);
       this.asyncQueryRanklist(qid);
 

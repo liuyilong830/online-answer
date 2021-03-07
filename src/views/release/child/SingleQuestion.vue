@@ -85,6 +85,10 @@
       ismultis: {
         type: Boolean,
         default: false
+      },
+      isedit: {
+        type: Boolean,
+        default: false,
       }
     },
     computed: {

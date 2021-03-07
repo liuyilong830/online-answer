@@ -5,14 +5,12 @@
         <span @click.stop="toclose">取消</span>
       </template>
       <div class="create-title">创建{{title}}</div>
-      <template #right>
-        <button :class="btnCls" @click.stop="createData">创建</button>
-      </template>
+      <template #right><i></i></template>
     </nav-bar>
     <div class="form-content">
-      <single-question v-if="type === 'singles'" :ismultis="false" :created="singles"/>
-      <single-question v-else-if="type === 'multis'" :created="multis"/>
-      <short-answer-question v-else-if="type === 'shortanswers'" :created="shortanswers"/>
+      <create-type-timu-form v-if="type === 'singles'" issingle/>
+      <create-type-timu-form v-else-if="type === 'multis'" ismulti/>
+      <create-type-timu-form v-else-if="type === 'fills'" isfill/>
     </div>
   </div>
 </template>
@@ -21,20 +19,22 @@
   import NavBar from "../../nav-bar/NavBar";
   import SingleQuestion from "../../../views/release/child/SingleQuestion";
   import ShortAnswerQuestion from "../../../views/release/child/ShortAnswerQuestion";
+  import CreateTypeTimuForm from "@/components/content/form/CreateTypeTimuForm";
   import { deepClone } from '../../../util/util';
-  const types = new Map([['singles', '单选题'], ['multis', '多选题'], ['shortanswers', '简答题']]);
+  const types = new Map([['singles', '单选题'], ['multis', '多选题'], ['fills', '填空题']]);
   export default {
     name: "TimuForm",
     components: {
       NavBar,
       SingleQuestion,
       ShortAnswerQuestion,
+      CreateTypeTimuForm,
     },
     data() {
       return {
         singles: [],
         multis: [],
-        shortanswers: [],
+        fills: [],
       }
     },
     inject: ['box1'],
@@ -65,12 +65,6 @@
       toclose() {
         this.box1.toclose();
       },
-      createData() {
-        if (this.btnCls.length < 2) return;
-        this.$emit('success', deepClone(this[this.type]), () => {
-          this.toclose();
-        });
-      },
     },
   }
 </script>
@@ -80,6 +74,8 @@
     height: 100%;
     box-sizing: border-box;
     padding: 0 10px 5px;
+    display: flex;
+    flex-direction: column;
     .create-title {
       height: 100%;
       display: flex;
@@ -98,7 +94,7 @@
       }
     }
     .form-content {
-      height: calc(100% - 55px);
+      flex: 1;
       overflow: hidden;
     }
   }

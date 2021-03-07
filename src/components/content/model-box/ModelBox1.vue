@@ -1,5 +1,5 @@
 <template>
-  <transition name="box2" @afterEnter="enterd" @beforeLeave="closed">
+  <transition name="box2" @afterEnter="enterd" @beforeLeave="closed" @after-leave="afterLeave">
     <div class="model-box2" v-if="value" :style="zindexStyle">
       <slot></slot>
     </div>
@@ -28,10 +28,13 @@
         this.$emit('enterd');
       },
       closed() {
-        this.$emit('closed');
+        this.$emit('beforeClose');
       },
       toclose() {
         this.$emit('input', false);
+      },
+      afterLeave() {
+        this.$emit('closed');
       },
     },
     mounted() {

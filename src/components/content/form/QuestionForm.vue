@@ -15,27 +15,16 @@
     <div class="single">
       <div class="editor">
         <div class="mask" v-show="disable && curr !== maxLen">
-          <div class="iconfont icon-suo"></div>
+          <div class="iconfont icon-suo" @click.self="checkDisable"></div>
         </div>
         <div class="single-content">
           <slot></slot>
         </div>
       </div>
       <div class="btns">
-        <template v-if="curr === maxLen">
-          <button :class="{disable: prevFormDisable}" @click="toprevForm">上一个</button>
-          <button @click="onsubmit">提交</button>
-        </template>
-        <template v-else-if="disable">
-          <button :class="{disable: prevFormDisable}" @click="toprevForm">上一个</button>
-          <button @click="tomodify">修改</button>
-          <button @click="todelete">删除</button>
-          <button @click="tonextForm">下一个</button>
-        </template>
-        <template v-else-if="!disable">
-          <button @click="toupdate">更新</button>
-          <button @click="todelete">删除</button>
-        </template>
+        <button :class="{disable: prevFormDisable}" @click="toprevForm">上一个</button>
+        <button v-if="curr < maxLen" @click="todelete">删除</button>
+        <button :class="{disable: maxLen === curr}" @click="tonextForm">下一个</button>
       </div>
     </div>
   </div>
@@ -45,9 +34,7 @@
   export default {
     name: "QuestionForm",
     data() {
-      return {
-        disable: false,
-      }
+      return {}
     },
     props: {
       value: Boolean,
@@ -56,6 +43,7 @@
         default: 0
       },
       curr: Number,
+      disable: Boolean,
     },
     computed: {
       formatCurr() {
@@ -71,6 +59,13 @@
       maxLen() {
         return this.len + 1;
       },
+    },
+    watch: {
+      curr(val) {
+        if (val < this.maxLen) {
+          this.$emit('update:disable', true);
+        }
+      }
     },
     methods: {
       toMore() {
@@ -91,23 +86,15 @@
       },
       setForm() {
         this.$nextTick(() => {
-          this.disable = true;
           this.$emit('setForm', this.curr);
         })
-      },
-      tomodify() {
-        this.disable = false;
-      },
-      toupdate() {
-        this.$emit('toupdate', this.curr);
-        this.disable = true;
       },
       todelete() {
         this.$emit('todelete', this.curr);
       },
-      onsubmit() {
-        this.$emit('onsubmit');
-      },
+      checkDisable() {
+        this.$emit('update:disable', false);
+      }
     },
     mounted() {
       document.body.addEventListener('click', () => {
