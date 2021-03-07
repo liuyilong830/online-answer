@@ -61,12 +61,9 @@
       issingle: Boolean,
       ismulti: Boolean,
       isfill: Boolean,
+      qid: Number,
     },
     computed: {
-      ...mapGetters(['getQuesDetail']),
-      qid() {
-        return this.getQuesDetail.qid;
-      },
       len() {
         return this.created.length;
       },

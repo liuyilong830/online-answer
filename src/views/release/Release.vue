@@ -9,15 +9,18 @@
       <static-swipe ref="swipe" v-model="curr">
         <static-swipe-item><questions-create @tonext="tonext"/></static-swipe-item>
         <static-swipe-item>
-          <operation @tonext="tonext"><single-question/></operation>
+          <operation @tonext="tonext">
+            <create-type-timu-form :qid="qid" issingle />
+          </operation>
         </static-swipe-item>
         <static-swipe-item>
-          <operation @tonext="tonext"><single-question ismultis/></operation>
+          <operation @tonext="tonext">
+            <create-type-timu-form :qid="qid" ismulti />
+          </operation>
         </static-swipe-item>
         <static-swipe-item>
-          <fills-create/>
+          <create-type-timu-form :qid="qid" isfill />
         </static-swipe-item>
-        <static-swipe-item><finish-question/></static-swipe-item>
       </static-swipe>
     </div>
   </div>
@@ -31,7 +34,9 @@
   import StaticSwipe from "../../components/content/static-swipe/StaticSwipe";
   import StaticSwipeItem from "../../components/content/static-swipe/StaticSwipeItem";
   import Operation from "./child/Operation";
+  import CreateTypeTimuForm from "@/components/content/form/CreateTypeTimuForm";
   import onlyZIndex from '../../util/mixins/zindex';
+  import {mapGetters} from "vuex";
   const titles = ['创建题库', '创建单选题', '创建多选题', '创建填空题'];
   export default {
     name: "Release",
@@ -43,6 +48,7 @@
       StaticSwipeItem,
       Operation,
       FillsCreate,
+      CreateTypeTimuForm,
     },
     mixins: [onlyZIndex],
     inject: {
@@ -65,6 +71,10 @@
       }
     },
     computed: {
+      ...mapGetters(['createdQuesId']),
+      qid() {
+        return this.createdQuesId;
+      },
       navbarStyle() {
         return {
           borderBottom: '0px',

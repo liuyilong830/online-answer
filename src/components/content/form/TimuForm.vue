@@ -8,9 +8,9 @@
       <template #right><i></i></template>
     </nav-bar>
     <div class="form-content">
-      <create-type-timu-form v-if="type === 'singles'" issingle/>
-      <create-type-timu-form v-else-if="type === 'multis'" ismulti/>
-      <create-type-timu-form v-else-if="type === 'fills'" isfill/>
+      <create-type-timu-form v-if="type === 'singles'" issingle :qid="qid" />
+      <create-type-timu-form v-else-if="type === 'multis'" ismulti :qid="qid" />
+      <create-type-timu-form v-else-if="type === 'fills'" isfill :qid="qid" />
     </div>
   </div>
 </template>
@@ -20,7 +20,7 @@
   import SingleQuestion from "../../../views/release/child/SingleQuestion";
   import ShortAnswerQuestion from "../../../views/release/child/ShortAnswerQuestion";
   import CreateTypeTimuForm from "@/components/content/form/CreateTypeTimuForm";
-  import { deepClone } from '../../../util/util';
+  import {mapGetters} from "vuex";
   const types = new Map([['singles', '单选题'], ['multis', '多选题'], ['fills', '填空题']]);
   export default {
     name: "TimuForm",
@@ -42,6 +42,10 @@
       type: String,
     },
     computed: {
+      ...mapGetters(['getQuesDetail']),
+      qid() {
+        return this.getQuesDetail.qid;
+      },
       navbarStyle() {
         return {
           backgroundColor: 'transparent',
